@@ -332,50 +332,6 @@ namespace Parser.Grammar
             }
         }
 
-        ///// <summary>
-        ///// Creates transitions from the given currentSets and records them in the table.
-        ///// </summary>
-        ///// <param name="table"></param>
-        ///// <param name="currentSets"></param>
-        //private void createTransitions(ParseTable<T> table, ref int currentStateIndex, IEnumerable<IEnumerable<LRItem<T>>> currentSets)
-        //{
-        //    List<IEnumerable<LRItem<T>>> existingSets = new List<IEnumerable<LRItem<T>>>();
-        //    if(currentSets != null)
-        //    {
-        //        existingSets.AddRange(currentSets);
-        //    }
-
-        //    foreach(var eSet in existingSets)
-        //    {
-        //        var nextElements = eSet.Select(a => a.GetNextElement()).Where(a => a != null).DistinctBy(a => a.ToString()).ToArray();
-        //        foreach(var element in nextElements)
-        //        {
-        //            List<LRItem<T>> state = new List<LRItem<T>>();
-        //            state.AddRange(eSet.Where(a =>
-        //            {
-        //                GrammarElement<T> e = a.GetNextElement();
-        //                if(e != null)
-        //                {
-        //                    return e.Equals(element);
-        //                }
-        //                return false;
-        //            }).Select(a => a.Copy()));
-
-        //            if(element is Terminal<T>)
-        //            {
-        //                if(eSet.Any(a => a.IsAtEndOfProduction() && a.
-        //                //add to action table
-        //                table.ActionTable.Add(currentStateIndex, (Terminal<T>)element, new ParseTable<T>.ShiftAction(table, currentStateIndex++));
-        //            }
-        //            else
-        //            {
-        //                //add to goto table
-        //                table.GotoTable.Add(currentStateIndex, (NonTerminal<T>)element, currentStateIndex++);
-        //            }
-        //        }
-        //    }
-        //}
-
         /// <summary>
         /// Creates the first state.
         /// </summary>
@@ -399,6 +355,7 @@ namespace Parser.Grammar
         /// Creates a complete list of LR(1) states from the Context Free Grammar.
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Use CreateStateGraph()")]
         public IEnumerable<IEnumerable<LRItem<T>>> CreateAllStates()
         {
             IEnumerable<IEnumerable<LRItem<T>>> allStates = CreateAllStates(CreateFirstState());
@@ -411,6 +368,7 @@ namespace Parser.Grammar
         /// </summary>
         /// <param name="startState"></param>
         /// <returns></returns>
+        [Obsolete("Use CreateStateGraph(Graph)")]
         public IEnumerable<IEnumerable<LRItem<T>>> CreateAllStates(IEnumerable<LRItem<T>> startState)
         {
             HashSet<IEnumerable<LRItem<T>>> states = new HashSet<IEnumerable<LRItem<T>>>();
@@ -427,102 +385,15 @@ namespace Parser.Grammar
         }
 
         /// <summary>
-        /// Creates a parse table from the given state using currentSets to determine if a newly created set is unique.
-        /// </summary>
-        /// <param name="state"></param>
-        /// <param name="currentStates"></param>
-        /// <returns></returns>
-        //public ParseTable<GrammarElement<T>> CreateStates(IEnumerable<LRItem<T>> state, IEnumerable<IEnumerable<LRItem<T>>> currentStates = null)
-        //{
-        //    ParseTable<GrammarElement<T>> table = new ParseTable<GrammarElement<T>>();
-
-        //    List<IEnumerable<LRItem<T>>> existingSets = new List<IEnumerable<LRItem<T>>>();
-        //    if(state != null)
-        //    {
-        //        existingSets.Add(state);
-        //    }
-        //    if(currentStates != null)
-        //    {
-        //        existingSets.AddRange(currentStates);
-        //    }
-
-        //    List<IEnumerable<LRItem<T>>> newSets = new List<IEnumerable<LRItem<T>>>();
-
-        //    //for each of the already existing sets
-        //    foreach (IEnumerable<LRItem<T>> eSet in existingSets)
-        //    {
-        //        //add a new set for each element appearing after a '•'
-        //        IEnumerable<GrammarElement<T>> nextElements = eSet.Select(e => e.GetNextElement()).Where(e => e != null).DistinctBy(a => a.ToString()).ToArray();
-        //        foreach (GrammarElement<T> next in nextElements)
-        //        {
-        //            List<LRItem<T>> items = new List<LRItem<T>>();
-
-        //            //add a new set of elements from the existing elements
-        //            items.AddRange(eSet.Where(i =>
-        //            {
-        //                GrammarElement<T> e = i.GetNextElement();
-        //                if (e != null)
-        //                {
-        //                    return e.Equals(next);
-        //                }
-        //                return false;
-        //            }).Select(i => i.Copy()));
-
-        //            //shift all of the • indexes
-        //            items.ForEach(i => i.DotIndex++);
-
-        //            //add the closure
-        //            IEnumerable<LRItem<T>> closure = items.Select(a => LR1Closure(a)).SelectMany(a => a).Distinct().ToArray();
-
-        //            items.AddRange(closure);
-
-        //            if (newSets.All(a => !a.SequenceEqual(items)) && existingSets.All(a => !a.SequenceEqual(items)))
-        //            {
-        //                newSets.Add(items);
-        //            }
-        //        }
-        //    }
-
-        //    var totalSets = newSets.Union(existingSets);
-
-        //    if (newSets.Count > 0)
-        //    {
-        //        return CreateStates(null, totalSets);
-        //    }
-        //    else
-        //    {
-        //        return totalSets;
-        //    }
-        //}
-
-        /// <summary>
         /// Creates a list of LRItem(1) sets(coresponding to states) from the given set using currentSets to determine if a newly created set is unique. 
         /// </summary>
         /// <param name="state">The state to create new states from.</param>
         /// <param name="currentStates">The current states that have already been created.</param>
         /// <returns></returns>
+        [Obsolete("Use CreateTransitions(graph)")]
         public IEnumerable<IEnumerable<LRItem<T>>> CreateStates(IEnumerable<LRItem<T>> state, IEnumerable<IEnumerable<LRItem<T>>> currentStates = null)
         {
             ParseTable<T> table = new ParseTable<T>();
-
-            //HashSet<IEnumerable<LRItem<T>>> newSets = new HashSet<IEnumerable<LRItem<T>>>();
-
-            //List<IEnumerable<LRItem<T>>> distinctSets = new List<IEnumerable<LRItem<T>>>();
-
-            //if (currentStates != null)
-            //{
-            //foreach (var s in currentStates)
-            //{
-            //    newSets.Add(s);
-            //}
-            //distinctSets.AddRange(currentStates);
-            //}
-
-            //newSets.Add(state.Select(a => new LRItem<T>(a.DotIndex, a)));
-
-            //distinctSets.Add(state.Select(a => new LRItem<T>(a.DotIndex, a)));
-
-            //List<LRItem<T>> items = new List<LRItem<T>>();
 
             List<IEnumerable<LRItem<T>>> existingSets = new List<IEnumerable<LRItem<T>>>();
             if (state != null)
@@ -540,8 +411,6 @@ namespace Parser.Grammar
             //i is the current state
             for (int i = 0; i < existingSets.Count; i++)
             {
-
-
                 //add a new set for each element appearing after a '•'
                 IEnumerable<GrammarElement<T>> nextElements = existingSets[i].Select(e => e.GetNextElement()).Where(e => e != null).DistinctBy(a => a.ToString()).ToArray();
                 foreach (GrammarElement<T> next in nextElements)
@@ -570,9 +439,7 @@ namespace Parser.Grammar
                     //if the state does not already exist
                     if (newSets.All(a => !a.SequenceEqual(items)) && existingSets.All(a => !a.SequenceEqual(items)))
                     {
-
                         //add the state transition to the parse table
-
 
                         //add/create the new state.
                         newSets.Add(items);
@@ -590,48 +457,6 @@ namespace Parser.Grammar
             {
                 return totalSets;
             }
-
-            ////create a new item set for each element apearing after a '•'
-            //var nextElements = state.Select(b => b.GetNextElement()).Where(a => a != null).GroupBy(a => a.ToString()).Select(a => a.First()).ToArray();
-            //foreach (var next in nextElements)
-            //{
-            //    //create a new set
-            //    items = new List<LRItem<T>>();
-            //    //add existing elements
-            //    items.AddRange(distinctSets.SelectMany(s => s.Where(a =>
-            //    {
-            //        GrammarElement<T> e = a.GetNextElement();
-            //        if (e != null)
-            //        {
-            //            return e.Equals(next);
-            //        }
-            //        return false;
-            //    })));
-            //    distinctSets.Add(items.Select(a => new LRItem<T>(a.DotIndex, a)).Distinct(LRItem<T>.Comparer).ToArray());
-            //    //add a new set of items from the old set, shifting the dots(•) over 1 space
-            //    items.ForEach(i => i.DotIndex++);
-
-
-
-            //    //add the closure
-            //    items.AddRange(CreateLR1Set(Closure(items.First())));
-
-            //    newSets.Add(items.Distinct(LRItem<T>.Comparer));
-            //}
-
-            ////add all of the states of the newly created states
-            //foreach (var s in newSets.ToArray())
-            //{
-            //    IEnumerable<IEnumerable<LRItem<T>>> states = CreateStates(s, newSets);
-
-            //    //add the states to new sets
-            //    foreach (var a in states)
-            //    {
-            //        newSets.Add(a);
-            //    }
-            //}
-            //newSets.Add(state);
-            //return newSets;
         }
 
         /// <summary>
