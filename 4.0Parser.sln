@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4.0Parser", "4.0Parser\4.0Parser.csproj", "{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{7BF0258E-F67B-45FE-9710-83955ACD4CF2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|x86.ActiveCfg = Debug|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|x86.Build.0 = Debug|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|Any CPU.ActiveCfg = Release|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|x86.ActiveCfg = Release|x86
+		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|x86.Build.0 = Release|x86
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
