@@ -162,6 +162,13 @@ namespace Parser
             return false;
         }
 
+        /// <summary>
+        /// Returns whether a node is contained by this node(and linked "from" nodes).
+        /// </summary>
+        /// <param name="comparer"></param>
+        /// <param name="currentLoop"></param>
+        /// <param name="maxLoop"></param>
+        /// <returns></returns>
         private bool containsFromTransition(Predicate<StateNode<TKey, T>> comparer, ref int currentLoop, int maxLoop)
         {
             //if it is not contained
