@@ -210,7 +210,7 @@ namespace _4._0Parser
 
             var c = grammar.Closure(grammar.Productions[0]);
 
-            grammar.CreateParseTable();
+            grammar.CreateStateGraph();
             w.Stop();
 
         }

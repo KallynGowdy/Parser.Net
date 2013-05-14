@@ -67,7 +67,23 @@ namespace Parser.Grammar
             private set;
         }
 
-        public IEnumerable<LRItem<T>> LR1Closure(LRItem<T> item, IEnumerable<LRItem<T>> currentItems = null)
+        /// <summary>
+        /// Gets the LR(1) closure of the given item.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public IEnumerable<LRItem<T>> LR1Closure(LRItem<T> item)
+        {
+            return lr1Closure(item, null);
+        }
+
+        /// <summary>
+        /// Gets the LR(1) closure of the given item, using currentItems to filter out duplicates.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="currentItems"></param>
+        /// <returns></returns>
+        private IEnumerable<LRItem<T>> lr1Closure(LRItem<T> item, IEnumerable<LRItem<T>> currentItems)
         {
             List<LRItem<T>> items;
 
@@ -79,7 +95,6 @@ namespace Parser.Grammar
                 items.AddRange(currentItems);
             }
 
-
             GrammarElement<T> nextElement;
 
             //if the next element is a non terminal
@@ -87,12 +102,6 @@ namespace Parser.Grammar
             {
                 //get all of the productions whose LHS equals the next element
                 var productions = this.Productions.Where(a => a.NonTerminal.Equals(nextElement));
-
-                //filter out existing productions
-                //if (currentItems != null)
-                //{
-                //    productions = productions.Where(a => !currentItems.Any(i => i.LeftHandSide.Equals(a.NonTerminal)));
-                //}
 
                 //for each of the possible following elements of item
                 foreach (Terminal<T> l in Follow(item))
@@ -111,20 +120,10 @@ namespace Parser.Grammar
                             //add the new item(but make sure it is not a duplicate
                             items.Add(newItem);
                             //add the LR1 closure of the new item
-                            items = items.Union(LR1Closure(newItem, items)).ToList();
+                            items = items.Union(lr1Closure(newItem, items)).ToList();
                         }
                     }
                 }
-
-                //items.AddRange(productions.Select(a => new LRItem<T>(0, a)));
-                //
-                //foreach (Production<T> p in productions)
-                //{
-                //    if (p.DerivedElements[0] is NonTerminal<T>)
-                //    {
-                //        items.AddRange(Closure(new LRItem<T>(0, p), items));
-                //    }
-                //}
             }
 
             return items.Distinct();
@@ -136,7 +135,18 @@ namespace Parser.Grammar
         /// <param name="item"></param>
         /// <param name="currentItems"></param>
         /// <returns></returns>
-        public IEnumerable<LRItem<T>> Closure(LRItem<T> item, IEnumerable<LRItem<T>> currentItems = null)
+        public IEnumerable<LRItem<T>> Closure(LRItem<T> item)
+        {
+            return closure(item, null);
+        }
+
+        /// <summary>
+        /// Gets a collection of LR(0) items that can be derived from the given item.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="currentItems"></param>
+        /// <returns></returns>
+        private IEnumerable<LRItem<T>> closure(LRItem<T> item, IEnumerable<LRItem<T>> currentItems)
         {
             List<LRItem<T>> items;
 
@@ -147,23 +157,27 @@ namespace Parser.Grammar
                 items.Add(item);
             }
 
+            //if the next item is a non terminal, get all of the productions of that non terminal
             if (item.GetNextElement() is NonTerminal<T>)
             {
                 var productions = this.Productions.Where(a => a.NonTerminal.Equals(item.GetNextElement()));
+
+                //remove duplicate productions
                 if (currentItems != null)
                 {
                     productions = productions.Where(a => !currentItems.Any(i => i.LeftHandSide.Equals(a.NonTerminal)));
                 }
 
 
-
+                //add the productions as LRItems
                 items.AddRange(productions.Select(a => new LRItem<T>(0, a)));
 
+                //add the closure of each found production
                 foreach (Production<T> p in productions)
                 {
                     if (p.DerivedElements[0] is NonTerminal<T>)
                     {
-                        items.AddRange(Closure(new LRItem<T>(0, p), items));
+                        items.AddRange(closure(new LRItem<T>(0, p), items));
                     }
                 }
             }
@@ -174,7 +188,6 @@ namespace Parser.Grammar
         /// <summary>
         /// Gets a collection of LR(0) items that be derived from the given production.
         /// </summary>
-        ///  
         /// <example>
         /// With Grammar:
         /// S -> A
@@ -240,166 +253,34 @@ namespace Parser.Grammar
             }
         }
 
-        //public void Create()
-        //{
-        //    //Steps to construct the DFA:
-        //    //1). Begin with the starting state
-        //    //2). For each state(item) 'A'[t] in the closure of S (where 't' is the lookahead):
-        //    //    A). Construct states(items) A -> a•w[t]
-
-        //    //Start by creating the first set by:
-        //    //1). Taking the closure of the starting element
-
-        //    //1). For each terminal and nonterminal symbol A appearing after a '•' in each already existing item set k, create a new item set m by adding
-        //    //    to m all the rules of k where the '•' is followed by A, but only if m will not be the same as an already existing item set after step 3
-        //    //
-        //    //2). Shift all the '•'s for each rule in the new item set one symbol to the right
-        //    //3). Create the closure of the new item set by:
-        //    //    A). Taking the closure of all of the items in the set and producing a distinct result.
-        //    //
-        //    //4). Repeat from step 1 for all newly created item sets, until no more new sets appear.
-
-        //    ////start with State S' with a lookahead of $
-        //    //LRItem<T> StartItem = new LRItem<T>(0, Productions[0], EndOfInputElement);
-
-        //    ////create the first set, this is the LR(0) version
-        //    //var firstSet = Closure(StartItem);
-
-        //    //HashSet<IEnumerable<LRItem<T>>> sets = new HashSet<IEnumerable<LRItem<T>>>();
-
-        //    //List<LRItem<T>> items = new List<LRItem<T>>();
-
-        //    ////compute the lookahead elements for each of the NonTerminals
-        //    ////and add a new item for each lookahead element.
-        //    ////foreach (NonTerminal<T> nt in NonTerminals)
-        //    ////{
-
-        //    ////add the starting item
-        //    //items.Add(new LRItem<T>(0, Productions[0], EndOfInputElement));
-
-        //    ////add the first set
-        //    //items.AddRange(LR1Closure(firstSet));
-
-        //    //List<LRItem<T>> lastSet = items;
-
-        //    //sets.Add(items);
-
-        //    ////List<List<LRItem<T>>> newSets = new List<List<LRItem<T>>>();
-
-        //    //var allStates = CreateAllStates(items);
-
-        //    //loop and add new sets
-        //    //while (true)
-        //    //{
-        //    //    HashSet<List<LRItem<T>>> newSets = new HashSet<List<LRItem<T>>>();
-        //    //    newSets.Add(new List<LRItem<T>>(lastSet.Select(a => new LRItem<T>(a.DotIndex, a))));
-
-        //    //    //for each terminal and nonterminal symbol that:
-        //    //    //1). Is after a '•'
-        //    //    //
-
-        //    //    var nextElements = newSets.SelectMany(a => a.Select(b => b.GetNextElement())).Distinct().ToArray();//.OrderBy(a => a.ToString()).Reverse();
-        //    //    foreach (var next in nextElements)
-        //    //    {
-        //    //        //create a new set
-        //    //        items = new List<LRItem<T>>();
-        //    //        //add existing elements
-        //    //        items.AddRange(newSets.SelectMany(s => s.Where(a =>
-        //    //        {
-        //    //            GrammarElement<T> e = a.GetNextElement();
-        //    //            if (e != null)
-        //    //            {
-        //    //                return e.Equals(next);
-        //    //            }
-        //    //            return false;
-        //    //        }).Distinct()));
-
-        //    //        newSets.Add(new List<LRItem<T>>(items.Select(a => new LRItem<T>(a.DotIndex, a)).Distinct()));
-        //    //        //shift all of the '•'s
-        //    //        items = items.Select(a => new LRItem<T>(a.DotIndex + 1, a)).ToList();
-
-
-
-        //    //        //add the closure
-        //    //        items.AddRange(CreateLR1Set(Closure(items.First())));
-
-        //    //        items = items.Distinct().ToList();
-
-        //    //        if (!sets.Add(items))
-        //    //        {
-        //    //            break;
-        //    //        }
-        //    //        else
-        //    //        {
-        //    //            lastSet = items;
-        //    //        }
-        //    //    }
-        //    //}
-
-        //    //var lookaheadElements = Follow(
-        //    ////for all of the items whose LHS equals nt
-        //    ////add a new item for each lookahead element
-        //    //var productions = firstSet.Where(a => a.LeftHandSide.Equals(nt));
-        //    //foreach (var p in productions)
-        //    //{
-        //    //    foreach (Terminal<T> t in lookaheadElements)
-        //    //    {
-        //    //        LRItem<T> i = new LRItem<T>(0, p);
-        //    //        i.LookaheadElement = t;
-        //    //        items.Add(i);
-        //    //    }
-        //    //}
-        //    //}
-        //}
-
         /// <summary>
-        /// Creates a parse table from the Context Free Grammar.
+        /// Creates a StateGraph that matches the DFA for this grammar.
         /// </summary>
         /// <returns></returns>
-        public ParseTable<GrammarElement<T>> CreateParseTable()
+        public StateGraph<GrammarElement<T>, LRItem<T>[]> CreateStateGraph()
         {
-            ParseTable<T> table = new ParseTable<T>();
-
-
-
             //Get the first state
             IEnumerable<LRItem<T>> firstState = CreateFirstState();
 
-            //IEnumerable<IEnumerable<LRItem<T>>> allStates = CreateAllStates(firstState);
-
-            //return null;
-
-            //int currentStateIndex = 0;
-
-            //var nextElements = firstState.Select(a => a.GetNextElement()).Where(a => a != null).DistinctBy(a => a.ToString()).ToArray();
-            //foreach(var element in nextElements)
-            //{
-            //    //create a new state with a transition in the table
-            //    List<LRItem<T>> state = new List<LRItem<T>>();
-            //    state.AddRange(firstState.Where(a =>
-            //    {
-            //        GrammarElement<T> e = a.GetNextElement();
-            //        if(e != null)
-            //        {
-            //            return e.Equals(element);
-            //        }
-            //        return false;
-            //    }).Select(a => a.Copy()));
-            //}
-
+            //create the graph
             StateGraph<GrammarElement<T>, LRItem<T>[]> graph = new StateGraph<GrammarElement<T>, LRItem<T>[]>();
             graph.Root = new StateNode<GrammarElement<T>, LRItem<T>[]>(firstState.ToArray(), graph);
-            CreateTransitions(graph);
 
-            return null;
+            //create the transitions for the graph
+            CreateTransitions(graph);
+            return graph;
         }
 
+        /// <summary>
+        /// Creates transitions that match the DFA for this grammar from the root of the graph until no more transitions can be made. 
+        /// </summary>
+        /// <param name="graph"></param>
         public void CreateTransitions(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
         {
-            CreateTransitions(graph.Root);
+            createTransitions(graph.Root);
         }
 
-        public void CreateTransitions(StateNode<GrammarElement<T>, LRItem<T>[]> startingNode)
+        private void createTransitions(StateNode<GrammarElement<T>, LRItem<T>[]> startingNode)
         {
             //List<IEnumerable<LRItem<T>>> existingSets = new List<IEnumerable<LRItem<T>>>(startingNode.FromTransitions.Select(a => a.Value.Value));
 
@@ -426,12 +307,8 @@ namespace Parser.Grammar
 
                 state.AddRange(closure);
 
-
-
                 //get an already existing transition
                 StateNode<GrammarElement<T>, LRItem<T>[]> node = startingNode.Graph.Root.GetFromTransition(a => a.Value.SequenceEqual(state));
-
-
 
                 if (node == null)
                 {
@@ -449,7 +326,7 @@ namespace Parser.Grammar
                 {
                     //add the state transition
                     startingNode.AddTransition(next, node);
-                    CreateTransitions(node);
+                    createTransitions(node);
                 }
 
             }
@@ -514,7 +391,7 @@ namespace Parser.Grammar
             firstState.Add(startingItem);
 
             //get the rest of the first state
-            firstState.AddRange(LR1Closure(startingItem, null));
+            firstState.AddRange(lr1Closure(startingItem, null));
             return firstState;
         }
 
@@ -780,6 +657,8 @@ namespace Parser.Grammar
         /// T ->  T + n
         /// 
         /// Follow(S -> •E) : {$}
+        /// Follow(T -> •+ T) : {'+', 'n'}
+        /// Follow(T -> •n, ')') : {')'}
         /// </example>
         /// <param name="nonTerminal"></param>
         /// <returns></returns>
@@ -838,6 +717,18 @@ namespace Parser.Grammar
         /// If element is a Terminal, then First(element) : {element}. Otherwise if element is a NonTerminal,
         /// then First(element) : {set of first terminal elements matching the productions of element}.
         /// </summary>
+        /// <example>
+        /// With Grammar:
+        /// E -> T
+        /// E -> ( E )
+        /// T -> n
+        /// T -> + T
+        /// T -> T + n
+        /// 
+        /// FIRST(E): {'n', '+', '('}
+        /// 
+        /// FIRST(T): {'n', '+'}
+        /// </example>
         /// <param name="element"></param>
         /// <returns></returns>
         public IEnumerable<Terminal<T>> First(GrammarElement<T> element)
@@ -856,7 +747,6 @@ namespace Parser.Grammar
         /// Gets the collection of Terminal elements that can appear as the first element
         /// matching to the given production.
         /// </summary>
-        /// 
         /// <example>
         /// With Grammar:
         /// S -> A
@@ -1023,6 +913,11 @@ namespace Parser.Grammar
             return firstElements.Distinct();
         }
 
+        /// <summary>
+        /// Creates a new CFG given the starting non-terminal, and productions.
+        /// </summary>
+        /// <param name="startingElement"></param>
+        /// <param name="productions"></param>
         public ContextFreeGrammar(NonTerminal<T> startingElement, IEnumerable<Production<T>> productions)
         {
             //add the production S -> startingElement
@@ -1034,6 +929,12 @@ namespace Parser.Grammar
             Closure(Productions[0]);
         }
 
+        /// <summary>
+        /// Creates a new CFG given the starting non-terminal, end of input terminal, and productions.
+        /// </summary>
+        /// <param name="startingElement"></param>
+        /// <param name="endOfInput"></param>
+        /// <param name="productions"></param>
         public ContextFreeGrammar(NonTerminal<T> startingElement, Terminal<T> endOfInput, IEnumerable<Production<T>> productions)
         {
             this.startElement = new NonTerminal<T>("S'");
