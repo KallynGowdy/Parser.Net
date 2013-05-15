@@ -58,9 +58,7 @@
     <Compile Include="Grammar\Terminal.cs" />
     <Compile Include="ICodeElement.cs" />
     <Compile Include="LexicalAnalysis\Lexer.cs" />
-    <Compile Include="ParseAction.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="ParseTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StateGraph.cs" />
     <Compile Include="StateNode.cs" />

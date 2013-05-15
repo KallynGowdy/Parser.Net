@@ -100,7 +100,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Defines a table that maps states(int) and Tokens(T) to Actions(Action(state, token)). This property is read only.
         /// </summary>
-        public Table<int, Terminal<T>, ParserAction> ActionTable
+        public Table<int, Terminal<T>, List<ParserAction>> ActionTable
         {
             get;
             private set;
@@ -109,65 +109,75 @@ namespace Parser.StateMachine
         /// <summary>
         /// Defines a table that maps states(int) and Tokens(T) to the next state(int). This property is read only.
         /// </summary>
-        public Table<int, NonTerminal<T>, int> GotoTable
+        public Table<int, NonTerminal<T>, int?> GotoTable
         {
             get;
             private set;
         }
 
-        /// <summary>
-        /// Adds a state to the table, relating Actions to terminals, and nonTerminals to gotos.
-        /// </summary>
-        /// <param name="actions"></param>
-        /// <param name="terminals"></param>
-        /// <param name="nonTerminals"></param>
-        /// <param name="gotos">The state to go to </param>
-        public void AddState(ParserAction[] actions, Terminal<T>[] terminals, NonTerminal<T>[] nonTerminals, int[] gotos)
-        {
-            if (actions.Length != terminals.Length)
-            {
-                throw new ArgumentException("actions.Length and terminals.Length must be the same.");
-            }
-            if(nonTerminals.Length != gotos.Length)
-            {
-                throw new ArgumentException("nonTerminals.Length and gotos.Length must be the same.");
-            }
-
-            for(int i = 0; i < actions.Length; i++)
-            {
-                ActionTable.Add(ActionTable.Count, terminals[i], actions[i]);
-            }
-
-            for(int i = 0; i < nonTerminals.Length; i++)
-            {
-                GotoTable.Add(GotoTable.Count, nonTerminals[i], gotos[i]);
-            }
-        }
-
-
-
         ///// <summary>
-        ///// Adds an entry to the table such that state is the row, column is the column, and action is the action to perform.
+        ///// Adds a state to the table, relating Actions to terminals, and nonTerminals to gotos.
         ///// </summary>
-        ///// <param name="state"></param>
-        ///// <param name="column"></param>
-        ///// <param name="action"></param>
-        ///// <param name="goto"></param>
-        //public void AddEntry(int state, GrammarElement<T> column,  action)
+        ///// <param name="actions"></param>
+        ///// <param name="terminals"></param>
+        ///// <param name="nonTerminals"></param>
+        ///// <param name="gotos">The state to go to </param>
+        //public void AddState(ParserAction[] actions, Terminal<T>[] terminals, NonTerminal<T>[] nonTerminals, int[] gotos)
         //{
-        //    if (column is Terminal<T>)
+        //    if (actions.Length != terminals.Length)
         //    {
-        //        ActionTable.Add(state, (Terminal<T>)column, action);
+        //        throw new ArgumentException("actions.Length and terminals.Length must be the same.");
         //    }
-        //    else if(column is NonTerminal<T>)
+        //    if(nonTerminals.Length != gotos.Length)
         //    {
+        //        throw new ArgumentException("nonTerminals.Length and gotos.Length must be the same.");
+        //    }
 
+        //    for(int i = 0; i < actions.Length; i++)
+        //    {
+        //        ActionTable.Add(ActionTable.Count, terminals[i], actions[i]);
+        //    }
+
+        //    for(int i = 0; i < nonTerminals.Length; i++)
+        //    {
+        //        GotoTable.Add(GotoTable.Count, nonTerminals[i], gotos[i]);
         //    }
         //}
 
+        /// <summary>
+        /// Creates a new, empty parse table.
+        /// </summary>
         public ParseTable()
         {
-            ActionTable = new Table<int, Terminal<T>, ParserAction>();
+            ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
+            GotoTable = new Table<int, NonTerminal<T>, int?>();
+        }
+
+        /// <summary>
+        /// Creates a new parse table with the given states as rows, and possibleTerminals with possibleNonTerminals as columns for the Action and Goto tables respectively.
+        /// </summary>
+        /// <param name="possibleTerminals"></param>
+        /// <param name="possibleNonTerminals"></param>
+        /// <param name="states"></param>
+        public ParseTable(IEnumerable<Terminal<T>> possibleTerminals, IEnumerable<NonTerminal<T>> possibleNonTerminals, IEnumerable<int> states)
+        {
+            this.ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
+            foreach (Terminal<T> t in possibleTerminals)
+            {
+                foreach (int s in states)
+                {
+                    this.ActionTable.Add(s, t, null);
+                }
+            }
+
+            this.GotoTable = new Table<int, NonTerminal<T>, int?>();
+            foreach (NonTerminal<T> nt in possibleNonTerminals)
+            {
+                foreach (int s in states)
+                {
+                    GotoTable.Add(s, nt, null);
+                }
+            }
         }
     }
 }
