@@ -254,7 +254,8 @@ namespace Parser.Grammar
         }
 
         /// <summary>
-        /// Creates a StateGraph that matches the DFA for this grammar.
+        /// Creates a StateGraph that matches the grammar.
+        /// The graph is deterministic if the grammar is deterministic.
         /// </summary>
         /// <returns></returns>
         public StateGraph<GrammarElement<T>, LRItem<T>[]> CreateStateGraph()

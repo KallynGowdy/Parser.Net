@@ -8,6 +8,7 @@ namespace Parser
 {
     /// <summary>
     /// Provides a graph that relates states to other states based on transitions.
+    /// This provides the most deterministic automa for a CFG.
     /// </summary>
     public class StateGraph<TKey, T>
     {
