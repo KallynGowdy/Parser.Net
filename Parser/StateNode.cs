@@ -240,6 +240,9 @@ namespace Parser
             }
         }
 
+        /// <summary>
+        /// Creates a new empty state.
+        /// </summary>
         public StateNode()
         {
             fromTransitions = new Dictionary<TKey, StateNode<TKey, T>>();
@@ -247,6 +250,10 @@ namespace Parser
             Value = default(T);
         }
 
+        /// <summary>
+        /// Creates a new state containing the given value.
+        /// </summary>
+        /// <param name="value"></param>
         public StateNode(T value)
         {
             fromTransitions = new Dictionary<TKey, StateNode<TKey, T>>();
@@ -254,6 +261,11 @@ namespace Parser
             this.Value = value;
         }
 
+        /// <summary>
+        /// Creates a new state contianing the given value with a reference to the given graph.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="graph"></param>
         public StateNode(T value, StateGraph<TKey, T> graph)
         {
             fromTransitions = new Dictionary<TKey, StateNode<TKey, T>>();
