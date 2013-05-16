@@ -211,6 +211,8 @@ namespace _4._0Parser
             var c = grammar.Closure(grammar.Productions[0]);
 
             var graph = grammar.CreateStateGraph();
+
+            var table = new ParseTable<string>(graph, grammar.StartElement);
             w.Stop();
 
         }

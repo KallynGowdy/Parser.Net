@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Parser
 {
-    class ParseTree<T>
+    public class ParseTree<T>
     {
     }
 }

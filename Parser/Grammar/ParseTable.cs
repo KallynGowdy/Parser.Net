@@ -90,6 +90,34 @@ namespace Parser.StateMachine
             }
         }
 
+        /// <summary>
+        /// Provides a class that defines that the parse should be accepted(and therefore successful).
+        /// </summary>
+        public sealed class AcceptAction : ParserAction
+        {
+            /// <summary>
+            /// Gets the item that defines that the parse should be accepted.
+            /// </summary>
+            public LRItem<T> AcceptItem
+            {
+                get;
+                private set;
+            }
+
+            public AcceptAction(ParseTable<T> table, LRItem<T> acceptItem)
+                : base(table)
+            {
+                if (acceptItem != null)
+                {
+                    this.AcceptItem = acceptItem;
+                }
+                else
+                {
+                    throw new ArgumentNullException("acceptItem", "Must be non-null");
+                }
+            }
+        }
+
         //A DFA for a parser contains two tables
         //1). The ACTION table
         //2). the GOTO table
@@ -114,35 +142,6 @@ namespace Parser.StateMachine
             get;
             private set;
         }
-
-        ///// <summary>
-        ///// Adds a state to the table, relating Actions to terminals, and nonTerminals to gotos.
-        ///// </summary>
-        ///// <param name="actions"></param>
-        ///// <param name="terminals"></param>
-        ///// <param name="nonTerminals"></param>
-        ///// <param name="gotos">The state to go to </param>
-        //public void AddState(ParserAction[] actions, Terminal<T>[] terminals, NonTerminal<T>[] nonTerminals, int[] gotos)
-        //{
-        //    if (actions.Length != terminals.Length)
-        //    {
-        //        throw new ArgumentException("actions.Length and terminals.Length must be the same.");
-        //    }
-        //    if(nonTerminals.Length != gotos.Length)
-        //    {
-        //        throw new ArgumentException("nonTerminals.Length and gotos.Length must be the same.");
-        //    }
-
-        //    for(int i = 0; i < actions.Length; i++)
-        //    {
-        //        ActionTable.Add(ActionTable.Count, terminals[i], actions[i]);
-        //    }
-
-        //    for(int i = 0; i < nonTerminals.Length; i++)
-        //    {
-        //        GotoTable.Add(GotoTable.Count, nonTerminals[i], gotos[i]);
-        //    }
-        //}
 
         /// <summary>
         /// Adds a shift command to the action table at the position between the given element and given currentState, with the given actions as the values.
@@ -174,7 +173,7 @@ namespace Parser.StateMachine
         private void addGoto(NonTerminal<T> element, int currentState, int @goto)
         {
             //if the column already exists
-            if(GotoTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
+            if (GotoTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
             {
                 //add the goto state
                 GotoTable[currentState, element] = @goto;
@@ -185,7 +184,6 @@ namespace Parser.StateMachine
                 GotoTable.Add(currentState, element, @goto);
             }
         }
-
 
         /// <summary>
         /// Creates a new, empty parse table.
@@ -200,9 +198,14 @@ namespace Parser.StateMachine
         /// Creates a new parse table from the given graph.
         /// </summary>
         /// <param name="graph"></param>
-        public ParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        public ParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
         {
+            ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
+            GotoTable = new Table<int, NonTerminal<T>, int?>();
 
+            int state = 0;
+            //build the parse table from the root of the graph
+            buildParseTable(graph.Root, ref state, startingElement);
         }
 
         /// <summary>
@@ -210,20 +213,41 @@ namespace Parser.StateMachine
         /// </summary>
         /// <param name="currentNode"></param>
         /// <param name="currentStateIndex">The interger identifier of the given currentNode</param>
-        private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, ref int currentStateIndex)
+        private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, ref int currentStateIndex, NonTerminal<T> startingElement)
         {
+            int currentState = currentStateIndex;
+
+            int currentIndex = 0;
+
             foreach (var transition in currentNode.FromTransitions)
             {
                 //add a shift transition to the ActionTable
                 if (transition.Key is Terminal<T>)
                 {
                     //add a shift action from the current state to the next state
-                    addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, currentStateIndex++) });
+                    addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, currentState + (currentIndex + 1)) });
                 }
                 //otherwise add to goto table
                 else
                 {
-                    addGoto((NonTerminal<T>)transition.Key, currentStateIndex, currentStateIndex++);
+                    addGoto((NonTerminal<T>)transition.Key, currentStateIndex, currentState + (currentIndex + 1));
+                }
+                int lastState = currentState + (currentIndex + 1);
+                //build from the next transition
+                buildParseTable(transition.Value, ref lastState, startingElement);
+                currentIndex++;
+            }
+
+            //add a reduce for every item that is at the end of the production
+            foreach (LRItem<T> i in currentNode.Value.Where(a => a.IsAtEndOfProduction()))
+            {
+                if (i.LeftHandSide.Equals(startingElement))
+                {
+                    addAction(i.LookaheadElement, currentStateIndex, new[] { new AcceptAction(this, i) });
+                }
+                else
+                {
+                    addAction(i.LookaheadElement, currentStateIndex, new[] { new ReduceAction(this, i) });
                 }
             }
         }
