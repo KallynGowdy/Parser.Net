@@ -145,12 +145,87 @@ namespace Parser.StateMachine
         //}
 
         /// <summary>
+        /// Adds a shift command to the action table at the position between the given element and given currentState, with the given actions as the values.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="currentState"></param>
+        /// <param name="actions"></param>
+        private void addAction(Terminal<T> element, int currentState, params ParserAction[] actions)
+        {
+            //if the column already exists
+            if (ActionTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
+            {
+                //add the actions
+                ActionTable[currentState, element].AddRange(actions);
+            }
+            //otherwise, create new
+            else
+            {
+                ActionTable.Add(currentState, element, actions.ToList());
+            }
+        }
+
+        /// <summary>
+        /// Adds a goto command to the goto table at the position defined by the currentState and element.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="currentState"></param>
+        /// <param name="goto"></param>
+        private void addGoto(NonTerminal<T> element, int currentState, int @goto)
+        {
+            //if the column already exists
+            if(GotoTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
+            {
+                //add the goto state
+                GotoTable[currentState, element] = @goto;
+            }
+            //otherwise, create new
+            else
+            {
+                GotoTable.Add(currentState, element, @goto);
+            }
+        }
+
+
+        /// <summary>
         /// Creates a new, empty parse table.
         /// </summary>
         public ParseTable()
         {
             ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
+        }
+
+        /// <summary>
+        /// Creates a new parse table from the given graph.
+        /// </summary>
+        /// <param name="graph"></param>
+        public ParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        {
+
+        }
+
+        /// <summary>
+        /// builds the parse table from the current node.
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <param name="currentStateIndex">The interger identifier of the given currentNode</param>
+        private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, ref int currentStateIndex)
+        {
+            foreach (var transition in currentNode.FromTransitions)
+            {
+                //add a shift transition to the ActionTable
+                if (transition.Key is Terminal<T>)
+                {
+                    //add a shift action from the current state to the next state
+                    addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, currentStateIndex++) });
+                }
+                //otherwise add to goto table
+                else
+                {
+                    addGoto((NonTerminal<T>)transition.Key, currentStateIndex, currentStateIndex++);
+                }
+            }
         }
 
         /// <summary>
