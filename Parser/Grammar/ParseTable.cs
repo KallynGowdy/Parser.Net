@@ -205,7 +205,15 @@ namespace Parser.StateMachine
 
             int state = 0;
             //build the parse table from the root of the graph
-            buildParseTable(graph.Root, ref state, startingElement);
+            buildParseTable(graph);//, state, startingElement, ref state);
+        }
+
+        private void buildParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        {
+            foreach(var node in graph.GetBreadthFirstTraversal())
+            {
+                
+            }
         }
 
         /// <summary>
@@ -213,29 +221,43 @@ namespace Parser.StateMachine
         /// </summary>
         /// <param name="currentNode"></param>
         /// <param name="currentStateIndex">The interger identifier of the given currentNode</param>
-        private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, ref int currentStateIndex, NonTerminal<T> startingElement)
+        private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, int currentStateIndex, NonTerminal<T> startingElement, ref int nextIndex)
         {
             int currentState = currentStateIndex;
 
-            int currentIndex = 0;
+            if(nextIndex == 0)
+            {
+                nextIndex = 1;
+            }
 
             foreach (var transition in currentNode.FromTransitions)
             {
+                int index = (nextIndex);
                 //add a shift transition to the ActionTable
                 if (transition.Key is Terminal<T>)
                 {
                     //add a shift action from the current state to the next state
-                    addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, currentState + (currentIndex + 1)) });
+                    addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, index) });
                 }
                 //otherwise add to goto table
                 else
                 {
-                    addGoto((NonTerminal<T>)transition.Key, currentStateIndex, currentState + (currentIndex + 1));
+                    addGoto((NonTerminal<T>)transition.Key, currentStateIndex, index);
                 }
-                int lastState = currentState + (currentIndex + 1);
+
+                //if (index == -1)
+                //{
+                //    index = currentIndex + currentNode.FromTransitions.Length;
+                //}
                 //build from the next transition
-                buildParseTable(transition.Value, ref lastState, startingElement);
-                currentIndex++;
+
+                nextIndex++;
+            }
+
+            //add the nodes of the transition nodes to the table
+            foreach (var trans in currentNode.FromTransitions)
+            {
+                buildParseTable(trans.Value, nextIndex, startingElement, ref nextIndex);
             }
 
             //add a reduce for every item that is at the end of the production
@@ -243,10 +265,12 @@ namespace Parser.StateMachine
             {
                 if (i.LeftHandSide.Equals(startingElement))
                 {
+                    //accept
                     addAction(i.LookaheadElement, currentStateIndex, new[] { new AcceptAction(this, i) });
                 }
                 else
                 {
+                    //reduce
                     addAction(i.LookaheadElement, currentStateIndex, new[] { new ReduceAction(this, i) });
                 }
             }

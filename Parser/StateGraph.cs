@@ -54,9 +54,9 @@ namespace Parser
         /// <param name="condition">The condition that determines if a node is a match.</param>
         /// <param name="maxLoop">The maximum number of nodes to travel to, this prevents infinite loops.</param>
         /// <returns></returns>
-        public bool Contains(Predicate<StateNode<TKey, T>> condition, int maxLoop = 1000)
+        public bool Contains(Predicate<StateNode<TKey, T>> condition)
         {
-            return Root.ContainsFromTransition(condition, maxLoop);
+            return Root.ContainsFromTransition(condition);
         }
 
         /// <summary>
@@ -65,9 +65,30 @@ namespace Parser
         /// <param name="condition">The condition that determines if a node is a match.</param>
         /// <param name="maxLoop">The maximum number of nodes to travel to, this prevents infinite loops.</param>
         /// <returns></returns>
-        public StateNode<TKey, T> GetExistingNode(Predicate<StateNode<TKey, T>> condition, int maxLoop = 1000)
+        public StateNode<TKey, T> GetExistingNode(Predicate<StateNode<TKey, T>> condition)
         {
-            return Root.GetFromTransition(condition, maxLoop);
+            return Root.GetFromTransition(condition);
         }
+
+        /// <summary>
+        /// Gets the depth first traversal of the graph.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<StateNode<TKey, T>> GetDepthFirstTraversal()
+        {
+            return Root.GetDepthFirstTraversal();
+        }
+
+
+
+        /// <summary>
+        /// Gets the breadth first traversal of the graph.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<StateNode<TKey, T>> GetBreadthFirstTraversal()
+        {
+            return Root.GetBreadthFirstTraversal();
+        }
+
     }
 }
