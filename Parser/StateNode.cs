@@ -115,51 +115,106 @@ namespace Parser
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public bool ContainsFromTransition(StateNode<TKey, T> node)
-        {
-            if (!fromTransitions.Values.Contains(node))
-            {
-                foreach (var transition in fromTransitions)
-                {
-                    if (transition.Value.ContainsFromTransition(node))
-                    {
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                return true;
-            }
-            return false;
-        }
+        //public bool ContainsFromTransition(StateNode<TKey, T> node)
+        //{
+        //    if (!fromTransitions.Values.Contains(node))
+        //    {
+        //        foreach (var transition in fromTransitions)
+        //        {
+        //            if (transition.Value.Equals(node))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //        foreach (var transition in fromTransitions)
+        //        {
+        //            if (transition.Value.ContainsFromTransition(node))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         /// <summary>
         /// Returns whether a node is contained by this node(and linked "from" nodes).
         /// </summary>
         /// <param name="comparer">The predicate used to determine if a node is contained.</param>
-        /// <param name="maxLoop">The maximum distance to travel through the graph, this stops infinate loops.</param>
         /// <returns></returns>
-        public bool ContainsFromTransition(Predicate<StateNode<TKey, T>> comparer, int maxLoop = 1000)
+        //public bool ContainsFromTransition(Predicate<StateNode<TKey, T>> comparer)
+        //{
+        //    //if it is not contained
+        //    if (fromTransitions.All(a => !comparer(a.Value)))
+        //    {
+        //        foreach (var transition in fromTransitions)
+        //        {
+        //            if (comparer(transition.Value))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //        //loop through transitions and find it
+        //        foreach (var transition in fromTransitions)
+        //        {
+        //            if (transition.Value.containsFromTransition(comparer))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        /// <summary>
+        /// Gets the depth first traversal of the children of this node.
+        /// </summary>
+        /// <exception cref="System.StackOverflowException"/>
+        /// <returns></returns>
+        public IEnumerable<StateNode<TKey, T>> GetDepthFirstTraversal()
         {
-            //if it is not contained
-            if (fromTransitions.All(a => !comparer(a.Value)))
+            Stack<StateNode<TKey, T>> stack = new Stack<StateNode<TKey, T>>();
+            Stack<StateNode<TKey, T>> traversal = new Stack<StateNode<TKey, T>>();
+            traversal.Push(this);
+            while (stack.Count != 0)
             {
-                int looper = 0;
-                //loop through transitions and find it
-                foreach (var transition in fromTransitions)
+                StateNode<TKey, T> node = stack.Pop();
+                foreach (var transition in node.FromTransitions)
                 {
-                    if (transition.Value.containsFromTransition(comparer, ref looper, maxLoop))
-                    {
-                        return true;
-                    }
+                    stack.Push(transition.Value);
+                    traversal.Push(transition.Value);
                 }
             }
-            else
+            return traversal;
+        }
+
+        /// <summary>
+        /// Gets the breadth first traversal of the graph.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<StateNode<TKey, T>> GetBreadthFirstTraversal()
+        {
+            Queue<StateNode<TKey, T>> queue = new Queue<StateNode<TKey, T>>();
+            Queue<StateNode<TKey, T>> traversal = new Queue<StateNode<TKey, T>>();
+            traversal.Enqueue(this);
+            while (queue.Count != 0)
             {
-                return true;
+                StateNode<TKey, T> node = queue.Dequeue();
+                foreach (var transition in node.FromTransitions)
+                {
+                    queue.Enqueue(transition.Value);
+                    traversal.Enqueue(transition.Value);
+                }
             }
-            return false;
+            return traversal;
         }
 
         /// <summary>
@@ -169,32 +224,54 @@ namespace Parser
         /// <param name="currentLoop"></param>
         /// <param name="maxLoop"></param>
         /// <returns></returns>
-        private bool containsFromTransition(Predicate<StateNode<TKey, T>> comparer, ref int currentLoop, int maxLoop)
+        //private bool containsFromTransition(Predicate<StateNode<TKey, T>> comparer)
+        //{
+        //    //if it is not contained
+        //    if (fromTransitions.All(a => !comparer(a.Value)))
+        //    {
+
+        //        //loop through transitions and find it
+        //        foreach (var transition in fromTransitions)
+        //        {
+        //            if (comparer(transition.Value))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //        //loop through transitions and find it
+        //        foreach (var transition in fromTransitions)
+        //        {
+        //            if (containsFromTransition(comparer))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        /// <summary>
+        /// Returns whether the given node is contained in a "from" transition.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public bool ContainsFromTransition(StateNode<TKey, T> node)
         {
-            //if it is not contained
-            if (fromTransitions.All(a => !comparer(a.Value)))
-            {
+            return GetBreadthFirstTraversal().Any(a => a == node);
+        }
 
-                //loop through transitions and find it
-                foreach (var transition in fromTransitions)
-                {
-
-                    currentLoop++;
-                    if (currentLoop >= maxLoop)
-                    {
-                        return false;
-                    }
-                    if (transition.Value.containsFromTransition(comparer, ref currentLoop, maxLoop))
-                    {
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                return true;
-            }
-            return false;
+        /// <summary>
+        /// Returns whether a transition is contained as a child of this node based on the given comparer.
+        /// </summary>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool ContainsFromTransition(Predicate<StateNode<TKey, T>> comparer)
+        {
+            return GetBreadthFirstTraversal().Any(a => comparer(a));
         }
 
         /// <summary>
@@ -203,19 +280,29 @@ namespace Parser
         /// <param name="comparer"></param>
         /// <param name="maxLoop"></param>
         /// <returns></returns>
-        public StateNode<TKey, T> GetFromTransition(Predicate<StateNode<TKey, T>> comparer, int maxLoop = 1000)
+        //public StateNode<TKey, T> GetFromTransition(Predicate<StateNode<TKey, T>> comparer)
+        //{
+        //    StateNode<TKey, T> node = null;
+        //    ContainsFromTransition(a =>
+        //    {
+        //        if (comparer(a))
+        //        {
+        //            node = a;
+        //            return true;
+        //        }
+        //        return false;
+        //    });
+        //    return node;
+        //}
+
+        /// <summary>
+        /// Gets a node from the "from" transitions that matches comparer. Returns null if the transition cannot be found.
+        /// </summary>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StateNode<TKey, T> GetFromTransition(Predicate<StateNode<TKey, T>> comparer)
         {
-            StateNode<TKey, T> node = null;
-            ContainsFromTransition(a =>
-            {
-                if (comparer(a))
-                {
-                    node = a;
-                    return true;
-                }
-                return false;
-            }, maxLoop);
-            return node;
+            return GetBreadthFirstTraversal().FirstOrDefault(a => comparer(a));
         }
 
         /// <summary>

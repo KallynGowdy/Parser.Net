@@ -110,6 +110,25 @@ namespace Parser
         }
 
         /// <summary>
+        /// Gets or sets the value at the given row and column
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public TValue this[TRow row, TColumn column]
+        {
+            get
+            {
+                return lookup.Where(a => a.Key.Row.Equals(row) && a.Key.Column.Equals(column)).First().Value;
+            }
+            set
+            {
+                var columnRow = lookup.Where(a => a.Key.Row.Equals(row) && a.Key.Column.Equals(column)).First().Key;
+                lookup[columnRow] = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the value of the value at the given column and row.
         /// </summary>
         /// <param name="key"></param>

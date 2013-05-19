@@ -34,14 +34,14 @@ namespace _4._0Parser
         {
             NonTerminal<string>[] terms = new NonTerminal<string>[]
             {
-                //new NonTerminal<string>("A"),
-                //new NonTerminal<string>("B")
-                new NonTerminal<string>("E"),
-                new NonTerminal<string>("T")
+                new NonTerminal<string>("A"),
+                new NonTerminal<string>("B")
+                //new NonTerminal<string>("E"),
+                //new NonTerminal<string>("T")
             };
 
             ContextFreeGrammar<string> grammar = new ContextFreeGrammar<string>(
-                "E".ToNonTerminal(),
+                "S".ToNonTerminal(),
                 "$".ToTerminal(),
                 new Production<string>[]
                 {
@@ -52,25 +52,25 @@ namespace _4._0Parser
                     ////B -> b
                     //new Production<string>(terms[1], new Terminal<string>("b"))
 
-                    //E -> T
-                    new Production<string>(terms[0], terms[1]),
-                    //E -> (E)
-                    new Production<string>(terms[0], ("(").ToTerminal(), terms[0], (")").ToTerminal()),
-                    //T -> n
-                    new Production<string>(terms[1], ("n").ToTerminal()),
-                    //T -> + T
-                    new Production<string>(terms[1], ("+").ToTerminal(), terms[1]),
-                    //T -> T + n
-                    new Production<string>(terms[1], terms[1], ("+").ToTerminal(), ("n").ToTerminal())
+                    ////E -> T
+                    //new Production<string>(terms[0], terms[1]),
+                    ////E -> (E)
+                    //new Production<string>(terms[0], ("(").ToTerminal(), terms[0], (")").ToTerminal()),
+                    ////T -> n
+                    //new Production<string>(terms[1], ("n").ToTerminal()),
+                    ////T -> + T
+                    //new Production<string>(terms[1], ("+").ToTerminal(), terms[1]),
+                    ////T -> T + n
+                    //new Production<string>(terms[1], terms[1], ("+").ToTerminal(), ("n").ToTerminal())
                     
-                    ////S -> AB
-                    //new Production<string>("S".ToNonTerminal(), "A".ToNonTerminal(), "B".ToNonTerminal()),
-                    ////A -> aAb
-                    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal(), "A".ToNonTerminal(), "b".ToTerminal()),
-                    ////A -> a
-                    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal()),
-                    ////B -> d
-                    //new Production<string>("B".ToNonTerminal(), "d".ToTerminal())
+                    //S -> AB
+                    new Production<string>("S".ToNonTerminal(), "A".ToNonTerminal(), "B".ToNonTerminal()),
+                    //A -> aAb
+                    new Production<string>("A".ToNonTerminal(), "a".ToTerminal(), "A".ToNonTerminal(), "b".ToTerminal()),
+                    //A -> a
+                    new Production<string>("A".ToNonTerminal(), "a".ToTerminal()),
+                    //B -> d
+                    new Production<string>("B".ToNonTerminal(), "d".ToTerminal())
                 });
 
             //    var closure = grammar.Closure(grammar.Productions[0]);
@@ -210,7 +210,9 @@ namespace _4._0Parser
 
             var c = grammar.Closure(grammar.Productions[0]);
 
-            grammar.CreateStateGraph();
+            var graph = grammar.CreateStateGraph();
+
+            var table = new ParseTable<string>(graph, grammar.StartElement);
             w.Stop();
 
         }

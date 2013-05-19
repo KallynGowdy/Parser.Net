@@ -10,7 +10,7 @@ namespace Parser
     /// </summary>
     /// <typeparam name="TRow">The type of the column.</typeparam>
     /// <typeparam name="TColumn">The type of the row.</typeparam>
-    public class ColumnRowPair<TRow, TColumn>
+    public struct ColumnRowPair<TRow, TColumn>
     {
         /// <summary>
         /// Gets or sets the value of the column.
@@ -31,6 +31,7 @@ namespace Parser
         }
 
         public ColumnRowPair(TRow row, TColumn column)
+            : this()
         {
             this.Column = column;
             this.Row = row;
