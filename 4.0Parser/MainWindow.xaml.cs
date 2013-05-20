@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -32,46 +33,82 @@ namespace _4._0Parser
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            NonTerminal<string>[] terms = new NonTerminal<string>[]
+            string input = txtCFG.Text;
+
+            string[] inputProductions = input.Replace("\r\n", string.Empty).Split(new[] { ';', '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+
+            List<Production<string>> productions = new List<Production<string>>();
+
+            List<List<string>> splits = new List<List<string>>();
+
+            foreach (string s in inputProductions)
             {
-                new NonTerminal<string>("A"),
-                new NonTerminal<string>("B")
-                //new NonTerminal<string>("E"),
-                //new NonTerminal<string>("T")
-            };
+                splits.Add(new List<string>(s.Split(new[] { "->" }, StringSplitOptions.RemoveEmptyEntries).Select(a => a.Trim())));
+            }
+
+            foreach (string[] split in splits.Select(a => a.ToArray()))
+            {
+                if (split.Length == 2)
+                {
+                    List<GrammarElement<string>> element = new List<GrammarElement<string>>();
+                    string[] elements = split[1].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(a => a.Trim()).ToArray();
+                    foreach (string el in elements)
+                    {
+                        if (splits.Any(a => a[0].Equals(el)))
+                        {
+                            element.Add(el.ToNonTerminal());
+                        }
+                        else
+                        {
+                            element.Add(el.ToTerminal());
+                        }
+                    }
+
+                    productions.Add(new Production<string>(split[0].ToNonTerminal(), element.ToArray()));
+                }
+            }
 
             ContextFreeGrammar<string> grammar = new ContextFreeGrammar<string>(
-                "S".ToNonTerminal(),
+                productions.First().NonTerminal,
                 "$".ToTerminal(),
-                new Production<string>[]
-                {
-                    ////A -> A + B
-                    //new Production<string>(terms[0], terms[0], new Terminal<string>("+"), terms[1]),
-                    ////A -> a
-                    //new Production<string>(terms[0], new Terminal<string>("a")),
-                    ////B -> b
-                    //new Production<string>(terms[1], new Terminal<string>("b"))
+                //new Production<string>[]
+                //{
+                //    ////A -> A + B
+                //    //new Production<string>(terms[0], terms[0], new Terminal<string>("+"), terms[1]),
+                //    ////A -> a
+                //    //new Production<string>(terms[0], new Terminal<string>("a")),
+                //    ////B -> b
+                //    //new Production<string>(terms[1], new Terminal<string>("b"))
 
-                    ////E -> T
-                    //new Production<string>(terms[0], terms[1]),
-                    ////E -> (E)
-                    //new Production<string>(terms[0], ("(").ToTerminal(), terms[0], (")").ToTerminal()),
-                    ////T -> n
-                    //new Production<string>(terms[1], ("n").ToTerminal()),
-                    ////T -> + T
-                    //new Production<string>(terms[1], ("+").ToTerminal(), terms[1]),
-                    ////T -> T + n
-                    //new Production<string>(terms[1], terms[1], ("+").ToTerminal(), ("n").ToTerminal())
-                    
-                    //S -> AB
-                    new Production<string>("S".ToNonTerminal(), "A".ToNonTerminal(), "B".ToNonTerminal()),
-                    //A -> aAb
-                    new Production<string>("A".ToNonTerminal(), "a".ToTerminal(), "A".ToNonTerminal(), "b".ToTerminal()),
-                    //A -> a
-                    new Production<string>("A".ToNonTerminal(), "a".ToTerminal()),
-                    //B -> d
-                    new Production<string>("B".ToNonTerminal(), "d".ToTerminal())
-                });
+                //    ////E -> T
+                //    //new Production<string>(terms[0], terms[1]),
+                //    ////E -> (E)
+                //    //new Production<string>(terms[0], ("(").ToTerminal(), terms[0], (")").ToTerminal()),
+                //    ////T -> n
+                //    //new Production<string>(terms[1], ("n").ToTerminal()),
+                //    ////T -> + T
+                //    //new Production<string>(terms[1], ("+").ToTerminal(), terms[1]),
+                //    ////T -> T + n
+                //    //new Production<string>(terms[1], terms[1], ("+").ToTerminal(), ("n").ToTerminal())
+
+                //    ////S -> AB
+                //    //new Production<string>("S".ToNonTerminal(), "A".ToNonTerminal(), "B".ToNonTerminal()),
+                //    ////A -> aAb
+                //    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal(), "A".ToNonTerminal(), "b".ToTerminal()),
+                //    ////A -> a
+                //    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal()),
+                //    ////B -> d
+                //    //new Production<string>("B".ToNonTerminal(), "d".ToTerminal())
+
+                //    //E -> EE
+                //    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "E".ToNonTerminal()),
+                //    //E -> E
+                //    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal()),
+                //    //E -> a
+                //    new Production<string>("E".ToNonTerminal(), "a".ToTerminal()),
+                //});
+                productions.ToArray());
 
             //    var closure = grammar.Closure(grammar.Productions[0]);
 
@@ -160,7 +197,7 @@ namespace _4._0Parser
                 "volatile",
                 "while",
                 "string"
-            }; 
+            };
             #endregion
 
             #region Definitions
@@ -196,7 +233,7 @@ namespace _4._0Parser
                     new StringedTokenDefinition(@"\]", "RIGHT_BRACKET"), 
                     new StringedTokenDefinition(@"\b[a-zA-Z@_][\w_]*\b", "IDENTIFIER")
                 }
-                }; 
+                };
             #endregion
 
             Lexer lexer = new Lexer
@@ -206,7 +243,7 @@ namespace _4._0Parser
 
             Stopwatch w = Stopwatch.StartNew();
 
-            var tokens = lexer.ReadTokens(text);
+            //var tokens = lexer.ReadTokens(text);
 
             var c = grammar.Closure(grammar.Productions[0]);
 
@@ -215,6 +252,38 @@ namespace _4._0Parser
             var table = new ParseTable<string>(graph, grammar.StartElement);
             w.Stop();
 
+            List<dynamic> gridCollection = new List<dynamic>();
+
+            foreach (var item in table.ActionTable.Select(a => new
+            {
+                State = a.Key.Row,
+                Input = a.Key.Column,
+                Value = a.Value
+            }))
+            {
+                gridCollection.Add(item);
+            }
+
+            foreach (var item in table.GotoTable.Select(a => new
+            {
+                State = a.Key.Row,
+                Input = a.Key.Column,
+                Value = a.Value
+            }))
+            {
+                gridCollection.Add(item);
+            }
+            //grdTable.AutoGenerateColumns = true;
+            
+            grdTable.Columns.Clear();
+            foreach (dynamic column in gridCollection.Select(a => a.Input).DistinctBy(a => a))
+            {
+                DataGridColumn col = new DataGridTextColumn();
+                col.Header = column;
+                grdTable.Columns.Add(col);
+            }
+            gridCollection.ForEach(a => grdTable.Items.Add(a.Value.ToString()));
+            //grdTable.ItemsSource = gridCollection.Select(a => a.Value.ToString());
         }
 
 

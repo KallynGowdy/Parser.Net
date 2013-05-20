@@ -59,6 +59,11 @@ namespace Parser.StateMachine
                 }
                 this.NextState = nextState;
             }
+
+            public override string ToString()
+            {
+                return string.Format("Shift({0})", NextState);
+            }
         }
 
         /// <summary>
@@ -88,6 +93,11 @@ namespace Parser.StateMachine
                     throw new ArgumentNullException("reduceItem", "Must be non-null");
                 }
             }
+
+            public override string ToString()
+            {
+                return string.Format("Reduce({0})", ReduceItem.ToString());
+            }
         }
 
         /// <summary>
@@ -115,6 +125,11 @@ namespace Parser.StateMachine
                 {
                     throw new ArgumentNullException("acceptItem", "Must be non-null");
                 }
+            }
+
+            public override string ToString()
+            {
+                return "Accept";
             }
         }
 

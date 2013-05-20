@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4.0Parser", "4.0Parser\4.0P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{7BF0258E-F67B-45FE-9710-83955ACD4CF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserGUI", "ParserGUI\ParserGUI.csproj", "{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,16 @@ Global
 		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|x86.ActiveCfg = Release|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
