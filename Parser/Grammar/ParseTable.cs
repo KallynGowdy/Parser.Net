@@ -203,16 +203,58 @@ namespace Parser.StateMachine
             ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
 
-            int state = 0;
+            //int state = 0;
             //build the parse table from the root of the graph
-            buildParseTable(graph);//, state, startingElement, ref state);
+            buildParseTable(graph, startingElement);//, state, startingElement, ref state);
         }
 
-        private void buildParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        private void buildParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
         {
-            foreach(var node in graph.GetBreadthFirstTraversal())
+            if(graph == null)
             {
-                
+                throw new ArgumentNullException("graph");
+            }
+            if(startingElement == null)
+            {
+                throw new ArgumentNullException("startingElement");
+            }
+
+            //get the breadth-first traversal of the graph
+            var t = graph.GetBreadthFirstTraversal().ToList();
+
+
+            //add the transitions for each node in the traversal
+            for(int i = 0; i < t.Count; i++)
+            {
+                //for each transition in the node, add either a shift action or goto action
+                foreach(var transition in t[i].FromTransitions)
+                {
+                    if(transition.Key is Terminal<T>)
+                    {
+                        //add a shift from this state to the next state
+                        addAction((Terminal<T>)transition.Key, i, new ShiftAction(this, t.IndexOf(transition.Value)));
+                    }
+                    else
+                    {
+                        addGoto((NonTerminal<T>)transition.Key, i, t.IndexOf(transition.Value));
+                    }
+                }
+
+                //for each of the items in the state that are at the end of a production,
+                //add either a reduce action or accept action
+                foreach(LRItem<T> item in t[i].Value.Where(a => a.IsAtEndOfProduction()))
+                {
+                    //if we would reduce to the starting element, then accept
+                    if(item.LeftHandSide.Equals(startingElement))
+                    {
+                        addAction(item.LookaheadElement, i, new AcceptAction(this, item));
+                    }
+                    //otherwise, add a reduce action
+                    else
+                    {
+                        addAction(item.LookaheadElement, i, new ReduceAction(this, item));
+                    }
+                }
             }
         }
 

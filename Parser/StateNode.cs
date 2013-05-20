@@ -72,13 +72,13 @@ namespace Parser
         {
             //add a "from" transition so that the value knows
             //that we lead to it.
-            
-            
-            if(!value.toTransitions.Contains(this))
+
+
+            if (!value.toTransitions.Contains(this))
             {
                 value.toTransitions.Add(this);
             }
-            
+
             fromTransitions.Add(key, value);
         }
 
@@ -90,7 +90,7 @@ namespace Parser
         {
             //add a "from" transition so that the value knows
             //that we lead to it.
-            if(!transition.Value.toTransitions.Contains(this))
+            if (!transition.Value.toTransitions.Contains(this))
             {
                 transition.Value.toTransitions.Add(this);
             }
@@ -184,6 +184,7 @@ namespace Parser
             Stack<StateNode<TKey, T>> stack = new Stack<StateNode<TKey, T>>();
             Stack<StateNode<TKey, T>> traversal = new Stack<StateNode<TKey, T>>();
             traversal.Push(this);
+            stack.Push(this);
             while (stack.Count != 0)
             {
                 StateNode<TKey, T> node = stack.Pop();
@@ -196,22 +197,72 @@ namespace Parser
             return traversal;
         }
 
+        private class MarkerQueue<T>
+        {
+            public Queue<Marker<T>> Queue
+            {
+                get;
+                private set;
+            }
+
+            public MarkerQueue()
+            {
+                Queue = new Queue<Marker<T>>();
+            }
+        }
+
+        private struct Marker<T>
+        {
+            /// <summary>
+            /// Gets or sets the value contained by the marker.
+            /// </summary>
+            public T Value
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// Gets or sets if this value is already marked.
+            /// </summary>
+            public bool Marked
+            {
+                get;
+                set;
+            }
+
+            public Marker(T value, bool marked = false)
+                : this()
+            {
+                this.Value = value;
+                this.Marked = marked;
+            }
+        }
+
         /// <summary>
         /// Gets the breadth first traversal of the graph.
         /// </summary>
         /// <returns></returns>
         public IEnumerable<StateNode<TKey, T>> GetBreadthFirstTraversal()
         {
-            Queue<StateNode<TKey, T>> queue = new Queue<StateNode<TKey, T>>();
+            MarkerQueue<StateNode<TKey, T>> queue = new MarkerQueue<StateNode<TKey, T>>();
             Queue<StateNode<TKey, T>> traversal = new Queue<StateNode<TKey, T>>();
             traversal.Enqueue(this);
-            while (queue.Count != 0)
+            queue.Queue.Enqueue(new Marker<StateNode<TKey, T>>(this));
+            while (queue.Queue.Count != 0)
             {
-                StateNode<TKey, T> node = queue.Dequeue();
-                foreach (var transition in node.FromTransitions)
+                var node = queue.Queue.Dequeue();
+                if (!node.Marked)
                 {
-                    queue.Enqueue(transition.Value);
-                    traversal.Enqueue(transition.Value);
+                    foreach (var transition in node.Value.FromTransitions)
+                    {
+                        if (!traversal.Contains(transition.Value))
+                        {
+                            queue.Queue.Enqueue(new Marker<StateNode<TKey, T>>(transition.Value));
+                            traversal.Enqueue(transition.Value);
+                        }
+                    }
+                    node.Marked = true;
                 }
             }
             return traversal;
@@ -333,7 +384,7 @@ namespace Parser
         public StateNode()
         {
             fromTransitions = new Dictionary<TKey, StateNode<TKey, T>>();
-            toTransitions = new List<StateNode<TKey,T>>();
+            toTransitions = new List<StateNode<TKey, T>>();
             Value = default(T);
         }
 
@@ -344,7 +395,7 @@ namespace Parser
         public StateNode(T value)
         {
             fromTransitions = new Dictionary<TKey, StateNode<TKey, T>>();
-            toTransitions = new List<StateNode<TKey,T>>();
+            toTransitions = new List<StateNode<TKey, T>>();
             this.Value = value;
         }
 
@@ -356,7 +407,7 @@ namespace Parser
         public StateNode(T value, StateGraph<TKey, T> graph)
         {
             fromTransitions = new Dictionary<TKey, StateNode<TKey, T>>();
-            toTransitions = new List<StateNode<TKey,T>>();
+            toTransitions = new List<StateNode<TKey, T>>();
             this.Value = value;
             this.Graph = graph;
         }
