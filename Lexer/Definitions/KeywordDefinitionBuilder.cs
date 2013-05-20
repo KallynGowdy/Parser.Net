@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Parser.Defininitions
+namespace LexicalAnalysis.Defininitions
 {
     /// <summary>
     /// A class that provides a way to build a single regular expression that matches all of the given keywords.

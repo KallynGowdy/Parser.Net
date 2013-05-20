@@ -197,9 +197,9 @@ namespace Parser
             return traversal;
         }
 
-        private class MarkerQueue<T>
+        private class MarkerQueue<Type>
         {
-            public Queue<Marker<T>> Queue
+            public Queue<Marker<Type>> Queue
             {
                 get;
                 private set;
@@ -207,16 +207,16 @@ namespace Parser
 
             public MarkerQueue()
             {
-                Queue = new Queue<Marker<T>>();
+                Queue = new Queue<Marker<Type>>();
             }
         }
 
-        private struct Marker<T>
+        private struct Marker<Type>
         {
             /// <summary>
             /// Gets or sets the value contained by the marker.
             /// </summary>
-            public T Value
+            public Type Value
             {
                 get;
                 set;
@@ -231,7 +231,7 @@ namespace Parser
                 set;
             }
 
-            public Marker(T value, bool marked = false)
+            public Marker(Type value, bool marked = false)
                 : this()
             {
                 this.Value = value;

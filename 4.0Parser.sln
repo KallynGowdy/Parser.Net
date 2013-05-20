@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4.0Parser", "4.0Parser\4.0Parser.csproj", "{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{7BF0258E-F67B-45FE-9710-83955ACD4CF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserGUI", "ParserGUI\ParserGUI.csproj", "{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexicalAnalysis", "Lexer\LexicalAnalysis.csproj", "{585C5449-33FD-45D6-8DA0-948C41B0859D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,16 +17,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|x86.ActiveCfg = Debug|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Debug|x86.Build.0 = Debug|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|Any CPU.ActiveCfg = Release|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|Mixed Platforms.Build.0 = Release|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|x86.ActiveCfg = Release|x86
-		{3FEB933B-0A6D-4196-A0F1-6BF3B05585DE}.Release|x86.Build.0 = Release|x86
 		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -47,6 +37,16 @@ Global
 		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}.Release|x86.ActiveCfg = Release|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{585C5449-33FD-45D6-8DA0-948C41B0859D}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

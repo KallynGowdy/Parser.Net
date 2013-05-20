@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace Parser.LexicalAnalysis
+namespace LexicalAnalysis
 {
     using Defininitions;
-    using System.Diagnostics;
 
     public class Lexer
     {
@@ -56,7 +52,7 @@ namespace Parser.LexicalAnalysis
             //    }
             //}
 
-            tokens = allMatches.SelectMany<MatchCollection, Token<string>>((a, i) => a.Cast<Match>().Select(t => Definitions[i].GetToken(t))).OrderBy(t => t.Index).AsParallel().ToList();
+            tokens = allMatches.SelectMany<MatchCollection, Token<string>>((a, i) => a.Cast<Match>().Select(t => Definitions[i].GetToken(t))).OrderBy(t => t.Index).ToList();
 
             //itterate though the matches backwards and remove all matches that are contained by the next/last
             for (int i = 0; i < tokens.Count; i++)
