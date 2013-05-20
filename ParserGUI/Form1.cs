@@ -268,12 +268,21 @@ namespace ParserGUI
 
             grdTable.Columns.Clear();
 
-            foreach (dynamic column in gridCollection.Select(a => a.Input).DistinctBy(a => a.InnerValue))
+            grdTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
+            foreach (dynamic column in gridCollection.OrderBy(a => a is Terminal<string>).Select(a => a.Input).DistinctBy(a => a.ToString()))
             {
                 DataGridViewColumn col = new DataGridViewTextBoxColumn();
                 col.HeaderText = column.ToString();
+                col.SortMode = DataGridViewColumnSortMode.NotSortable;
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
                 grdTable.Columns.Add(col);
             }
+            
+
+            grdTable.Columns[grdTable.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            grdTable.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
             var rows = gridCollection.GroupBy(a => a.State).Select(a => new List<dynamic>(a)).ToArray();
             for (int i = 0; i < rows.Length; i++)
@@ -284,9 +293,23 @@ namespace ParserGUI
 
                     if (r < rows[i].Count())
                     {
-                        if (grdTable.Columns[r].HeaderText == rows[i].ElementAt(r).Input.ToString())
+                        if (rows[i].Any(a =>
                         {
-                            row.Add(rows[i].ElementAt(r).Value.ToString());
+                            if (a != null)
+                            {
+                                return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
+                            }
+                            return false;
+                        }))
+                        {
+                            row.Add(concatArray(rows[i].First(a =>
+                            {
+                                if (a != null)
+                                {
+                                    return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
+                                }
+                                return false;
+                            }).Value, "\n"));
                         }
                         else
                         {
@@ -296,6 +319,38 @@ namespace ParserGUI
                     }
                 }
                 grdTable.Rows.Add(row.ToArray());
+                grdTable.Rows[i].HeaderCell.Value = i.ToString();
+                
+            }
+
+            foreach(DataGridViewColumn column in grdTable.Columns)
+            {
+                int colw = column.Width;
+                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                column.Width = colw;
+            }
+        }
+
+        /// <summary>
+        /// Concats each individual element in the given dynamic object to produce a single string representing all elements.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        private string concatArray(dynamic a, string seperator = " ")
+        {
+            if (a is IEnumerable<dynamic>)
+            {
+                StringBuilder b = new StringBuilder();
+                foreach (dynamic e in a)
+                {
+                    b.Append(e.ToString());
+                    b.Append(seperator);
+                }
+                return b.ToString();
+            }
+            else
+            {
+                return a.ToString();
             }
         }
     }
