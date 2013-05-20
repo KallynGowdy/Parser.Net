@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Parser
+﻿
+namespace LexicalAnalysis
 {
     /// <summary>
     /// Defines a token at a certian location with a given value and type.
     /// </summary>
     /// <typeparam name="T">The type of the value of the Token</typeparam>
-    public class Token<T> : ICodeElement
+    public class Token<T> : ITokenElement
     {
         /// <summary>
         /// A generic token identifier(i.e. KEYWORD, OPERATOR, ect.)

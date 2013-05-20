@@ -14,10 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Parser.Defininitions;
 using Parser.Grammar;
-using Parser.LexicalAnalysis;
 using Parser.StateMachine;
+using LexicalAnalysis;
 
 namespace _4._0Parser
 {

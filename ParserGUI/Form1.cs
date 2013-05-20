@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Parser.Defininitions;
+using Lexer.Defininitions;
+using Lexer = Lexer.LexicalAnalysis.Lexer;
 using Parser.Grammar;
-using Parser.LexicalAnalysis;
 using Parser.StateMachine;
 
 namespace ParserGUI
@@ -281,7 +281,7 @@ namespace ParserGUI
                 List<dynamic> row = new List<dynamic>();
                 for (int r = 0; r < grdTable.Columns.Count; r++)
                 {
-                    
+
                     if (r < rows[i].Count())
                     {
                         if (grdTable.Columns[r].HeaderText == rows[i].ElementAt(r).Input.ToString())
