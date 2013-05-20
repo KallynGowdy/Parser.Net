@@ -10,7 +10,7 @@ namespace Parser.StateMachine
 
 
     /// <summary>
-    /// Provides an implementation of a DFA table.
+    /// Provides an implementation of a DFA parse table.
     /// </summary>
     public class ParseTable<T>
     {
@@ -144,6 +144,45 @@ namespace Parser.StateMachine
         }
 
         /// <summary>
+        /// Gets the action(s) given the current state and the next input.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="nextInput"></param>
+        /// <exception cref="System.ArgumentNullException"/>
+        /// <returns>A array of ShiftActions if the operation is to move, ReduceActions if the operation is to Reduce, or AcceptActions if the parse is valid.
+        /// Returns null if the action does not exist.</returns>
+        public ParserAction[] this[int currentState, GrammarElement<T> nextInput]
+        {
+            get
+            {
+                if (nextInput == null)
+                {
+                    throw new ArgumentNullException("nextInput");
+                }
+                if (nextInput is Terminal<T>)
+                {
+                    //if the given state and next input are in the table
+                    if (ActionTable.Any(a => a.Key.Row == currentState && a.Key.Column.Equals(nextInput)))
+                    {
+                        //return the action
+                        return ActionTable[currentState, (Terminal<T>)nextInput].ToArray();
+                    }
+                }
+                else
+                {
+                    //if the given state and next input are in the table
+                    if (GotoTable.Any(a => a.Key.Row == currentState && a.Key.Column.Equals(nextInput)))
+                    {
+                        //return a new shift action representing the goto movement.
+                        return new[] { new ShiftAction(this, GotoTable[currentState, (NonTerminal<T>)nextInput].Value) };
+                    }
+                }
+                //the item does not exist in the table, return null.
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Adds a shift command to the action table at the position between the given element and given currentState, with the given actions as the values.
         /// </summary>
         /// <param name="element"></param>
@@ -208,28 +247,37 @@ namespace Parser.StateMachine
             buildParseTable(graph, startingElement);//, state, startingElement, ref state);
         }
 
-        private void buildParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
+        /// <summary>
+        /// Builds the parse table from the given node and starting element.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="startingElement"></param>
+        private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> node, NonTerminal<T> startingElement)
         {
-            if(graph == null)
+            if (node == null)
             {
-                throw new ArgumentNullException("graph");
+                throw new ArgumentNullException("node");
             }
-            if(startingElement == null)
+            if (startingElement == null)
             {
                 throw new ArgumentNullException("startingElement");
             }
 
+            //clear the tables
+            this.ActionTable.Clear();
+            this.GotoTable.Clear();
+
             //get the breadth-first traversal of the graph
-            var t = graph.GetBreadthFirstTraversal().ToList();
+            var t = node.GetBreadthFirstTraversal().ToList();
 
 
             //add the transitions for each node in the traversal
-            for(int i = 0; i < t.Count; i++)
+            for (int i = 0; i < t.Count; i++)
             {
                 //for each transition in the node, add either a shift action or goto action
-                foreach(var transition in t[i].FromTransitions)
+                foreach (var transition in t[i].FromTransitions)
                 {
-                    if(transition.Key is Terminal<T>)
+                    if (transition.Key is Terminal<T>)
                     {
                         //add a shift from this state to the next state
                         addAction((Terminal<T>)transition.Key, i, new ShiftAction(this, t.IndexOf(transition.Value)));
@@ -242,10 +290,69 @@ namespace Parser.StateMachine
 
                 //for each of the items in the state that are at the end of a production,
                 //add either a reduce action or accept action
-                foreach(LRItem<T> item in t[i].Value.Where(a => a.IsAtEndOfProduction()))
+                foreach (LRItem<T> item in t[i].Value.Where(a => a.IsAtEndOfProduction()))
                 {
                     //if we would reduce to the starting element, then accept
-                    if(item.LeftHandSide.Equals(startingElement))
+                    if (item.LeftHandSide.Equals(startingElement))
+                    {
+                        addAction(item.LookaheadElement, i, new AcceptAction(this, item));
+                    }
+                    //otherwise, add a reduce action
+                    else
+                    {
+                        addAction(item.LookaheadElement, i, new ReduceAction(this, item));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Builds the parse table from the given graph and starting element.
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="startingElement"></param>
+        private void buildParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
+        {
+            if (graph == null)
+            {
+                throw new ArgumentNullException("graph");
+            }
+            if (startingElement == null)
+            {
+                throw new ArgumentNullException("startingElement");
+            }
+
+            //clear the tables
+            this.ActionTable.Clear();
+            this.GotoTable.Clear();
+
+            //get the breadth-first traversal of the graph
+            var t = graph.GetBreadthFirstTraversal().ToList();
+
+
+            //add the transitions for each node in the traversal
+            for (int i = 0; i < t.Count; i++)
+            {
+                //for each transition in the node, add either a shift action or goto action
+                foreach (var transition in t[i].FromTransitions)
+                {
+                    if (transition.Key is Terminal<T>)
+                    {
+                        //add a shift from this state to the next state
+                        addAction((Terminal<T>)transition.Key, i, new ShiftAction(this, t.IndexOf(transition.Value)));
+                    }
+                    else
+                    {
+                        addGoto((NonTerminal<T>)transition.Key, i, t.IndexOf(transition.Value));
+                    }
+                }
+
+                //for each of the items in the state that are at the end of a production,
+                //add either a reduce action or accept action
+                foreach (LRItem<T> item in t[i].Value.Where(a => a.IsAtEndOfProduction()))
+                {
+                    //if we would reduce to the starting element, then accept
+                    if (item.LeftHandSide.Equals(startingElement))
                     {
                         addAction(item.LookaheadElement, i, new AcceptAction(this, item));
                     }
@@ -263,60 +370,53 @@ namespace Parser.StateMachine
         /// </summary>
         /// <param name="currentNode"></param>
         /// <param name="currentStateIndex">The interger identifier of the given currentNode</param>
-        private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, int currentStateIndex, NonTerminal<T> startingElement, ref int nextIndex)
-        {
-            int currentState = currentStateIndex;
+        //private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, int currentStateIndex, NonTerminal<T> startingElement, ref int nextIndex)
+        //{
+        //    int currentState = currentStateIndex;
 
-            if(nextIndex == 0)
-            {
-                nextIndex = 1;
-            }
+        //    if (nextIndex == 0)
+        //    {
+        //        nextIndex = 1;
+        //    }
 
-            foreach (var transition in currentNode.FromTransitions)
-            {
-                int index = (nextIndex);
-                //add a shift transition to the ActionTable
-                if (transition.Key is Terminal<T>)
-                {
-                    //add a shift action from the current state to the next state
-                    addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, index) });
-                }
-                //otherwise add to goto table
-                else
-                {
-                    addGoto((NonTerminal<T>)transition.Key, currentStateIndex, index);
-                }
+        //    foreach (var transition in currentNode.FromTransitions)
+        //    {
+        //        int index = (nextIndex);
+        //        //add a shift transition to the ActionTable
+        //        if (transition.Key is Terminal<T>)
+        //        {
+        //            //add a shift action from the current state to the next state
+        //            addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, index) });
+        //        }
+        //        //otherwise add to goto table
+        //        else
+        //        {
+        //            addGoto((NonTerminal<T>)transition.Key, currentStateIndex, index);
+        //        }
+        //        nextIndex++;
+        //    }
 
-                //if (index == -1)
-                //{
-                //    index = currentIndex + currentNode.FromTransitions.Length;
-                //}
-                //build from the next transition
+        //    //add the nodes of the transition nodes to the table
+        //    foreach (var trans in currentNode.FromTransitions)
+        //    {
+        //        buildParseTable(trans.Value, nextIndex, startingElement, ref nextIndex);
+        //    }
 
-                nextIndex++;
-            }
-
-            //add the nodes of the transition nodes to the table
-            foreach (var trans in currentNode.FromTransitions)
-            {
-                buildParseTable(trans.Value, nextIndex, startingElement, ref nextIndex);
-            }
-
-            //add a reduce for every item that is at the end of the production
-            foreach (LRItem<T> i in currentNode.Value.Where(a => a.IsAtEndOfProduction()))
-            {
-                if (i.LeftHandSide.Equals(startingElement))
-                {
-                    //accept
-                    addAction(i.LookaheadElement, currentStateIndex, new[] { new AcceptAction(this, i) });
-                }
-                else
-                {
-                    //reduce
-                    addAction(i.LookaheadElement, currentStateIndex, new[] { new ReduceAction(this, i) });
-                }
-            }
-        }
+        //    //add a reduce for every item that is at the end of the production
+        //    foreach (LRItem<T> i in currentNode.Value.Where(a => a.IsAtEndOfProduction()))
+        //    {
+        //        if (i.LeftHandSide.Equals(startingElement))
+        //        {
+        //            //accept
+        //            addAction(i.LookaheadElement, currentStateIndex, new[] { new AcceptAction(this, i) });
+        //        }
+        //        else
+        //        {
+        //            //reduce
+        //            addAction(i.LookaheadElement, currentStateIndex, new[] { new ReduceAction(this, i) });
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Creates a new parse table with the given states as rows, and possibleTerminals with possibleNonTerminals as columns for the Action and Goto tables respectively.
