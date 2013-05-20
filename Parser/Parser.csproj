@@ -60,7 +60,7 @@
     <Compile Include="Table.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lexer\Lexer.csproj">
+    <ProjectReference Include="..\Lexer\LexicalAnalysis.csproj">
       <Project>{585c5449-33fd-45d6-8da0-948c41b0859d}</Project>
       <Name>Lexer</Name>
     </ProjectReference>

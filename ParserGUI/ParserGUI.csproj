@@ -79,6 +79,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lexer\LexicalAnalysis.csproj">
+      <Project>{585c5449-33fd-45d6-8da0-948c41b0859d}</Project>
+      <Name>LexicalAnalysis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Parser\Parser.csproj">
       <Project>{7bf0258e-f67b-45fe-9710-83955acd4cf2}</Project>
       <Name>Parser</Name>

@@ -8,10 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Lexer.Defininitions;
-using Lexer = Lexer.LexicalAnalysis.Lexer;
 using Parser.Grammar;
 using Parser.StateMachine;
+using LexicalAnalysis.Defininitions;
+using LexicalAnalysis;
 
 namespace ParserGUI
 {
