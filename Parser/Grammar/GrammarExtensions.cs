@@ -62,9 +62,9 @@ namespace Parser.Grammar
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Terminal<T> ToTerminal<T>(this T value)
+        public static Terminal<T> ToTerminal<T>(this T value, bool keep = true)
         {
-            return new Terminal<T>(value);
+            return new Terminal<T>(value, keep);
         }
 
         /// <summary>

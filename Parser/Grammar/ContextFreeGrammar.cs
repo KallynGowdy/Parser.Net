@@ -394,7 +394,7 @@ namespace Parser.Grammar
         [Obsolete("Use CreateTransitions(graph)")]
         public IEnumerable<IEnumerable<LRItem<T>>> CreateStates(IEnumerable<LRItem<T>> state, IEnumerable<IEnumerable<LRItem<T>>> currentStates = null)
         {
-            ParseTable<T> table = new ParseTable<T>();
+            LRParseTable<T> table = new LRParseTable<T>();
 
             List<IEnumerable<LRItem<T>>> existingSets = new List<IEnumerable<LRItem<T>>>();
             if (state != null)

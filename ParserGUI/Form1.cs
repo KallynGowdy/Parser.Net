@@ -240,7 +240,7 @@ namespace ParserGUI
 
             var graph = grammar.CreateStateGraph();
 
-            var table = new ParseTable<string>(graph, grammar.StartElement);
+            var table = new LRParseTable<string>(graph, grammar.StartElement);
             w.Stop();
 
             List<dynamic> gridCollection = new List<dynamic>();

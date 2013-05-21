@@ -7,132 +7,11 @@ using Parser.Grammar;
 
 namespace Parser.StateMachine
 {
-
-
     /// <summary>
-    /// Provides an implementation of a DFA parse table.
+    /// Provides an implementation of a LR(1) DFA parse table.
     /// </summary>
-    public class ParseTable<T>
+    public class LRParseTable<T> : IParseTable<T>
     {
-        /// <summary>
-        /// Provides an abstract class that defines an action that the parser should take when input is read based on the current state.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public abstract class ParserAction
-        {
-            /// <summary>
-            /// Gets the parse table that the Action uses to determine what to perform.
-            /// </summary>
-            public ParseTable<T> ParseTable
-            {
-                get;
-                private set;
-            }
-
-            public ParserAction(ParseTable<T> table)
-            {
-                this.ParseTable = table;
-            }
-        }
-
-        /// <summary>
-        /// Provides a class that defines that a "shift" should occur at the location that the action is stored in the table.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public sealed class ShiftAction : ParserAction
-        {
-            /// <summary>
-            /// Gets the next state that the parser should move to.
-            /// </summary>
-            public int NextState
-            {
-                get;
-                private set;
-            }
-
-            public ShiftAction(ParseTable<T> table, int nextState)
-                : base(table)
-            {
-                if (nextState < 0)
-                {
-                    throw new ArgumentOutOfRangeException("nextState", "Must be greater than or equal to 0");
-                }
-                this.NextState = nextState;
-            }
-
-            public override string ToString()
-            {
-                return string.Format("Shift({0})", NextState);
-            }
-        }
-
-        /// <summary>
-        /// Provides a class that defines that a "reduce" should occur at the location that the action is stored in the table.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public sealed class ReduceAction : ParserAction
-        {
-            /// <summary>
-            /// Gets the item that defines the reduction to perform.
-            /// </summary>
-            public LRItem<T> ReduceItem
-            {
-                get;
-                private set;
-            }
-
-            public ReduceAction(ParseTable<T> table, LRItem<T> reduceItem)
-                : base(table)
-            {
-                if (reduceItem != null)
-                {
-                    this.ReduceItem = reduceItem;
-                }
-                else
-                {
-                    throw new ArgumentNullException("reduceItem", "Must be non-null");
-                }
-            }
-
-            public override string ToString()
-            {
-                return string.Format("Reduce({0})", ReduceItem.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Provides a class that defines that the parse should be accepted(and therefore successful).
-        /// </summary>
-        public sealed class AcceptAction : ParserAction
-        {
-            /// <summary>
-            /// Gets the item that defines that the parse should be accepted.
-            /// </summary>
-            public LRItem<T> AcceptItem
-            {
-                get;
-                private set;
-            }
-
-            public AcceptAction(ParseTable<T> table, LRItem<T> acceptItem)
-                : base(table)
-            {
-                if (acceptItem != null)
-                {
-                    this.AcceptItem = acceptItem;
-                }
-                else
-                {
-                    throw new ArgumentNullException("acceptItem", "Must be non-null");
-                }
-            }
-
-            public override string ToString()
-            {
-                return "Accept";
-            }
-        }
-
         //A DFA for a parser contains two tables
         //1). The ACTION table
         //2). the GOTO table
@@ -143,7 +22,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Defines a table that maps states(int) and Tokens(T) to Actions(Action(state, token)). This property is read only.
         /// </summary>
-        public Table<int, Terminal<T>, List<ParserAction>> ActionTable
+        public Table<int, Terminal<T>, List<ParserAction<T>>> ActionTable
         {
             get;
             private set;
@@ -166,7 +45,7 @@ namespace Parser.StateMachine
         /// <exception cref="System.ArgumentNullException"/>
         /// <returns>A array of ShiftActions if the operation is to move, ReduceActions if the operation is to Reduce, or AcceptActions if the parse is valid.
         /// Returns null if the action does not exist.</returns>
-        public ParserAction[] this[int currentState, GrammarElement<T> nextInput]
+        public ParserAction<T>[] this[int currentState, GrammarElement<T> nextInput]
         {
             get
             {
@@ -189,7 +68,7 @@ namespace Parser.StateMachine
                     if (GotoTable.Any(a => a.Key.Row == currentState && a.Key.Column.Equals(nextInput)))
                     {
                         //return a new shift action representing the goto movement.
-                        return new[] { new ShiftAction(this, GotoTable[currentState, (NonTerminal<T>)nextInput].Value) };
+                        return new[] { new ShiftAction<T>(this, GotoTable[currentState, (NonTerminal<T>)nextInput].Value) };
                     }
                 }
                 //the item does not exist in the table, return null.
@@ -203,7 +82,7 @@ namespace Parser.StateMachine
         /// <param name="element"></param>
         /// <param name="currentState"></param>
         /// <param name="actions"></param>
-        private void addAction(Terminal<T> element, int currentState, params ParserAction[] actions)
+        private void addAction(Terminal<T> element, int currentState, params ParserAction<T>[] actions)
         {
             //if the column already exists
             if (ActionTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
@@ -242,9 +121,9 @@ namespace Parser.StateMachine
         /// <summary>
         /// Creates a new, empty parse table.
         /// </summary>
-        public ParseTable()
+        public LRParseTable()
         {
-            ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
+            ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
         }
 
@@ -252,9 +131,9 @@ namespace Parser.StateMachine
         /// Creates a new parse table from the given graph.
         /// </summary>
         /// <param name="graph"></param>
-        public ParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
+        public LRParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
         {
-            ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
+            ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
 
             //int state = 0;
@@ -295,7 +174,7 @@ namespace Parser.StateMachine
                     if (transition.Key is Terminal<T>)
                     {
                         //add a shift from this state to the next state
-                        addAction((Terminal<T>)transition.Key, i, new ShiftAction(this, t.IndexOf(transition.Value)));
+                        addAction((Terminal<T>)transition.Key, i, new ShiftAction<T>(this, t.IndexOf(transition.Value)));
                     }
                     else
                     {
@@ -310,12 +189,12 @@ namespace Parser.StateMachine
                     //if we would reduce to the starting element, then accept
                     if (item.LeftHandSide.Equals(startingElement))
                     {
-                        addAction(item.LookaheadElement, i, new AcceptAction(this, item));
+                        addAction(item.LookaheadElement, i, new AcceptAction<T>(this, item));
                     }
                     //otherwise, add a reduce action
                     else
                     {
-                        addAction(item.LookaheadElement, i, new ReduceAction(this, item));
+                        addAction(item.LookaheadElement, i, new ReduceAction<T>(this, item));
                     }
                 }
             }
@@ -354,7 +233,7 @@ namespace Parser.StateMachine
                     if (transition.Key is Terminal<T>)
                     {
                         //add a shift from this state to the next state
-                        addAction((Terminal<T>)transition.Key, i, new ShiftAction(this, t.IndexOf(transition.Value)));
+                        addAction((Terminal<T>)transition.Key, i, new ShiftAction<T>(this, t.IndexOf(transition.Value)));
                     }
                     else
                     {
@@ -369,12 +248,12 @@ namespace Parser.StateMachine
                     //if we would reduce to the starting element, then accept
                     if (item.LeftHandSide.Equals(startingElement))
                     {
-                        addAction(item.LookaheadElement, i, new AcceptAction(this, item));
+                        addAction(item.LookaheadElement, i, new AcceptAction<T>(this, item));
                     }
                     //otherwise, add a reduce action
                     else
                     {
-                        addAction(item.LookaheadElement, i, new ReduceAction(this, item));
+                        addAction(item.LookaheadElement, i, new ReduceAction<T>(this, item));
                     }
                 }
             }
@@ -439,9 +318,9 @@ namespace Parser.StateMachine
         /// <param name="possibleTerminals"></param>
         /// <param name="possibleNonTerminals"></param>
         /// <param name="states"></param>
-        public ParseTable(IEnumerable<Terminal<T>> possibleTerminals, IEnumerable<NonTerminal<T>> possibleNonTerminals, IEnumerable<int> states)
+        public LRParseTable(IEnumerable<Terminal<T>> possibleTerminals, IEnumerable<NonTerminal<T>> possibleNonTerminals, IEnumerable<int> states)
         {
-            this.ActionTable = new Table<int, Terminal<T>, List<ParserAction>>();
+            this.ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             foreach (Terminal<T> t in possibleTerminals)
             {
                 foreach (int s in states)

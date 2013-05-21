@@ -13,11 +13,21 @@ namespace Parser.Grammar
     public class Terminal<T> : GrammarElement<T>
     {
 
-        public Terminal(T value)
+        public Terminal(T value, bool keep = true)
             : base(value)
         {
+            this.Keep = keep;
         }
 
+
+        /// <summary>
+        /// Gets or sets whether this Terminal element should be kept or discarded when building an abstract sentax tree.
+        /// </summary>
+        public bool Keep
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets a unique interger value that describes this object that is garenteed not to change.

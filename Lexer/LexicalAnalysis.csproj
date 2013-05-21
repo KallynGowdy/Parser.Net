@@ -7,7 +7,7 @@
     <ProjectGuid>{585C5449-33FD-45D6-8DA0-948C41B0859D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lexer</RootNamespace>
+    <RootNamespace>Parser</RootNamespace>
     <AssemblyName>Lexer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

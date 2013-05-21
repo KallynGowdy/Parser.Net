@@ -31,10 +31,11 @@ namespace Parser
     /// <typeparam name="T"></typeparam>
     public interface IGrammarParser<T> : IParser<T>
     {
-        ContextFreeGrammar<T> Grammar
-        {
-            get;
-        }
+        /// <summary>
+        /// Sets the internal parse table of the parser from the given grammar.
+        /// </summary>
+        /// <param name="grammar"></param>
+        void SetParseTable(ContextFreeGrammar<T> grammar);
     }
 
     /// <summary>
@@ -43,7 +44,20 @@ namespace Parser
     /// <typeparam name="T"></typeparam>
     public interface IGraphParser<T> : IParser<T>
     {
-        StateGraph<GrammarElement<T>, LRItem<T>[]> Graph
+        /// <summary>
+        /// Sets the internal parse table of the parser from the given graph.
+        /// </summary>
+        /// <param name="grammar"></param>
+        void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph);
+    }
+
+    /// <summary>
+    /// Provides an interface for a parser that can parse input with a StateGraph into either an AST or Parse Tree.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface ITableParser<T> : IParser<T>
+    {
+        IParseTable<T> Table
         {
             get;
         }
