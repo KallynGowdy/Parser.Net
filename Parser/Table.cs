@@ -20,7 +20,7 @@ namespace Parser
         /// </summary>
         public Table()
         {
-            lookup = new Dictionary<ColumnRowPair<TRow,TColumn>,TValue>();
+            lookup = new Dictionary<ColumnRowPair<TRow, TColumn>, TValue>();
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Parser
         /// <param name="items"></param>
         public Table(IDictionary<ColumnRowPair<TRow, TColumn>, TValue> items)
         {
-            lookup = new Dictionary<ColumnRowPair<TRow,TColumn>,TValue>(items);   
+            lookup = new Dictionary<ColumnRowPair<TRow, TColumn>, TValue>(items);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Parser
         /// <param name="value"></param>
         public void Add(TRow row, TColumn column, TValue value)
         {
-            lookup.Add(new ColumnRowPair<TRow,TColumn>(row, column), value);
+            lookup.Add(new ColumnRowPair<TRow, TColumn>(row, column), value);
         }
 
         /// <summary>
@@ -119,7 +119,18 @@ namespace Parser
         {
             get
             {
-                return lookup.Where(a => a.Key.Row.Equals(row) && a.Key.Column.Equals(column)).First().Value;
+                KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> v = lookup.Where(a =>
+                {
+                    return a.Key.Row.Equals(row) && a.Key.Column.Equals(column);
+                }).FirstOrDefault();
+                if (v.Value != null)
+                {
+                    return v.Value;
+                }
+                else
+                {
+                    return default(TValue);
+                }
             }
             set
             {

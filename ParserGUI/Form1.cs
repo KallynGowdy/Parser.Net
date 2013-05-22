@@ -12,6 +12,7 @@ using Parser.Grammar;
 using Parser.StateMachine;
 using LexicalAnalysis.Defininitions;
 using LexicalAnalysis;
+using Parser.Parsers;
 
 namespace ParserGUI
 {
@@ -60,46 +61,47 @@ namespace ParserGUI
                 }
             }
 
-            ContextFreeGrammar<string> grammar = new ContextFreeGrammar<string>(
-                productions.First().NonTerminal,
-                "$".ToTerminal(),
-                //new Production<string>[]
-                //{
-                //    ////A -> A + B
-                //    //new Production<string>(terms[0], terms[0], new Terminal<string>("+"), terms[1]),
-                //    ////A -> a
-                //    //new Production<string>(terms[0], new Terminal<string>("a")),
-                //    ////B -> b
-                //    //new Production<string>(terms[1], new Terminal<string>("b"))
+            ContextFreeGrammar<Token<string>> grammar = new ContextFreeGrammar<Token<string>>(
+                //productions.First().NonTerminal,
+                (new Token<string>(0, "E", null)).ToNonTerminal(),
+                (new Token<string>(0, "$", null)).ToTerminal(true),
+                new Production<Token<string>>[]
+                {
+                    ////A -> A + B
+                    //new Production<string>(terms[0], terms[0], new Terminal<string>("+"), terms[1]),
+                    ////A -> a
+                    //new Production<string>(terms[0], new Terminal<string>("a")),
+                    ////B -> b
+                    //new Production<string>(terms[1], new Terminal<string>("b"))
 
-                //    ////E -> T
-                //    //new Production<string>(terms[0], terms[1]),
-                //    ////E -> (E)
-                //    //new Production<string>(terms[0], ("(").ToTerminal(), terms[0], (")").ToTerminal()),
-                //    ////T -> n
-                //    //new Production<string>(terms[1], ("n").ToTerminal()),
-                //    ////T -> + T
-                //    //new Production<string>(terms[1], ("+").ToTerminal(), terms[1]),
-                //    ////T -> T + n
-                //    //new Production<string>(terms[1], terms[1], ("+").ToTerminal(), ("n").ToTerminal())
+                    //E -> T
+                    new Production<Token<string>>("E".ToNonTerminal<Token<string>>(), "T".ToNonTerminal<Token<string>>()),
+                    //E -> (E)
+                    new Production<Token<string>>("E".ToNonTerminal<Token<string>>(), ((new Token<string>(0, "(", null))).ToTerminal(true), "E".ToNonTerminal<Token<string>>(), ((new Token<string>(0, ")", null))).ToTerminal(true)),
+                    //T -> n
+                    new Production<Token<string>>("T".ToNonTerminal<Token<string>>(), ((new Token<string>(0, "n", null))).ToTerminal(true)),
+                    ////T -> + T
+                    //new Production<string>(terms[1], ("+").ToTerminal(), terms[1]),
+                    //T -> T + n
+                    new Production<Token<string>>("T".ToNonTerminal<Token<string>>(), "T".ToNonTerminal<Token<string>>(), (new Token<string>(0, "+", null)).ToTerminal(true), (new Token<string>(0, "n", null)).ToTerminal(true))
 
-                //    ////S -> AB
-                //    //new Production<string>("S".ToNonTerminal(), "A".ToNonTerminal(), "B".ToNonTerminal()),
-                //    ////A -> aAb
-                //    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal(), "A".ToNonTerminal(), "b".ToTerminal()),
-                //    ////A -> a
-                //    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal()),
-                //    ////B -> d
-                //    //new Production<string>("B".ToNonTerminal(), "d".ToTerminal())
+                    ////S -> AB
+                    //new Production<string>("S".ToNonTerminal(), "A".ToNonTerminal(), "B".ToNonTerminal()),
+                    ////A -> aAb
+                    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal(), "A".ToNonTerminal(), "b".ToTerminal()),
+                    ////A -> a
+                    //new Production<string>("A".ToNonTerminal(), "a".ToTerminal()),
+                    ////B -> d
+                    //new Production<string>("B".ToNonTerminal(), "d".ToTerminal())
 
-                //    //E -> EE
-                //    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "E".ToNonTerminal()),
-                //    //E -> E
-                //    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal()),
-                //    //E -> a
-                //    new Production<string>("E".ToNonTerminal(), "a".ToTerminal()),
-                //});
-                productions.ToArray());
+                    ////E -> EE
+                    //new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "E".ToNonTerminal()),
+                    ////E -> E
+                    //new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal()),
+                    ////E -> a
+                    //new Production<string>("E".ToNonTerminal(), "a".ToTerminal()),
+                });
+            //productions.ToArray());
 
             //    var closure = grammar.Closure(grammar.Productions[0]);
 
@@ -227,108 +229,136 @@ namespace ParserGUI
             };
             #endregion
 
+            //Lexer lexer = new Lexer
+            //{
+            //    Definitions = collection
+            //};
+
+            TokenDefinitionCollection<string> defs = new TokenDefinitionCollection<string>(new[]
+            {
+                new StringedTokenDefinition(@"(\b|^)-?[\d]+(\b|$)", "n"),
+                new StringedTokenDefinition(@"\+", "+"),
+                new StringedTokenDefinition(@"\(", "("),
+                new StringedTokenDefinition(@"\)", ")")
+            });
+
             Lexer lexer = new Lexer
             {
-                Definitions = collection
+                Definitions = defs
             };
 
             Stopwatch w = Stopwatch.StartNew();
 
-            //var tokens = lexer.ReadTokens(text);
+            var tokens = lexer.ReadTokens(txtCFG.Text);
 
             var c = grammar.Closure(grammar.Productions[0]);
 
             var graph = grammar.CreateStateGraph();
 
-            var table = new LRParseTable<string>(graph, grammar.StartElement);
+            var table = new LRParseTable<Token<string>>(graph, grammar.StartElement);
+
+            var parser = new LRParser<Token<string>>();
+
+            parser.SetParseTable(grammar);
+
+            var tree = parser.ParseAST(tokens.Select(a => a.ToTerminal(true, t =>
+            { 
+            
+               return t.TokenType.Equals(a.TokenType);
+            
+            })));
             w.Stop();
 
-            List<dynamic> gridCollection = new List<dynamic>();
-
-            foreach (var item in table.ActionTable.Select(a => new
-            {
-                State = a.Key.Row,
-                Input = a.Key.Column,
-                Value = a.Value
-            }))
-            {
-                gridCollection.Add(item);
-            }
-
-            foreach (var item in table.GotoTable.Select(a => new
-            {
-                State = a.Key.Row,
-                Input = a.Key.Column,
-                Value = a.Value
-            }))
-            {
-                gridCollection.Add(item);
-            }
-            //grdTable.AutoGenerateColumns = true;
-
-            grdTable.Columns.Clear();
-
-            grdTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
-            foreach (dynamic column in gridCollection.OrderBy(a => a is Terminal<string>).Select(a => a.Input).DistinctBy(a => a.ToString()))
-            {
-                DataGridViewColumn col = new DataGridViewTextBoxColumn();
-                col.HeaderText = column.ToString();
-                col.SortMode = DataGridViewColumnSortMode.NotSortable;
-                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-                grdTable.Columns.Add(col);
-            }
             
 
-            grdTable.Columns[grdTable.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            #region Parse Table Builder
+            //List<dynamic> gridCollection = new List<dynamic>();
 
-            grdTable.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            //foreach (var item in table.ActionTable.Select(a => new
+            //{
+            //    State = a.Key.Row,
+            //    Input = a.Key.Column,
+            //    Value = a.Value
+            //}))
+            //{
+            //    gridCollection.Add(item);
+            //}
 
-            var rows = gridCollection.GroupBy(a => a.State).Select(a => new List<dynamic>(a)).ToArray();
-            for (int i = 0; i < rows.Length; i++)
-            {
-                List<dynamic> row = new List<dynamic>();
-                for (int r = 0; r < grdTable.Columns.Count; r++)
-                {
+            //foreach (var item in table.GotoTable.Select(a => new
+            //{
+            //    State = a.Key.Row,
+            //    Input = a.Key.Column,
+            //    Value = a.Value
+            //}))
+            //{
+            //    gridCollection.Add(item);
+            //}
+            ////grdTable.AutoGenerateColumns = true;
 
-                    if (r < rows[i].Count())
-                    {
-                        if (rows[i].Any(a =>
-                        {
-                            if (a != null)
-                            {
-                                return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
-                            }
-                            return false;
-                        }))
-                        {
-                            row.Add(concatArray(rows[i].First(a =>
-                            {
-                                if (a != null)
-                                {
-                                    return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
-                                }
-                                return false;
-                            }).Value, "\n"));
-                        }
-                        else
-                        {
-                            row.Add(null);
-                            rows[i].Insert(r, null);
-                        }
-                    }
-                }
-                grdTable.Rows.Add(row.ToArray());
-                grdTable.Rows[i].HeaderCell.Value = i.ToString();
-                
-            }
+            //grdTable.Columns.Clear();
 
-            foreach(DataGridViewColumn column in grdTable.Columns)
-            {
-                int colw = column.Width;
-                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-                column.Width = colw;
-            }
+            //grdTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
+            //foreach (dynamic column in gridCollection.OrderBy(a => a is Terminal<string>).Select(a => a.Input).DistinctBy(a => a.ToString()))
+            //{
+            //    DataGridViewColumn col = new DataGridViewTextBoxColumn();
+            //    col.HeaderText = column.ToString();
+            //    col.SortMode = DataGridViewColumnSortMode.NotSortable;
+            //    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            //    grdTable.Columns.Add(col);
+            //}
+
+
+            //grdTable.Columns[grdTable.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            //grdTable.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+
+            //var rows = gridCollection.GroupBy(a => a.State).Select(a => new List<dynamic>(a)).ToArray();
+            //for (int i = 0; i < rows.Length; i++)
+            //{
+            //    List<dynamic> row = new List<dynamic>();
+            //    for (int r = 0; r < grdTable.Columns.Count; r++)
+            //    {
+
+            //        if (r < rows[i].Count())
+            //        {
+            //            if (rows[i].Any(a =>
+            //            {
+            //                if (a != null)
+            //                {
+            //                    return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
+            //                }
+            //                return false;
+            //            }))
+            //            {
+            //                row.Add(concatArray(rows[i].First(a =>
+            //                {
+            //                    if (a != null)
+            //                    {
+            //                        return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
+            //                    }
+            //                    return false;
+            //                }).Value, "\n"));
+            //            }
+            //            else
+            //            {
+            //                row.Add(null);
+            //                rows[i].Insert(r, null);
+            //            }
+            //        }
+            //    }
+            //    grdTable.Rows.Add(row.ToArray());
+            //    grdTable.Rows[i].HeaderCell.Value = i.ToString();
+
+            //}
+
+            //foreach(DataGridViewColumn column in grdTable.Columns)
+            //{
+            //    int colw = column.Width;
+            //    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            //    column.Width = colw;
+            //} 
+            #endregion
         }
 
         /// <summary>

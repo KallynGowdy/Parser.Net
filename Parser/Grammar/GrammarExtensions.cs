@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LexicalAnalysis;
 using Parser.Grammar;
 
 namespace Parser.Grammar
@@ -56,15 +57,31 @@ namespace Parser.Grammar
             return table;
         }
 
+        public static Terminal<Token<T>> ToTerminal<T>(this Token<T> value, bool keep)
+        {
+            return new Terminal<Token<T>>(value, keep, a => value.TokenType.Equals(a.TokenType));
+        }
+
         /// <summary>
         /// Returns a new Terminal(T) object whose value is currentValue.ToString().
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Terminal<T> ToTerminal<T>(this T value, bool keep = true)
+        public static Terminal<T> ToTerminal<T>(this T value, bool keep = true, Predicate<T> equalityOperator = null)
         {
-            return new Terminal<T>(value, keep);
+            return new Terminal<T>(value, keep, equalityOperator);
+        }
+
+        /// <summary>
+        /// Returns a new NonTerminal(T) object whose name is currentValue.ToString().
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static NonTerminal<T> ToNonTerminal<T>(this string value)
+        {
+            return new NonTerminal<T>(value.ToString());
         }
 
         /// <summary>

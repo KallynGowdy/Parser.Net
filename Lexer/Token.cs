@@ -40,5 +40,10 @@ namespace LexicalAnalysis
             this.TokenType = tokenType;
             this.Value = value;
         }
+
+        public override string ToString()
+        {
+            return TokenType;
+        }
     }
 }

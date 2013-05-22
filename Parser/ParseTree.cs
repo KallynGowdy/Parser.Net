@@ -84,6 +84,7 @@ namespace Parser
             {
                 this.Value = value;
                 this.ParentTree = tree;
+                this.children = new List<ParseTreebranch>();
             }
 
             public ParseTreebranch(GrammarElement<T> value, ParseTreebranch parent)
@@ -91,11 +92,13 @@ namespace Parser
                 this.Value = value;
                 this.Parent = parent;
                 this.ParentTree = parent.ParentTree;
+                this.children = new List<ParseTreebranch>();
             }
 
             public ParseTreebranch(GrammarElement<T> value)
             {
                 this.Value = value;
+                this.children = new List<ParseTreebranch>();
             }
         }
 

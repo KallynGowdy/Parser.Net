@@ -13,12 +13,28 @@ namespace Parser.Grammar
     public class Terminal<T> : GrammarElement<T>
     {
 
-        public Terminal(T value, bool keep = true)
+        public Terminal(T value, bool keep = true, Predicate<T> equalityOperator = null)
             : base(value)
         {
             this.Keep = keep;
+            if(equalityOperator == null)
+            {
+                this.EqualityOperator = a => this.InnerValue.Equals(a);
+            }
+            else
+            {
+                this.EqualityOperator = equalityOperator;
+            }
         }
 
+        /// <summary>
+        /// Gets or sets the equality operator that determines if this terminal equals another terminal.
+        /// </summary>
+        public Predicate<T> EqualityOperator
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets whether this Terminal element should be kept or discarded when building an abstract sentax tree.
@@ -46,7 +62,7 @@ namespace Parser.Grammar
         /// <returns></returns>
         public bool Equals(Terminal<T> terminal)
         {
-            return this.InnerValue.Equals(terminal.InnerValue);
+            return this.EqualityOperator(terminal.InnerValue);
         }
 
         /// <summary>
