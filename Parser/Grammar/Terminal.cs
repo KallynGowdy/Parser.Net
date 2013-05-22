@@ -17,7 +17,7 @@ namespace Parser.Grammar
             : base(value)
         {
             this.Keep = keep;
-            if(equalityOperator == null)
+            if (equalityOperator == null)
             {
                 this.EqualityOperator = a => this.InnerValue.Equals(a);
             }
@@ -55,6 +55,31 @@ namespace Parser.Grammar
         }
 
 
+        public static bool operator ==(Terminal<T> left, Terminal<T> right)
+        {
+            if (((object)left) == null || ((object)right) == null)
+            {
+                return ((object)left) == ((object)right);
+            }
+            else
+            {
+                return left.Equals(right);
+            }
+        }
+
+        public static bool operator !=(Terminal<T> left, Terminal<T> right)
+        {
+            if (((object)left) == null || ((object)right) == null)
+            {
+                return ((object)left) != ((object)right);
+            }
+            else
+            {
+                return !left.Equals(right);
+            }
+        }
+
+
         /// <summary>
         /// Determines if this terminal is equal to the given other terminal.
         /// </summary>
@@ -62,7 +87,14 @@ namespace Parser.Grammar
         /// <returns></returns>
         public bool Equals(Terminal<T> terminal)
         {
-            return this.EqualityOperator(terminal.InnerValue);
+            if (terminal != null)
+            {
+                return this.EqualityOperator(terminal.InnerValue);
+            }
+            else
+            {
+                return (object)this.InnerValue == (object)terminal;
+            }
         }
 
         /// <summary>
@@ -72,7 +104,7 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj is Terminal<T>)
+            if (obj is Terminal<T> || obj == null)
             {
                 return Equals((Terminal<T>)obj);
             }
@@ -88,7 +120,14 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override string ToString()
         {
-            return InnerValue.ToString();
+            if (this.InnerValue != null)
+            {
+                return InnerValue.ToString();
+            }
+            else
+            {
+                return base.ToString();
+            }
         }
     }
 }

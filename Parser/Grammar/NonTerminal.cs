@@ -19,7 +19,7 @@ namespace Parser.Grammar
         public string Name
         {
             get;
-            private set;
+            set;
         }
 
         /// <summary>

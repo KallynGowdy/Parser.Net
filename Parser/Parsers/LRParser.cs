@@ -182,7 +182,6 @@ namespace Parser.Parsers
                 {
                     return null;
                 }
-
             }
             return null;
         }
@@ -195,6 +194,95 @@ namespace Parser.Parsers
         public ParseTree<T> ParseSentaxTree(IEnumerable<Terminal<T>> input)
         {
             checkParseTable();
+            ParseTree<T>.ParseTreebranch currentBranch = null;
+
+            //create a stack to record which states we have been to.
+            Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = new Stack<KeyValuePair<int, GrammarElement<T>>>();
+
+            //push the first state
+            stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(0, null));
+
+            List<Terminal<T>> augmentedInput = new List<Terminal<T>>(input);
+            augmentedInput.Add(EndOfInputElement);
+
+            for (int i = 0; i < augmentedInput.Count; i++)
+            {
+                Terminal<T> item = augmentedInput[i];
+                int s = stateStack.Peek().Key;
+                var actions = ParseTable.ActionTable[s, item];
+
+                if (actions != null)
+                {
+                    ParserAction<T> action = actions.First();
+                    //if there is an action
+                    if (action != null)
+                    {
+                        //if we should shift
+                        if (action is ShiftAction<T>)
+                        {
+                            //push the state and item
+                            stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(((ShiftAction<T>)action).NextState, item));
+                        }
+                        //otherwise if we should reduce
+                        else if (action is ReduceAction<T>)
+                        {
+                            ReduceAction<T> r = (ReduceAction<T>)action;
+
+                            List<GrammarElement<T>> e = new List<GrammarElement<T>>();
+
+                            //pop the number of elements in the RHS of the item
+                            for (int c = 0; c < r.ReduceItem.ProductionElements.Length; c++)
+                            {
+                                e.Add(stateStack.Pop().Value);
+                            }
+                            e.Reverse();
+
+                            //set the current branch if it is null
+                            if (currentBranch == null)
+                            {
+                                currentBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
+                                currentBranch.AddChildren(e.Where(a =>
+                                {
+                                    if (a is Terminal<T>)
+                                    {
+                                        return ((Terminal<T>)a).Keep;
+                                    }
+                                    return true;
+                                }).Select(a => new ParseTree<T>.ParseTreebranch(a)));
+                            }
+                            //otherwise create a new branch and set that as the parent of the current branch
+                            else
+                            {
+                                ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
+                                newBranch.AddChild(currentBranch);
+
+                                //add all of the terminal and non terminal elements
+                                newBranch.AddChildren(e.Select(a => new ParseTree<T>.ParseTreebranch(a)));
+
+                                currentBranch = newBranch;
+                            }
+
+
+                            //push the LHS non-terminal and the next state
+                            stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(parseTable.GotoTable[stateStack.Peek().Key, r.ReduceItem.LeftHandSide].Value, r.ReduceItem.LeftHandSide));
+
+                            //subtract 1 from i so we don't consume the current item
+                            i--;
+                        }
+                        //otherwise if the parse if finished and we should accept
+                        else if (action is AcceptAction<T>)
+                        {
+                            //return a new ParseTree with the root as the current branch
+                            return new ParseTree<T>(currentBranch);
+                        }
+                    }
+                }
+                //otherwise, there is no action and a sentax error has occured.
+                else
+                {
+                    return null;
+                }
+            }
             return null;
         }
 

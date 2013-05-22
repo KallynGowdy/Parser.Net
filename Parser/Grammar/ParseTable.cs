@@ -85,7 +85,7 @@ namespace Parser.StateMachine
         private void addAction(Terminal<T> element, int currentState, params ParserAction<T>[] actions)
         {
             //if the column already exists
-            if (ActionTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
+            if (ActionTable.Keys.Any(a => a.Column == element && a.Row == currentState))
             {
                 //add the actions
                 ActionTable[currentState, element].AddRange(actions);
@@ -125,6 +125,18 @@ namespace Parser.StateMachine
         {
             ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
+        }
+
+        /// <summary>
+        /// Creates a new parse table from the given context free grammar.
+        /// </summary>
+        /// <param name="cfg"></param>
+        public LRParseTable(ContextFreeGrammar<T> cfg)
+        {
+            ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
+            GotoTable = new Table<int, NonTerminal<T>, int?>();
+
+            buildParseTable(cfg.CreateStateGraph(), cfg.StartElement);
         }
 
         /// <summary>

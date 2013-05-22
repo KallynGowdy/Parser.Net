@@ -41,7 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AllInOne\AIOParser.cs" />
     <Compile Include="ColumnRowPair.cs" />
+    <Compile Include="Definitions\ParserProductionTokenDefinition.cs" />
+    <Compile Include="Definitions\ParserTokenDefinition.cs" />
+    <Compile Include="Definitions\ParserTokenDefintionCollection.cs" />
+    <Compile Include="Definitions\StringedParserTokenDefinition.cs" />
     <Compile Include="Grammar\ContextFreeGrammar.cs" />
     <Compile Include="Grammar\IParseTable.cs" />
     <Compile Include="Grammar\ParseTable.cs" />

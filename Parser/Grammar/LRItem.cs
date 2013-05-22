@@ -175,7 +175,14 @@ namespace Parser.StateMachine
         /// <returns></returns>
         public bool Equals(LRItem<T> other)
         {
-            return (this.LeftHandSide.Equals(other.LeftHandSide) && this.DotIndex == other.DotIndex && this.ProductionElements.SequenceEqual(other.ProductionElements) && this.LookaheadElement.Equals(other.LookaheadElement));
+            if (this.LookaheadElement != null && other.LookaheadElement != null)
+            {
+                return (this.LeftHandSide.Equals(other.LeftHandSide) && this.DotIndex == other.DotIndex && this.ProductionElements.SequenceEqual(other.ProductionElements) && this.LookaheadElement.Equals(other.LookaheadElement));
+            }
+            else
+            {
+                return (this.LeftHandSide.Equals(other.LeftHandSide) && this.DotIndex == other.DotIndex && this.ProductionElements.SequenceEqual(other.ProductionElements));
+            }
         }
 
         /// <summary>
@@ -207,7 +214,7 @@ namespace Parser.StateMachine
         /// <returns></returns>
         public bool IsAtEndOfProduction()
         {
-            return (DotIndex >= ProductionElements.Length);            
+            return (DotIndex >= ProductionElements.Length);
         }
 
         /// <summary>
@@ -216,7 +223,7 @@ namespace Parser.StateMachine
         /// <returns></returns>
         public GrammarElement<T> LastElement()
         {
-            if(DotIndex > 0)
+            if (DotIndex > 0)
             {
                 return ProductionElements[DotIndex - 1];
             }

@@ -19,7 +19,7 @@ namespace Parser.Grammar
         public T InnerValue
         {
             get;
-            protected set;
+            set;
         }
 
         public GrammarElement()
