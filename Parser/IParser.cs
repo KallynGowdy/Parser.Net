@@ -16,13 +16,13 @@ namespace Parser
         /// Parses an Abstract Sentax Tree.
         /// </summary>
         /// <returns></returns>
-        ParseTree<T> ParseAST(IEnumerable<T> input);
+        ParseTree<T> ParseAST(IEnumerable<Terminal<T>> input);
 
         /// <summary>
         /// Parses a sentax tree that completely describes the parsed input.
         /// </summary>
         /// <returns></returns>
-        ParseTree<T> ParseSentaxTree(IEnumerable<T> input);
+        ParseTree<T> ParseSentaxTree(IEnumerable<Terminal<T>> input);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ namespace Parser
         /// Sets the internal parse table of the parser from the given graph.
         /// </summary>
         /// <param name="grammar"></param>
-        void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph);
+        void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement);
     }
 
     /// <summary>

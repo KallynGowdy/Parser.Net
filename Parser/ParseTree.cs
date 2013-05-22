@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Parser.Grammar;
 
 namespace Parser
 {
@@ -16,13 +17,17 @@ namespace Parser
         /// </summary>
         public class ParseTreebranch
         {
+            private List<ParseTreebranch> children;
+
             /// <summary>
             /// Gets the list of children of this branch.
             /// </summary>
-            public List<ParseTreebranch> Children
+            public ParseTreebranch[] Children
             {
-                get;
-                internal set;
+                get
+                {
+                    return children.ToArray();
+                }
             }
 
             /// <summary>
@@ -40,32 +45,55 @@ namespace Parser
             public ParseTreebranch Parent
             {
                 get;
-                internal set;
+                private set;
             }
 
             /// <summary>
             /// Gets or sets the value contained by this branch.
             /// </summary>
-            public T Value
+            public GrammarElement<T> Value
             {
                 get;
                 set;
             }
 
-            private ParseTreebranch(T value, ParseTree<T> tree)
+            /// <summary>
+            /// Adds the given branch as a child of this branch.
+            /// </summary>
+            /// <param name="branch"></param>
+            public void AddChild(ParseTreebranch branch)
+            {
+                branch.Parent = this;
+                this.children.Add(branch);
+            }
+
+            /// <summary>
+            /// Adds the given branches as children of this branch.
+            /// </summary>
+            /// <param name="branches"></param>
+            public void AddChildren(IEnumerable<ParseTreebranch> branches)
+            {
+                foreach (ParseTreebranch b in branches)
+                {
+                    b.Parent = this;
+                }
+                this.children.AddRange(branches);
+            }
+
+            private ParseTreebranch(GrammarElement<T> value, ParseTree<T> tree)
             {
                 this.Value = value;
                 this.ParentTree = tree;
             }
 
-            public ParseTreebranch(T value, ParseTreebranch parent)
+            public ParseTreebranch(GrammarElement<T> value, ParseTreebranch parent)
             {
                 this.Value = value;
                 this.Parent = parent;
                 this.ParentTree = parent.ParentTree;
             }
 
-            public ParseTreebranch(T value)
+            public ParseTreebranch(GrammarElement<T> value)
             {
                 this.Value = value;
             }
@@ -78,12 +106,17 @@ namespace Parser
         {
             get;
             private set;
-        }   
+        }
 
         public ParseTree(ParseTreebranch rootBranch)
         {
             this.Root = rootBranch;
             this.Root.ParentTree = this;
+        }
+
+        public ParseTree()
+        {
+
         }
     }
 }
