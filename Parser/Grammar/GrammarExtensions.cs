@@ -33,7 +33,7 @@ namespace Parser.Grammar
         /// <typeparam name="T"></typeparam>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static Table<T1, T2, T> ToTable<T1, T2, T>(this IDictionary<ColumnRowPair<T1, T2>, T> collection)
+        public static Table<T1, T2, T> ToTable<T1, T2, T>(this IDictionary<ColumnRowPair<T1, T2>, T> collection) where T1 : IEquatable<T1> where T2 : IEquatable<T2>
         {
             return new Table<T1,T2,T>(collection);
         }
@@ -48,6 +48,8 @@ namespace Parser.Grammar
         /// <param name="KeySelector"></param>
         /// <returns></returns>
         public static Table<T1, T2, T> ToTable<T1, T2, T>(this IEnumerable<T> collection, Func<T, ColumnRowPair<T1, T2>> KeySelector)
+            where T1 : IEquatable<T1>
+            where T2 : IEquatable<T2>
         {
             Table<T1, T2, T> table = new Table<T1,T2,T>();
             foreach(var item in collection)

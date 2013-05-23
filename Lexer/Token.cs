@@ -43,6 +43,16 @@ namespace LexicalAnalysis
             this.Value = value;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj.GetHashCode() == this.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return TokenType.GetHashCode();
+        }
+
         public Token()
         {
         }

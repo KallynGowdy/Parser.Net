@@ -10,7 +10,7 @@ namespace Parser.Grammar
     /// Defines a value that cannot be derived into a further 'child' element.
     /// </summary>
     [Serializable]
-    public class Terminal<T> : GrammarElement<T>
+    public class Terminal<T> : GrammarElement<T>, IEquatable<Terminal<T>>
     {
 
         public Terminal(T value, bool keep = true, Predicate<T> equalityOperator = null)

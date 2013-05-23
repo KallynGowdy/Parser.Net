@@ -13,7 +13,7 @@ namespace Parser
     /// <typeparam name="TColumn">The type of the column objects</typeparam>
     /// <typeparam name="TValue">The type of the values to store in the table</typeparam>
     [Serializable]
-    public class Table<TRow, TColumn, TValue> : IDictionary<ColumnRowPair<TRow, TColumn>, TValue>
+    public class Table<TRow, TColumn, TValue> : IDictionary<ColumnRowPair<TRow, TColumn>, TValue> where TRow : IEquatable<TRow> where TColumn : IEquatable<TColumn>
     {
         Dictionary<ColumnRowPair<TRow, TColumn>, TValue> lookup;
 
@@ -141,17 +141,18 @@ namespace Parser
             get
             {
                 //box once to prevent multiple boxes
-                object r = (object)row;
+                //object r = (object)row;
 
-                object c = (object)column;
+                //object c = (object)column;
 
-                KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> v = lookup.FirstOrDefault(a =>
-                {
-                    return r.Equals(a.Key.Row) && c.Equals(a.Key.Column);
-                });
+                //KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> v = lookup.FirstOrDefault(a =>
+                //{
+                //    return r.Equals(a.Key.Row) && c.Equals(a.Key.Column);
+                //});
 
-                return v.Value;
-                //return lookup[new ColumnRowPair<TRow,TColumn>(row, column)];
+                //return v.Value;
+                
+                return lookup[new ColumnRowPair<TRow,TColumn>(row, column)];
 
             }
             set

@@ -46,5 +46,19 @@ namespace Parser.Grammar
         {
             this.InnerValue = other.InnerValue;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj.GetHashCode() == GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            if (InnerValue != null)
+            {
+                return InnerValue.GetHashCode();
+            }
+            return base.GetHashCode();
+        }
     }
 }

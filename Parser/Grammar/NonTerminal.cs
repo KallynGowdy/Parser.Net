@@ -11,7 +11,7 @@ namespace Parser.Grammar
     /// Equality is determined by the name of the Non-Terminal.
     /// </summary>
     [Serializable]
-    public class NonTerminal<T> : GrammarElement<T>
+    public class NonTerminal<T> : GrammarElement<T>, IEquatable<NonTerminal<T>>
     {
         /// <summary>
         /// Gets the name of this Non-Terminal.
@@ -69,7 +69,7 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return Name.GetHashCode();
         }
 
         /// <summary>
