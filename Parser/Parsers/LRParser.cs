@@ -79,7 +79,7 @@ namespace Parser.Parsers
         {
             checkParseTable();
 
-            ParseTree<T>.ParseTreebranch currentBranch = null;
+            List<ParseTree<T>.ParseTreebranch> currentBranches = new List<ParseTree<T>.ParseTreebranch>();
 
             //create a stack to record which states we have been to.
             Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = new Stack<KeyValuePair<int, GrammarElement<T>>>();
@@ -122,45 +122,81 @@ namespace Parser.Parsers
                             }
                             e.Reverse();
 
-                            //set the current branch if it is null
-                            if (currentBranch == null)
-                            {
-                                currentBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
-                                currentBranch.AddChildren(e.Where(a =>
-                                {
-                                    if (a is Terminal<T>)
-                                    {
-                                        return ((Terminal<T>)a).Keep;
-                                    }
-                                    return true;
-                                }).Select(a => new ParseTree<T>.ParseTreebranch(a)));
-                            }
-                            //otherwise create a new branch and set that as the parent of the current branch
-                            else
-                            {
-                                ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
-                                newBranch.AddChild(currentBranch);
+                            ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
 
-                                //add all of the terminal and non terminal elements that should be kept
-                                newBranch.AddChildren(e.Where(a =>
+                            foreach (GrammarElement<T> element in e)
+                            {
+                                if (element is NonTerminal<T>)
                                 {
-                                    if (!a.Equals(currentBranch.Value))
+                                    if (element.Keep)
                                     {
-                                        if (a is Terminal<T>)
-                                        {
-                                            return ((Terminal<T>)a).Keep;
-                                        }
-
-                                        return true;
+                                        //find the first branch that matches the reduce element
+                                        var b = currentBranches.First(a => a.Value.Equals(element));
+                                        newBranch.AddChild(b);
+                                        currentBranches.Remove(b);
                                     }
                                     else
                                     {
-                                        return false;
+                                        //find the first branch that matches the reduce element
+                                        var b = currentBranches.First(a => a.Value.Equals(element));
+                                        //get the children of the branch since we dont want the current value
+                                        IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.Children;
+                                        //add the children
+                                        newBranch.AddChildren(branches);
+                                        currentBranches.Remove(b);
                                     }
-                                }).Select(a => new ParseTree<T>.ParseTreebranch(a)));
+                                }
+                                else
+                                {
+                                    if (element.Keep)
+                                    {
+                                        newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
+                                    }
+                                }
 
-                                currentBranch = newBranch;
                             }
+
+                            currentBranches.Add(newBranch);
+
+                            ////set the current branch if it is null
+                            //if (currentBranch == null)
+                            //{
+                            //    currentBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
+                            //    currentBranch.AddChildren(e.Where(a =>
+                            //    {
+                            //        if (a is Terminal<T>)
+                            //        {
+                            //            return ((Terminal<T>)a).Keep;
+                            //        }
+                            //        return true;
+                            //    }).Select(a => new ParseTree<T>.ParseTreebranch(a)));
+                            //}
+                            ////otherwise create a new branch and set that as the parent of the current branch
+                            //else
+                            //{
+                            //    ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
+                            //    newBranch.AddChild(currentBranch);
+
+                            //    //add all of the terminal and non terminal elements that should be kept
+                            //    newBranch.AddChildren(e.Where(a =>
+                            //    {
+                            //        if (!a.Equals(currentBranch.Value))
+                            //        {
+                            //            if (a is Terminal<T>)
+                            //            {
+                            //                return ((Terminal<T>)a).Keep;
+                            //            }
+
+                            //            return true;
+                            //        }
+                            //        else
+                            //        {
+                            //            return false;
+                            //        }
+                            //    }).Select(a => new ParseTree<T>.ParseTreebranch(a)));
+
+                            //    currentBranch = newBranch;
+                            //}
 
 
                             //push the LHS non-terminal and the next state
@@ -173,7 +209,7 @@ namespace Parser.Parsers
                         else if (action is AcceptAction<T>)
                         {
                             //return a new ParseTree with the root as the current branch
-                            return new ParseTree<T>(currentBranch);
+                            return new ParseTree<T>(currentBranches.First());
                         }
                     }
                 }
@@ -194,7 +230,6 @@ namespace Parser.Parsers
         public ParseTree<T> ParseSentaxTree(IEnumerable<Terminal<T>> input)
         {
             checkParseTable();
-            ParseTree<T>.ParseTreebranch currentBranch = null;
 
             List<ParseTree<T>.ParseTreebranch> currentBranches = new List<ParseTree<T>.ParseTreebranch>();
 
@@ -251,10 +286,7 @@ namespace Parser.Parsers
                                 }
                                 else
                                 {
-                                    if (((Terminal<T>)element).Keep)
-                                    {
-                                        newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
-                                    }
+                                    newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
                                 }
                             }
 

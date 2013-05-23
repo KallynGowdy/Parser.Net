@@ -28,7 +28,7 @@ namespace Parser
             }
             set
             {
-                if(value != null && lookup == null)
+                if (value != null && lookup == null)
                 {
                     lookup = value;
                 }
@@ -129,6 +129,7 @@ namespace Parser
             }
         }
 
+
         /// <summary>
         /// Gets or sets the value at the given row and column
         /// </summary>
@@ -139,11 +140,19 @@ namespace Parser
         {
             get
             {
+                //box once to prevent multiple boxes
+                object r = (object)row;
+
+                object c = (object)column;
+
                 KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> v = lookup.FirstOrDefault(a =>
                 {
-                    return a.Key.Row.Equals(row) && a.Key.Column.Equals(column);
+                    return r.Equals(a.Key.Row) && c.Equals(a.Key.Column);
                 });
+
                 return v.Value;
+                //return lookup[new ColumnRowPair<TRow,TColumn>(row, column)];
+
             }
             set
             {

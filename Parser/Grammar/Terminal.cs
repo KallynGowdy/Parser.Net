@@ -37,15 +37,6 @@ namespace Parser.Grammar
         }
 
         /// <summary>
-        /// Gets or sets whether this Terminal element should be kept or discarded when building an abstract sentax tree.
-        /// </summary>
-        public bool Keep
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets a unique interger value that describes this object that is garenteed not to change.
         /// </summary>
         /// <returns></returns>

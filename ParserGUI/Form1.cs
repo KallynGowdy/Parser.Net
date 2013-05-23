@@ -147,7 +147,7 @@ namespace ParserGUI
                     {
                         if (splits.Any(a => a[0].Equals(el)))
                         {
-                            element.Add(el.ToNonTerminal());
+                            element.Add(el.ToNonTerminal<string>());
                         }
                         else
                         {
@@ -155,13 +155,13 @@ namespace ParserGUI
                         }
                     }
 
-                    productions.Add(new Production<string>(split[0].ToNonTerminal(), element.ToArray()));
+                    productions.Add(new Production<string>(split[0].ToNonTerminal<string>(), element.ToArray()));
                 }
             }
 
             ContextFreeGrammar<Token<string>> grammar = new ContextFreeGrammar<Token<string>>(
                 //productions.First().NonTerminal,
-                (new Token<string>(0, "E", null)).ToNonTerminal(),
+                "E".ToNonTerminal<Token<string>>(),
                 (new Token<string>(0, "$", null)).ToTerminal(true),
                 new Production<Token<string>>[]
                 {
@@ -396,7 +396,7 @@ namespace ParserGUI
             //build the definitions
             ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
             {
-                Definitions = new ParserTokenDefintionCollection<string>
+                Definitions = new ParserTokenDefinitionCollection<string>
                 {
 
                     Definitions = new List<ParserTokenDefinition<string>>
@@ -419,29 +419,41 @@ namespace ParserGUI
                 },
                 Productions = new List<Production<string>>
                 {
-                    //E -> T
-                    new Production<string>("E".ToNonTerminal(), "T".ToNonTerminal()),
+                    //E -> n
+                    new Production<string>("E".ToNonTerminal<string>(false), "n".ToTerminal()),
 
                     //T -> n
                     //the 'n' terminal generated into another terminal which contains the properties to map to a Token with the same TokenType as this terminal's value
                     //therefore 'n' will map to the number token definition defined above.
                     //since 'n'(Terminal) == 'n'(TokenDefinition).TokenType then 'n' maps to Terminal<Token<string>>((new Token(0, 'n', null).ToTerminal(keep, where evaluated token.TokenType == 'n')
-                    new Production<string>("T".ToNonTerminal(), "n".ToTerminal()),
+                    new Production<string>("T".ToNonTerminal<string>(), "n".ToTerminal()),
 
                     //T -> ( T )
-                    new Production<string>("T".ToNonTerminal(), "(".ToTerminal(), "T".ToNonTerminal(), ")".ToTerminal()),
+                    new Production<string>("T".ToNonTerminal<string>(), "(".ToTerminal(), "T".ToNonTerminal<string>(), ")".ToTerminal()),
 
-                    //E -> E + T
-                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "+".ToTerminal(), "T".ToNonTerminal()),
+                    //A -> E + n
+                    new Production<string>("A".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
                     
-                    //E -> E * T
-                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "*".ToTerminal(), "T".ToNonTerminal()),
+                    //M -> E * n
+                    new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
 
-                    //E -> E / T
-                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "/".ToTerminal(), "T".ToNonTerminal()),
+                    //D -> E / n
+                    new Production<string>("D".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "/".ToTerminal(), "n".ToTerminal()),
 
-                    //E -> E - T
-                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "-".ToTerminal(), "T".ToNonTerminal()),
+                    //S -> E - n
+                    new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
+
+                    //E -> A
+                    new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
+
+                    //E -> M
+                    new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
+
+                    //E -> D
+                    new Production<string>("E".ToNonTerminal<string>(false), "D".ToNonTerminal<string>()),
+
+                    //E -> S
+                    new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
                 }
             };
 
@@ -463,12 +475,7 @@ namespace ParserGUI
 
             Stopwatch sw = Stopwatch.StartNew();
             //get the parse tree from it
-            var tree = allInOne.ParseSentaxTree(tokens.Select(a => a.ToTerminal(true, t =>
-            {
-
-                return t.TokenType.Equals(a.TokenType);
-
-            })));
+            var tree = allInOne.ParseAST(tokens);
             sw.Stop();
 
         }

@@ -25,7 +25,7 @@ namespace Parser.Definitions
         /// <summary>
         /// Gets or sets the Defintions matching Tokens to Terminals.
         /// </summary>
-        public ParserTokenDefintionCollection<T> Definitions
+        public ParserTokenDefinitionCollection<T> Definitions
         {
             get;
             set;
@@ -41,7 +41,7 @@ namespace Parser.Definitions
             //add a new production for each production in the class
             foreach (var p in Productions)
             {
-                Production<Token<T>> newP = new Production<Token<T>>(p.NonTerminal.Name.ToNonTerminal<Token<T>>());
+                Production<Token<T>> newP = new Production<Token<T>>(p.NonTerminal.Name.ToNonTerminal<Token<T>>(p.NonTerminal.Keep));
                 //create a new terminal or non-terminal for each production
                 foreach (var e in p.DerivedElements)
                 {
@@ -54,7 +54,7 @@ namespace Parser.Definitions
                     }
                     else
                     {
-                        newP.DerivedElements.Add(((NonTerminal<string>)e).Name.ToNonTerminal<Token<T>>());
+                        newP.DerivedElements.Add(((NonTerminal<string>)e).Name.ToNonTerminal<Token<T>>(e.Keep));
                     }
                 }
                 productions.Add(newP);

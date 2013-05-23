@@ -39,6 +39,11 @@ namespace Parser.Grammar
             this.Name = name;
         }
 
+        public NonTerminal(string name, bool keep) : base(keep)
+        {
+            this.Name = name;
+        }
+
         /// <summary>
         /// Creates an new NonTerminal(T) object with the given name and value.
         /// </summary>

@@ -40,7 +40,12 @@ namespace Parser.Definitions
         /// <returns></returns>
         public virtual Terminal<Token<T>> GetTerminal()
         {
-            return (new Token<T>(0, TokenTypeToMatch, default(T))).ToTerminal(Keep, a => this.TokenTypeToMatch.Equals(a.TokenType));
+            return (new Token<T>(0, TokenTypeToMatch, default(T))).ToTerminal(Keep, a => a != null && this.TokenTypeToMatch.Equals(a.TokenType));
+        }
+
+        public virtual Terminal<Token<T>> GetTerminal(T value)
+        {
+            return (new Token<T>(0, TokenTypeToMatch, value)).ToTerminal(Keep, a => a != null && this.TokenTypeToMatch.Equals(a.TokenType));
         }
     }
 }

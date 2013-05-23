@@ -79,20 +79,21 @@ namespace Parser.Grammar
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static NonTerminal<T> ToNonTerminal<T>(this string value)
+        public static NonTerminal<T> ToNonTerminal<T>(this string value, bool keep = true)
         {
-            return new NonTerminal<T>(value.ToString());
+            return new NonTerminal<T>(value.ToString(), keep);
         }
 
-        /// <summary>
-        /// Returns a new NonTerminal(T) object whose name is currentValue.ToString().
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static NonTerminal<T> ToNonTerminal<T>(this T value)
-        {
-            return new NonTerminal<T>(value.ToString());
-        }
+
+        ///// <summary>
+        ///// Returns a new NonTerminal(T) object whose name is currentValue.ToString().
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="value"></param>
+        ///// <returns></returns>
+        //public static NonTerminal<T> ToNonTerminal<T>(this T value, bool keep = true)
+        //{
+        //    return new NonTerminal<T>(value.ToString(), keep);
+        //}
     }
 }

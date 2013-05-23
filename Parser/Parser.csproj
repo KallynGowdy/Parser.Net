@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllInOne\AIOParser.cs" />
+    <Compile Include="AllInOne\IAllInOneParser.cs" />
     <Compile Include="ColumnRowPair.cs" />
     <Compile Include="Definitions\ParserProductionTokenDefinition.cs" />
     <Compile Include="Definitions\ParserTokenDefinition.cs" />

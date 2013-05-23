@@ -22,9 +22,19 @@ namespace Parser.Grammar
             set;
         }
 
-        public GrammarElement()
+        /// <summary>
+        /// Gets or sets whether this element should be kept or discarded.
+        /// </summary>
+        public bool Keep
+        {
+            get;
+            set;
+        }
+
+        public GrammarElement(bool keep = true)
         {
             this.InnerValue = default(T);
+            this.Keep = keep;
         }
 
         public GrammarElement(T value)

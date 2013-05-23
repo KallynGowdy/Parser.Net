@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LexicalAnalysis;
 using LexicalAnalysis.Defininitions;
 
 namespace Parser.Definitions
@@ -11,12 +12,23 @@ namespace Parser.Definitions
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public class ParserTokenDefintionCollection<T> : IList<ParserTokenDefinition<T>>
+    public class ParserTokenDefinitionCollection<T> : IList<ParserTokenDefinition<T>>
     {
         /// <summary>
         /// The defintions that this collection contains.
         /// </summary>
         public List<ParserTokenDefinition<T>> Definitions = new List<ParserTokenDefinition<T>>();
+
+        /// <summary>
+        /// Gets the definition for the given token.
+        /// Returns null if no definition is found.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public ParserTokenDefinition<T> GetDefinition(Token<T> token)
+        {
+            return Definitions.FirstOrDefault(a => a.TokenTypeToMatch.Equals(token.TokenType));
+        }
 
         /// <summary>
         /// Gets the regular TokenDefinition objects from this collection.
@@ -76,12 +88,18 @@ namespace Parser.Definitions
 
         public int Count
         {
-            get { return Definitions.Count; }
+            get
+            {
+                return Definitions.Count;
+            }
         }
 
         public bool IsReadOnly
         {
-            get { return false; }
+            get
+            {
+                return false;
+            }
         }
 
         public bool Remove(ParserTokenDefinition<T> item)

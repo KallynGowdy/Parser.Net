@@ -13,7 +13,7 @@ namespace Parser.AllInOne
     /// <summary>
     /// Defines an All-in-One LR parser, that provided a collection of ParserTokenDefinitions can successfully parse a given string of input characters.
     /// </summary>
-    public class AIOLRParser<T> : IParser<Token<T>>
+    public class AIOLRParser<T> : IParser<Token<T>>, IAllInOneParser<T>
     {
 
         /// <summary>
@@ -51,6 +51,50 @@ namespace Parser.AllInOne
         }
 
         /// <summary>
+        /// Converts the given collection of Token objects to Terminal objects that contain tokens.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public IEnumerable<Terminal<Token<T>>> ConvertToTerminals(IEnumerable<Token<T>> input)
+        {
+            List<Terminal<Token<T>>> tokens = new List<Terminal<Token<T>>>(input.Count());
+            foreach (var token in input)
+            {
+                ParserTokenDefinition<T> def = Definitions.Definitions.GetDefinition(token);
+                if (def != null)
+                {
+                    tokens.Add(def.GetTerminal(token.Value));
+                }
+            }
+            return tokens;
+        }
+
+        /// <summary>
+        /// Parses an abstract sentax tree from the given input.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public ParseTree<Token<T>> ParseAST(IEnumerable<Token<T>> input)
+        {
+            if (Definitions == null)
+            {
+                throw new InvalidOperationException("Definitions must be set before calling ParseAST");
+            }
+
+            return Parser.ParseAST(ConvertToTerminals(input));
+        }
+
+        public ParseTree<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input)
+        {
+            if (Definitions == null)
+            {
+                throw new InvalidOperationException("Definitions must be set before calling ParseAST");
+            }
+
+            return Parser.ParseSentaxTree(ConvertToTerminals(input));
+        }
+
+        /// <summary>
         /// Parses an Abstract Sentax tree from the given input.
         /// </summary>
         /// <param name="input"></param>
@@ -60,7 +104,7 @@ namespace Parser.AllInOne
         {
             if (Definitions == null)
             {
-                throw new InvalidOperationException("Definitions must be set before calling ParseAST"); 
+                throw new InvalidOperationException("Definitions must be set before calling ParseAST");
             }
             return Parser.ParseAST(input);
         }
