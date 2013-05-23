@@ -48,10 +48,10 @@ namespace LexicalAnalysis.Defininitions
                 {
                     Indent = true
                 };
-                using (XmlWriter writer = XmlWriter.Create(s, settings))
-                {
-                    serializer.WriteObject(writer, collection);
-                }
+                XmlWriter writer = XmlWriter.Create(s, settings);
+
+                serializer.WriteObject(writer, collection);
+
             }
 
         }

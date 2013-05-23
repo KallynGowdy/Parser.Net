@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Parser
@@ -11,9 +12,28 @@ namespace Parser
     /// <typeparam name="TRow">The type of the row objects</typeparam>
     /// <typeparam name="TColumn">The type of the column objects</typeparam>
     /// <typeparam name="TValue">The type of the values to store in the table</typeparam>
+    [Serializable]
     public class Table<TRow, TColumn, TValue> : IDictionary<ColumnRowPair<TRow, TColumn>, TValue>
     {
         Dictionary<ColumnRowPair<TRow, TColumn>, TValue> lookup;
+
+        /// <summary>
+        /// Gets or sets(if it is null) the internal dictionary used by the table.
+        /// </summary>
+        public Dictionary<ColumnRowPair<TRow, TColumn>, TValue> InternalDictionary
+        {
+            get
+            {
+                return lookup;
+            }
+            set
+            {
+                if(value != null && lookup == null)
+                {
+                    lookup = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Creates a new Empty table.

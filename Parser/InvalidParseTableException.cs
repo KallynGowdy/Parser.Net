@@ -20,6 +20,7 @@ namespace Parser
     /// <summary>
     /// Defines an exception that is thrown when given a parse table cannot be used with a certian parser.
     /// </summary>
+    [Serializable]
     public class InvalidParseTableException<T> : Exception
     {
         /// <summary>

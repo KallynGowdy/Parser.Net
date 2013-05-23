@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Parser.Grammar;
 
 namespace Parser.StateMachine
@@ -10,6 +13,7 @@ namespace Parser.StateMachine
     /// <summary>
     /// Provides an implementation of a LR(1) DFA parse table.
     /// </summary>
+    [Serializable]
     public class LRParseTable<T> : IParseTable<T>
     {
         //A DFA for a parser contains two tables
@@ -25,7 +29,7 @@ namespace Parser.StateMachine
         public Table<int, Terminal<T>, List<ParserAction<T>>> ActionTable
         {
             get;
-            private set;
+            set;
         }
 
         /// <summary>
@@ -34,7 +38,34 @@ namespace Parser.StateMachine
         public Table<int, NonTerminal<T>, int?> GotoTable
         {
             get;
-            private set;
+            set;
+        }
+
+        /// <summary>
+        /// Writes this parse table to the given stream as an XML object.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <exception cref="System.Runtime.Serialization.SerializationException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        public void WriteToStream(Stream stream)
+        {
+            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>));
+            XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings
+            {
+                Indent = true
+            });
+            ser.WriteObject(writer, this);
+        }
+
+        /// <summary>
+        /// Reads an LRParseTable object from the given stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static LRParseTable<T> ReadFromStream(Stream stream)
+        {
+            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>));
+            return (LRParseTable<T>)ser.ReadObject(stream);
         }
 
         /// <summary>

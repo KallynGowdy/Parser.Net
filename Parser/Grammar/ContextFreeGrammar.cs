@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Parser.StateMachine;
 
 namespace Parser.Grammar
@@ -11,8 +14,38 @@ namespace Parser.Grammar
     /// Defines a Context Free Grammar(CFG) such that given a string of terminal elements, they will be
     /// reduced to the starting element by the rules defined in the productions.
     /// </summary>
+    [Serializable]
     public class ContextFreeGrammar<T>
     {
+        /// <summary>
+        /// Writes this context free grammar to the given stream
+        /// </summary>
+        /// <exception cref="System.Runtime.Serialization.SerializationException"/>
+        /// <exception cref="System.ArgumentNullException"/>
+        public void WriteToStream(Stream stream)
+        {
+
+            DataContractSerializer ser = new DataContractSerializer(typeof(ContextFreeGrammar<T>));
+            XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings
+            {
+                Indent = true
+            });
+            ser.WriteObject(writer, this);
+        }
+
+        /// <summary>
+        /// Reads a context free grammar from the given stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static ContextFreeGrammar<T> ReadFromStream(Stream stream)
+        {
+            DataContractSerializer ser = new DataContractSerializer(typeof(ContextFreeGrammar<T>));
+            return (ContextFreeGrammar<T>)ser.ReadObject(stream);
+        }
+
+        
+
         /// <summary>
         /// Gets or sets the list of productions used in this context free grammar.
         /// </summary>
@@ -64,7 +97,7 @@ namespace Parser.Grammar
         public Terminal<T> EndOfInputElement
         {
             get;
-            private set;
+            set;
         }
 
         /// <summary>
@@ -354,7 +387,7 @@ namespace Parser.Grammar
             //get the rest of the first state
             firstState.AddRange(lr1Closure(startingItem, null));
             return firstState;
-        }       
+        }
 
         /// <summary>
         /// Returns the union of the LR(0) closure of each LRItem in the given set.
@@ -389,7 +422,7 @@ namespace Parser.Grammar
 
             //Follow(item) is First(b) where item is:
             //A -> a•Eb
-            
+
             GrammarElement<T> element = item.GetLookaheadElement(1);
 
             if (element != null)

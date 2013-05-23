@@ -49,7 +49,7 @@
     <Compile Include="Definitions\StringedParserTokenDefinition.cs" />
     <Compile Include="Grammar\ContextFreeGrammar.cs" />
     <Compile Include="Grammar\IParseTable.cs" />
-    <Compile Include="Grammar\ParseTable.cs" />
+    <Compile Include="Grammar\LRParseTable.cs" />
     <Compile Include="Grammar\GrammarElement.cs" />
     <Compile Include="Grammar\GrammarExtensions.cs" />
     <Compile Include="Grammar\LRItem.cs" />

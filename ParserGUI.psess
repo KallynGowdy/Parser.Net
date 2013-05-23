@@ -67,11 +67,6 @@
       <ProjName>ParserGUI</ProjName>
     </ProjBinary>
   </Binaries>
-  <Reports>
-    <Report>
-      <Path>ParserGUI130522(4).vsp</Path>
-    </Report>
-  </Reports>
   <Launches>
     <ProjBinary>
       <Path>:PB:{E12BC17F-D4B2-4404-82E5-18FDAF39FC36}|ParserGUI\ParserGUI.csproj</Path>
