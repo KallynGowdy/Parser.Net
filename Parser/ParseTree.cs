@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Parser.Grammar;
@@ -22,11 +23,11 @@ namespace Parser
             /// <summary>
             /// Gets the list of children of this branch.
             /// </summary>
-            public ParseTreebranch[] Children
+            public ReadOnlyCollection<ParseTreebranch> Children
             {
                 get
                 {
-                    return children.ToArray();
+                    return new ReadOnlyCollection<ParseTreebranch>(children);
                 }
             }
 

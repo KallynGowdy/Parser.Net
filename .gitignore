@@ -12,6 +12,7 @@ Thumbs.db
 *.pdb
 *.user
 *.aps
+*.vsp
 *.pch
 *.vspscc
 *_i.c

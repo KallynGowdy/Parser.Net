@@ -391,100 +391,106 @@ namespace ParserGUI
             }
         }
 
+        AIOLRParser<string> aioParser;
+
         private void aio()
         {
             #region Def
-            //build the definitions
-            //ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-            //{
-            //    Definitions = new ParserTokenDefinitionCollection<string>
-            //    {
-
-            //        Definitions = new List<ParserTokenDefinition<string>>
-            //        {
-            //            //map 'n' to a number, define that we should keep this terminal
-            //            new StringedParserTokenDefinition(@"(\b|^)[\d]+(\b|$)", "n", true),
-            //            //map '(', define that we should discard this terminal
-            //            new StringedParserTokenDefinition(@"\(", "(", false),
-            //            //map ')', define that we should discard this terminal
-            //            new StringedParserTokenDefinition(@"\)", ")", false),
-            //            //map '+', define that we should keep this terminal
-            //            new StringedParserTokenDefinition(@"\+", "+", false),
-            //            //map '*'
-            //            new StringedParserTokenDefinition(@"\*", "*", false),
-            //            //map '/'
-            //            new StringedParserTokenDefinition(@"/|\\", "/", false),
-            //            //map '-'
-            //            new StringedParserTokenDefinition(@"\-", "-", false)
-            //        }
-            //    },
-            //    Productions = new List<Production<string>>
-            //    {
-            //        //E -> n
-            //        new Production<string>("E".ToNonTerminal<string>(false), "n".ToTerminal()),
-
-            //        //T -> n
-            //        //the 'n' terminal generated into another terminal which contains the properties to map to a Token with the same TokenType as this terminal's value
-            //        //therefore 'n' will map to the number token definition defined above.
-            //        //since 'n'(Terminal) == 'n'(TokenDefinition).TokenType then 'n' maps to Terminal<Token<string>>((new Token(0, 'n', null).ToTerminal(keep, where evaluated token.TokenType == 'n')
-            //        new Production<string>("T".ToNonTerminal<string>(), "n".ToTerminal()),
-
-            //        //T -> ( T )
-            //        new Production<string>("T".ToNonTerminal<string>(), "(".ToTerminal(), "T".ToNonTerminal<string>(), ")".ToTerminal()),
-
-            //        //A -> E + n
-            //        new Production<string>("A".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
-
-            //        //M -> E * n
-            //        new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
-
-            //        //D -> E / n
-            //        new Production<string>("D".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "/".ToTerminal(), "n".ToTerminal()),
-
-            //        //S -> E - n
-            //        new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
-
-            //        //E -> A
-            //        new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
-
-            //        //E -> M
-            //        new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
-
-            //        //E -> D
-            //        new Production<string>("E".ToNonTerminal<string>(false), "D".ToNonTerminal<string>()),
-
-            //        //E -> S
-            //        new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
-            //    }
-            //}; 
-            #endregion
-
+           // build the definitions
             ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
             {
                 Definitions = new ParserTokenDefinitionCollection<string>
                 {
+
                     Definitions = new List<ParserTokenDefinition<string>>
                     {
-                        new StringedParserTokenDefinition(@"\w+", "Id", true),
-                        new StringedParserTokenDefinition(@"\(","(", false),
+                        //map 'n' to a number, define that we should keep this terminal
+                        new StringedParserTokenDefinition(@"(\b|^)[\d]+(\b|$)", "n", true),
+                        //map '(', define that we should discard this terminal
+                        new StringedParserTokenDefinition(@"\(", "(", false),
+                        //map ')', define that we should discard this terminal
                         new StringedParserTokenDefinition(@"\)", ")", false),
-                        new StringedParserTokenDefinition(@";", ";", false)
+                        //map '+', define that we should keep this terminal
+                        new StringedParserTokenDefinition(@"\+", "+", false),
+                        //map '*'
+                        new StringedParserTokenDefinition(@"\*", "*", false),
+                        //map '/'
+                        new StringedParserTokenDefinition(@"/|\\", "/", false),
+                        //map '-'
+                        new StringedParserTokenDefinition(@"\-", "-", false)
                     }
                 },
                 Productions = new List<Production<string>>
                 {
-                    new Production<string>("Stmt".ToNonTerminal<string>(), "Expr".ToNonTerminal<string>(), ";".ToTerminal<string>()),
-                    new Production<string>("Expr".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
-                    new Production<string>("Term".ToNonTerminal<string>(), "Id".ToTerminal<string>(), "(".ToTerminal<string>(), "Expr".ToNonTerminal<string>(), ")".ToTerminal<string>()),
-                    new Production<string>("Term".ToNonTerminal<string>(), "Id".ToTerminal<string>(), "(".ToTerminal<string>(), ")".ToTerminal<string>())                                 
-                }
-            };
+                    //E -> n
+                    new Production<string>("E".ToNonTerminal<string>(false), "n".ToTerminal()),
 
-            //Create a new all in one parser
-            AIOLRParser<string> allInOne = new AIOLRParser<string>
+                    //T -> n
+                    //the 'n' terminal generated into another terminal which contains the properties to map to a Token with the same TokenType as this terminal's value
+                    //therefore 'n' will map to the number token definition defined above.
+                    //since 'n'(Terminal) == 'n'(TokenDefinition).TokenType then 'n' maps to Terminal<Token<string>>((new Token(0, 'n', null).ToTerminal(keep, where evaluated token.TokenType == 'n')
+                    new Production<string>("T".ToNonTerminal<string>(), "n".ToTerminal()),
+
+                    //T -> ( T )
+                    new Production<string>("T".ToNonTerminal<string>(), "(".ToTerminal(), "T".ToNonTerminal<string>(), ")".ToTerminal()),
+
+                    //A -> E + n
+                    new Production<string>("A".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
+
+                    //M -> E * n
+                    new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
+
+                    //D -> E / n
+                    new Production<string>("D".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "/".ToTerminal(), "n".ToTerminal()),
+
+                    //S -> E - n
+                    new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
+
+                    //E -> A
+                    new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
+
+                    //E -> M
+                    new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
+
+                    //E -> D
+                    new Production<string>("E".ToNonTerminal<string>(false), "D".ToNonTerminal<string>()),
+
+                    //E -> S
+                    new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
+                }
+            }; 
+            #endregion
+
+            #region Def
+            //ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
+            //{
+            //    Definitions = new ParserTokenDefinitionCollection<string>
+            //    {
+            //        Definitions = new List<ParserTokenDefinition<string>>
+            //        {
+            //            new StringedParserTokenDefinition(@"\w+", "Id", true),
+            //            new StringedParserTokenDefinition(@"\(","(", false),
+            //            new StringedParserTokenDefinition(@"\)", ")", false),
+            //            new StringedParserTokenDefinition(@";", ";", false)
+            //        }
+            //    },
+            //    Productions = new List<Production<string>>
+            //    {
+            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Expr".ToNonTerminal<string>(), ";".ToTerminal<string>()),
+            //        new Production<string>("Expr".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
+            //        new Production<string>("Term".ToNonTerminal<string>(), "Id".ToTerminal<string>(), "(".ToTerminal<string>(), "Expr".ToNonTerminal<string>(), ")".ToTerminal<string>()),
+            //        new Production<string>("Term".ToNonTerminal<string>(), "Id".ToTerminal<string>(), "(".ToTerminal<string>(), ")".ToTerminal<string>())                                 
+            //    }
+            //}; 
+            #endregion
+
+            if(aioParser == null)
             {
-                Definitions = def
-            };
+                aioParser = new AIOLRParser<string>
+                {
+                    Definitions = def
+                };
+            }
 
             var lexer = new Lexer
             {
@@ -498,7 +504,7 @@ namespace ParserGUI
 
             Stopwatch sw = Stopwatch.StartNew();
             //get the parse tree from it
-            var tree = allInOne.ParseAST(tokens);
+            var tree = aioParser.ParseAST(tokens);
             sw.Stop();
 
         }
