@@ -69,12 +69,14 @@ namespace Parser.Grammar
 
         public static bool operator !=(Terminal<T> left, Terminal<T> right)
         {
+            //if the left or right objects are null
             if (((object)left) == null || ((object)right) == null)
             {
                 return ((object)left) != ((object)right);
             }
             else
             {
+                //otherwise return if the left object equals the right
                 return !left.Equals(right);
             }
         }

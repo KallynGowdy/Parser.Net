@@ -44,8 +44,6 @@ namespace Parser.StateMachine
             set;
         }
 
-
-
         /// <summary>
         /// Gets or sets the lookahead element.
         /// </summary>
@@ -85,6 +83,7 @@ namespace Parser.StateMachine
             }
             return null;
         }
+
 
         /// <summary>
         /// Gets the element that is lookahead indexes in front of the next element.

@@ -43,10 +43,8 @@ namespace Parser.AllInOne
                 {
                     Production<Token<T>>[] productions = Definitions.GetProductions();
                     ContextFreeGrammar<Token<T>> cfg = new ContextFreeGrammar<Token<T>>(productions.First().NonTerminal, new Terminal<Token<T>>(null, false, a => a == null), productions);
-                    parser = new LRParser<Token<T>>
-                    {
-                        ParseTable = new LRParseTable<Token<T>>(cfg)
-                    };
+                    parser = new LRParser<Token<T>>();
+                    parser.SetParseTable(cfg);
                 }
                 return parser;
             }

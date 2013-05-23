@@ -402,13 +402,19 @@ namespace ParserGUI
                     Definitions = new List<ParserTokenDefinition<string>>
                     {
                         //map 'n' to a number, define that we should keep this terminal
-                        new StringedParserTokenDefinition(@"(\b|^)-?[\d]+(\b|$)", "n", true),
+                        new StringedParserTokenDefinition(@"(\b|^)[\d]+(\b|$)", "n", true),
                         //map '(', define that we should discard this terminal
                         new StringedParserTokenDefinition(@"\(", "(", false),
                         //map ')', define that we should discard this terminal
                         new StringedParserTokenDefinition(@"\)", ")", false),
                         //map '+', define that we should keep this terminal
-                        new StringedParserTokenDefinition(@"\+", "+", true)
+                        new StringedParserTokenDefinition(@"\+", "+", false),
+                        //map '*'
+                        new StringedParserTokenDefinition(@"\*", "*", false),
+                        //map '/'
+                        new StringedParserTokenDefinition(@"/|\\", "/", false),
+                        //map '-'
+                        new StringedParserTokenDefinition(@"\-", "-", false)
                     }
                 },
                 Productions = new List<Production<string>>
@@ -422,11 +428,20 @@ namespace ParserGUI
                     //since 'n'(Terminal) == 'n'(TokenDefinition).TokenType then 'n' maps to Terminal<Token<string>>((new Token(0, 'n', null).ToTerminal(keep, where evaluated token.TokenType == 'n')
                     new Production<string>("T".ToNonTerminal(), "n".ToTerminal()),
 
-                    //E -> ( E )
-                    new Production<string>("E".ToNonTerminal(), "(".ToTerminal(), "E".ToNonTerminal(), ")".ToTerminal()),
+                    //T -> ( T )
+                    new Production<string>("T".ToNonTerminal(), "(".ToTerminal(), "T".ToNonTerminal(), ")".ToTerminal()),
 
-                    //T -> T + n
-                    new Production<string>("T".ToNonTerminal(), "T".ToNonTerminal(), "+".ToTerminal(), "n".ToTerminal())
+                    //E -> E + T
+                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "+".ToTerminal(), "T".ToNonTerminal()),
+                    
+                    //E -> E * T
+                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "*".ToTerminal(), "T".ToNonTerminal()),
+
+                    //E -> E / T
+                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "/".ToTerminal(), "T".ToNonTerminal()),
+
+                    //E -> E - T
+                    new Production<string>("E".ToNonTerminal(), "E".ToNonTerminal(), "-".ToTerminal(), "T".ToNonTerminal()),
                 }
             };
 
@@ -441,13 +456,21 @@ namespace ParserGUI
                 Definitions = def.Definitions.GetNormalDefinitions()
             };
 
+            Stopwatch w = Stopwatch.StartNew();
+
+            var tokens = lexer.ReadTokens(txtCFG.Text);
+            w.Stop();
+
+            Stopwatch sw = Stopwatch.StartNew();
             //get the parse tree from it
-            var tree = allInOne.ParseSentaxTree(lexer.ReadTokens(txtCFG.Text).Select(a => a.ToTerminal(true, t =>
+            var tree = allInOne.ParseSentaxTree(tokens.Select(a => a.ToTerminal(true, t =>
             {
 
                 return t.TokenType.Equals(a.TokenType);
 
             })));
+            sw.Stop();
+
         }
     }
 }

@@ -42,6 +42,7 @@ namespace LexicalAnalysis
             //that collection.
             List<Token<string>> tokens;
 
+            
 
             //for (int i = 0; i < allMatches.Length; i++)
             //{

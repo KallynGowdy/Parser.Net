@@ -281,6 +281,10 @@ namespace Parser.Grammar
             createTransitions(graph.Root);
         }
 
+        /// <summary>
+        /// Creates transitions from the given node to other nodes based on the items contained in the given node.
+        /// </summary>
+        /// <param name="startingNode"></param>
         private void createTransitions(StateNode<GrammarElement<T>, LRItem<T>[]> startingNode)
         {
             //List<IEnumerable<LRItem<T>>> existingSets = new List<IEnumerable<LRItem<T>>>(startingNode.FromTransitions.Select(a => a.Value.Value));
@@ -385,8 +389,9 @@ namespace Parser.Grammar
 
             //Follow(item) is First(b) where item is:
             //A -> a•Eb
-
+            
             GrammarElement<T> element = item.GetLookaheadElement(1);
+
             if (element != null)
             {
                 return First(element);
@@ -594,7 +599,6 @@ namespace Parser.Grammar
             this.Productions.Add(new Production<T>(startElement, startingElement));
 
             this.Productions.AddRange(productions);
-            Closure(Productions[0]);
         }
 
         /// <summary>

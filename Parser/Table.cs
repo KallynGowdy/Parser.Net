@@ -119,33 +119,11 @@ namespace Parser
         {
             get
             {
-                KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> v = lookup.Where(a =>
+                KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> v = lookup.FirstOrDefault(a =>
                 {
-                    if (a.Key.Row == null || a.Key.Column == null)
-                    {
-                        if (a.Key.Row == null && a.Key.Column == null)
-                        {
-                            return (object)a.Key.Row == (object)row && (object)a.Key.Column == (object)column;
-                        }
-                        else if (a.Key.Column != null)
-                        {
-                            return a.Key.Row.Equals(row) && (object)a.Key.Column == (object)column;
-                        }
-                        else
-                        {
-                            return ((object)a.Key.Row) == (object)row && a.Key.Column.Equals(column);
-                        }
-                    }
                     return a.Key.Row.Equals(row) && a.Key.Column.Equals(column);
-                }).FirstOrDefault();
-                if (v.Value != null)
-                {
-                    return v.Value;
-                }
-                else
-                {
-                    return default(TValue);
-                }
+                });
+                return v.Value;
             }
             set
             {
