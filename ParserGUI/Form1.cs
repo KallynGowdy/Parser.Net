@@ -367,6 +367,10 @@ namespace ParserGUI
             w.Stop();
         }
 
+        IEnumerable<Token<string>> tokens;
+
+        Lexer lexer;
+
         /// <summary>
         /// Concats each individual element in the given dynamic object to produce a single string representing all elements.
         /// </summary>
@@ -397,7 +401,7 @@ namespace ParserGUI
             string text = (string)p;
 
             #region Def
-           // build the definitions
+            // build the definitions
             ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
             {
                 Definitions = new ParserTokenDefinitionCollection<string>
@@ -418,13 +422,15 @@ namespace ParserGUI
                         //map '/'
                         new StringedParserTokenDefinition(@"/|\\", "/", false),
                         //map '-'
-                        new StringedParserTokenDefinition(@"\-", "-", false)
+                        new StringedParserTokenDefinition(@"\-", "-", false),
+                        //map '^'
+                        new StringedParserTokenDefinition(@"\^", "^", false)
                     }
                 },
                 Productions = new List<Production<string>>
                 {
-                    //E -> n
-                    new Production<string>("E".ToNonTerminal<string>(false), "n".ToTerminal()),
+                    //E -> T
+                    new Production<string>("E".ToNonTerminal<string>(false), "T".ToNonTerminal<string>()),
 
                     //T -> n
                     //the 'n' terminal generated into another terminal which contains the properties to map to a Token with the same TokenType as this terminal's value
@@ -432,11 +438,11 @@ namespace ParserGUI
                     //since 'n'(Terminal) == 'n'(TokenDefinition).TokenType then 'n' maps to Terminal<Token<string>>((new Token(0, 'n', null).ToTerminal(keep, where evaluated token.TokenType == 'n')
                     new Production<string>("T".ToNonTerminal<string>(), "n".ToTerminal()),
 
-                    //T -> ( T )
-                    new Production<string>("T".ToNonTerminal<string>(), "(".ToTerminal(), "T".ToNonTerminal<string>(), ")".ToTerminal()),
+                    //E -> ( E )
+                    new Production<string>("E".ToNonTerminal<string>(), "(".ToTerminal(), "E".ToNonTerminal<string>(), ")".ToTerminal()),
 
-                    //A -> E + n
-                    new Production<string>("A".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
+                    //T -> E + n
+                    new Production<string>("T".ToNonTerminal<string>(), "T".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
 
                     //M -> E * n
                     new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
@@ -447,8 +453,11 @@ namespace ParserGUI
                     //S -> E - n
                     new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
 
-                    //E -> A
-                    new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
+                    //P -> E ^ n
+                    new Production<string>("P".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "^".ToTerminal(), "n".ToTerminal()),
+
+                    ////E -> A
+                    //new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
 
                     //E -> M
                     new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
@@ -459,7 +468,7 @@ namespace ParserGUI
                     //E -> S
                     new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
                 }
-            }; 
+            };
             #endregion
 
             #region Def
@@ -485,33 +494,48 @@ namespace ParserGUI
             //}; 
             #endregion
 
-            if(aioParser == null)
+            long totalParseTime = 0;
+            long totalLexTime = 0;
+
+            for (int i = 0; i < 10; i++)
             {
-                aioParser = new AIOLRParser<string>
+
+                if (aioParser == null)
                 {
-                    Definitions = def
-                };
+                    aioParser = new AIOLRParser<string>
+                    {
+                        Definitions = def
+                    };
+                }
+
+                if (lexer == null)
+                {
+                    lexer = new Lexer();
+                    lexer.SetDefintions(def.Definitions.GetNormalDefinitions());
+                }
+                Stopwatch w = Stopwatch.StartNew();
+
+                tokens = lexer.ReadTokens(text);
+
+                w.Stop();
+
+                Stopwatch sw = Stopwatch.StartNew();
+                //get the parse tree from it
+                var tree = aioParser.ParseAST(tokens);
+                sw.Stop();
+
+                totalLexTime += w.ElapsedMilliseconds;
+                totalParseTime += sw.ElapsedMilliseconds;
+
+                (new Thread(OnParseDone)).Start(new{w = w, sw = sw, p = tokens.Count(), l = text.Length});
             }
 
-            var lexer = new Lexer();
-            lexer.SetDefintions(def.Definitions.GetNormalDefinitions());
-
-            Stopwatch w = Stopwatch.StartNew();
-
-            var tokens = lexer.ReadTokens(text);
-            w.Stop();
-
-            Stopwatch sw = Stopwatch.StartNew();
-            //get the parse tree from it
-            var tree = aioParser.ParseAST(tokens);
-            sw.Stop();
-
-            OnParseDone(w, sw, tokens.Count(), text.Length);
+            MessageBox.Show(string.Format("Totally done. Average time to lex {0} chars: {1}. Average time to parse {2} tokens: {3}", text.Length, totalLexTime / 10f, tokens.Count(), totalParseTime / 10f), "Done", MessageBoxButtons.OK);
         }
 
-        private void OnParseDone(Stopwatch w, Stopwatch sw, int p, int l)
+        private void OnParseDone(dynamic param)
         {
-            MessageBox.Show(string.Format("Parsing is done. {0} string chars were lexed in {1} milliseconds. {2} tokens were parsed in {3} milliseconds", l, w.ElapsedMilliseconds, p, sw.ElapsedMilliseconds), "Done", MessageBoxButtons.OK);
+            MessageBox.Show(string.Format("Parsing is done. {0} string chars were lexed in {1} milliseconds. {2} tokens were parsed in {3} milliseconds", param.l, param.w.ElapsedMilliseconds, param.p, param.sw.ElapsedMilliseconds), "Done", MessageBoxButtons.OK);
         }
     }
 }
