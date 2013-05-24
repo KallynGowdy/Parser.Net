@@ -33,7 +33,7 @@ namespace LexicalAnalysis.Defininitions
         /// </summary>
         /// <param name="match"></param>
         /// <returns></returns>
-        public abstract Token<T> GetToken(Match match); 
+        public abstract Token<T> GetToken(Capture match); 
 
         public TokenDefinition(Regex regex, string typeToMatch)
         {

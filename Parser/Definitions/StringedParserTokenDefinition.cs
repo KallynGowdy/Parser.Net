@@ -12,7 +12,7 @@ namespace Parser.Definitions
     /// </summary>
     public class StringedParserTokenDefinition : ParserTokenDefinition<string>
     {
-        public override Token<string> GetToken(Match match)
+        public override Token<string> GetToken(Capture match)
         {
             return new Token<string>(match.Index, this.TokenTypeToMatch, match.Value);
         }

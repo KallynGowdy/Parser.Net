@@ -31,6 +31,11 @@ namespace Parser
                 }
             }
 
+            public List<ParseTreebranch> GetChildren()
+            {
+                return children;
+            }
+
             /// <summary>
             /// Gets the parent tree that contains this branch.
             /// </summary>

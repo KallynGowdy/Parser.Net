@@ -15,6 +15,7 @@ using LexicalAnalysis;
 using Parser.Parsers;
 using Parser.Definitions;
 using Parser.AllInOne;
+using System.Threading;
 
 namespace ParserGUI
 {
@@ -27,7 +28,7 @@ namespace ParserGUI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            aio();
+            (new Thread(aio)).Start(txtCFG.Text);
 
 
 
@@ -340,10 +341,8 @@ namespace ParserGUI
                 new StringedTokenDefinition(@"\)", ")")
             });
 
-            Lexer lexer = new Lexer
-            {
-                Definitions = defs
-            };
+            Lexer lexer = new Lexer();
+            lexer.SetDefintions(defs);
 
             Stopwatch w = Stopwatch.StartNew();
 
@@ -393,8 +392,10 @@ namespace ParserGUI
 
         AIOLRParser<string> aioParser;
 
-        private void aio()
+        private void aio(object p)
         {
+            string text = (string)p;
+
             #region Def
            // build the definitions
             ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
@@ -405,7 +406,7 @@ namespace ParserGUI
                     Definitions = new List<ParserTokenDefinition<string>>
                     {
                         //map 'n' to a number, define that we should keep this terminal
-                        new StringedParserTokenDefinition(@"(\b|^)[\d]+(\b|$)", "n", true),
+                        new StringedParserTokenDefinition(@"(?:\b|^)[\d]+(?:\b|$)", "n", true),
                         //map '(', define that we should discard this terminal
                         new StringedParserTokenDefinition(@"\(", "(", false),
                         //map ')', define that we should discard this terminal
@@ -492,14 +493,12 @@ namespace ParserGUI
                 };
             }
 
-            var lexer = new Lexer
-            {
-                Definitions = def.Definitions.GetNormalDefinitions()
-            };
+            var lexer = new Lexer();
+            lexer.SetDefintions(def.Definitions.GetNormalDefinitions());
 
             Stopwatch w = Stopwatch.StartNew();
 
-            var tokens = lexer.ReadTokens(txtCFG.Text);
+            var tokens = lexer.ReadTokens(text);
             w.Stop();
 
             Stopwatch sw = Stopwatch.StartNew();
@@ -507,6 +506,12 @@ namespace ParserGUI
             var tree = aioParser.ParseAST(tokens);
             sw.Stop();
 
+            OnParseDone(w, sw, tokens.Count(), text.Length);
+        }
+
+        private void OnParseDone(Stopwatch w, Stopwatch sw, int p, int l)
+        {
+            MessageBox.Show(string.Format("Parsing is done. {0} string chars were lexed in {1} milliseconds. {2} tokens were parsed in {3} milliseconds", l, w.ElapsedMilliseconds, p, sw.ElapsedMilliseconds), "Done", MessageBoxButtons.OK);
         }
     }
 }

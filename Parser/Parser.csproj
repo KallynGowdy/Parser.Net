@@ -60,11 +60,13 @@
     <Compile Include="Grammar\Terminal.cs" />
     <Compile Include="InvalidParseTableException.cs" />
     <Compile Include="IParser.cs" />
+    <Compile Include="LexicalAnalysis\Lexer.cs" />
     <Compile Include="ParseAction.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Parsers\LRParser.cs" />
     <Compile Include="ParseTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegularExpressions\Regex.cs" />
     <Compile Include="StateGraph.cs" />
     <Compile Include="StateNode.cs" />
     <Compile Include="Table.cs" />

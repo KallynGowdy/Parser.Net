@@ -9,7 +9,7 @@ namespace LexicalAnalysis.Defininitions
     [Serializable]
     public class StringedTokenDefinition : TokenDefinition<string>
     {
-        public override Token<string> GetToken(System.Text.RegularExpressions.Match match)
+        public override Token<string> GetToken(System.Text.RegularExpressions.Capture match)
         {
             return new Token<string>(match.Index, this.TokenTypeToMatch, match.Value);
         }

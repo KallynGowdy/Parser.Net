@@ -140,7 +140,7 @@ namespace Parser.Parsers
                                         //find the first branch that matches the reduce element
                                         var b = currentBranches.First(a => a.Value.Equals(element));
                                         //get the children of the branch since we dont want the current value
-                                        IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.Children;
+                                        IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.GetChildren();
                                         //add the children
                                         newBranch.AddChildren(branches);
                                         currentBranches.Remove(b);
