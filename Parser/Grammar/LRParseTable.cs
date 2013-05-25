@@ -13,8 +13,8 @@ namespace Parser.StateMachine
     /// <summary>
     /// Provides an implementation of a LR(1) DFA parse table.
     /// </summary>
-    [Serializable]
-    public class LRParseTable<T> : IParseTable<T>
+    [DataContract(IsReference = true, Name = "LRParseTable")]
+    public class LRParseTable<T> : IParseTable<T> where T : IEquatable<T>
     {
         //A DFA for a parser contains two tables
         //1). The ACTION table
@@ -26,6 +26,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Defines a table that maps states(int) and Tokens(T) to Actions(Action(state, token)). This property is read only.
         /// </summary>
+        [DataMember(Name = "ActionTable")]
         public Table<int, Terminal<T>, List<ParserAction<T>>> ActionTable
         {
             get;
@@ -35,6 +36,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Defines a table that maps states(int) and Tokens(T) to the next state(int). This property is read only.
         /// </summary>
+        [DataMember(Name = "GotoTable")]
         public Table<int, NonTerminal<T>, int?> GotoTable
         {
             get;
@@ -49,12 +51,27 @@ namespace Parser.StateMachine
         /// <exception cref="System.ArgumentNullException"/>
         public void WriteToStream(Stream stream)
         {
-            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>));
-            XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings
+            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>),
+            new[]
+            {
+                typeof(ShiftAction<T>),
+                typeof(ReduceAction<T>),
+                typeof(AcceptAction<T>),
+                typeof(LRItem<T>),
+                typeof(Terminal<T>),
+                typeof(NonTerminal<T>)
+            });
+            //new[]
+            //{
+            //    typeof(DelegateSerializationHolder
+            //});
+            using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings
             {
                 Indent = true
-            });
-            ser.WriteObject(writer, this);
+            }))
+            {
+                ser.WriteObject(writer, this);
+            }
         }
 
         /// <summary>
@@ -64,7 +81,16 @@ namespace Parser.StateMachine
         /// <returns></returns>
         public static LRParseTable<T> ReadFromStream(Stream stream)
         {
-            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>));
+            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>),
+            new[]
+            {
+                typeof(ShiftAction<T>),
+                typeof(ReduceAction<T>),
+                typeof(AcceptAction<T>),
+                typeof(LRItem<T>),
+                typeof(Terminal<T>),
+                typeof(NonTerminal<T>)
+            });
             return (LRParseTable<T>)ser.ReadObject(stream);
         }
 

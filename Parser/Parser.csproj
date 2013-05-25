@@ -44,6 +44,8 @@
     <Compile Include="AllInOne\AIOParser.cs" />
     <Compile Include="AllInOne\IAllInOneParser.cs" />
     <Compile Include="ColumnRowPair.cs" />
+    <Compile Include="Definitions\ITokenMatch.cs" />
+    <Compile Include="Definitions\KeywordParserTokenDefinition.cs" />
     <Compile Include="Definitions\ParserProductionTokenDefinition.cs" />
     <Compile Include="Definitions\ParserTokenDefinition.cs" />
     <Compile Include="Definitions\ParserTokenDefintionCollection.cs" />

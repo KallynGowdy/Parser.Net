@@ -61,7 +61,7 @@ namespace Parser.Grammar
 
         public static Terminal<Token<T>> ToTerminal<T>(this Token<T> value, bool keep)
         {
-            return new Terminal<Token<T>>(value, keep, a => value.TokenType.Equals(a.TokenType));
+            return new Terminal<Token<T>>(value, keep);
         }
 
         /// <summary>
@@ -70,9 +70,9 @@ namespace Parser.Grammar
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Terminal<T> ToTerminal<T>(this T value, bool keep = true, Predicate<T> equalityOperator = null)
+        public static Terminal<T> ToTerminal<T>(this T value, bool keep = true) where T : IEquatable<T>
         {
-            return new Terminal<T>(value, keep, equalityOperator);
+            return new Terminal<T>(value, keep);
         }
 
         /// <summary>

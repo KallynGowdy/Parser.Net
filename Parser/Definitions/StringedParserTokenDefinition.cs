@@ -24,5 +24,14 @@ namespace Parser.Definitions
         public StringedParserTokenDefinition(string regex, string tokenType, bool keep)
             : base(new Regex(regex), tokenType, keep)
         { }
+
+        public override bool TerminalMatch(Grammar.Terminal<string> terminal)
+        {
+            if(terminal != null && terminal.InnerValue != null)
+            {
+                return this.TokenTypeToMatch.Equals(terminal.InnerValue);
+            }
+            return false;
+        }
     }
 }

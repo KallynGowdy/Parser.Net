@@ -9,7 +9,7 @@ namespace Parser.Grammar
     /// Provides an interface for a parse table.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IParseTable<T>
+    public interface IParseTable<T> where T : IEquatable<T>
     {
         Table<int, Terminal<T>, List<ParserAction<T>>> ActionTable
         {

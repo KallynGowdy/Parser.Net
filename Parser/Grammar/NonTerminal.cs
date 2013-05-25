@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,12 +11,13 @@ namespace Parser.Grammar
     /// Defines an element that has one or more terminal elements that represent it.
     /// Equality is determined by the name of the Non-Terminal.
     /// </summary>
-    [Serializable]
+    [DataContract(Name="NonTerminal")]
     public class NonTerminal<T> : GrammarElement<T>, IEquatable<NonTerminal<T>>
     {
         /// <summary>
         /// Gets the name of this Non-Terminal.
         /// </summary>
+        [DataMember(Name="Name")]
         public string Name
         {
             get;

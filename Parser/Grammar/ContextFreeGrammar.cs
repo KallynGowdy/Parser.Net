@@ -15,7 +15,7 @@ namespace Parser.Grammar
     /// reduced to the starting element by the rules defined in the productions.
     /// </summary>
     [Serializable]
-    public class ContextFreeGrammar<T>
+    public class ContextFreeGrammar<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Writes this context free grammar to the given stream
@@ -324,7 +324,8 @@ namespace Parser.Grammar
 
             var set = startingNode.Value;
 
-            var nextElements = startingNode.Value.Select(a => a.GetNextElement()).Where(a => a != null).DistinctBy(a => a.ToString()).ToArray();
+            var nextElements = startingNode.Value.Select(a => a.GetNextElement()).Where(a => a != null).DistinctBy(a => a.ToString());
+
             foreach (GrammarElement<T> next in nextElements)
             {
                 List<LRItem<T>> state = new List<LRItem<T>>();
@@ -341,7 +342,7 @@ namespace Parser.Grammar
                 state.ForEach(a => a.DotIndex++);
 
                 //add the closure
-                IEnumerable<LRItem<T>> closure = state.Select(a => LR1Closure(a)).SelectMany(a => a).DistinctBy(a => a.ToString()).ToArray();
+                IEnumerable<LRItem<T>> closure = state.Select(a => LR1Closure(a)).SelectMany(a => a).DistinctBy(a => a.ToString());
 
                 state.AddRange(closure);
 

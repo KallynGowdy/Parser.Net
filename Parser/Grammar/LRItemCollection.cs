@@ -6,7 +6,7 @@ using Parser.StateMachine;
 
 namespace Parser.Grammar
 {
-    public class LRItemCollection<T> : IEnumerable<LRItem<T>>
+    public class LRItemCollection<T> : IEnumerable<LRItem<T>> where T : IEquatable<T>
     {
         private LRItem<T>[] items;
 

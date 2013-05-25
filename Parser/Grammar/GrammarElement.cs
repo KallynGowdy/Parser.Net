@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,12 +11,13 @@ namespace Parser.Grammar
     /// Defines a element of grammar that is used in productions.
     /// This class is abstract.
     /// </summary>
-    [Serializable]
+    [DataContract(Name="GrammarElement")]
     public abstract class GrammarElement<T>
     {
         /// <summary>
         /// Gets the Value stored inside this GrammarElement.
         /// </summary>
+        [DataMember(Name="InnerValue")]
         public T InnerValue
         {
             get;
@@ -25,6 +27,7 @@ namespace Parser.Grammar
         /// <summary>
         /// Gets or sets whether this element should be kept or discarded.
         /// </summary>
+        [DataMember(Name="Keep")]
         public bool Keep
         {
             get;

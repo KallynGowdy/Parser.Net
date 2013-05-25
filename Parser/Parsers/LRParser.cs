@@ -11,7 +11,7 @@ namespace Parser.Parsers
     /// Defines an LR(1) parser.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class LRParser<T> : IGrammarParser<T>, IGraphParser<T>
+    public class LRParser<T> : IGrammarParser<T>, IGraphParser<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets the end of input element.
@@ -44,26 +44,30 @@ namespace Parser.Parsers
                     //if we have a conflict
                     if (colRow.Value.Count > 1)
                     {
-                        ParseTableExceptionType exType;
-                        //if we have a shift-reduce conflict
+                        List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>> conflicts = new List<Tuple<ParseTableExceptionType,int,GrammarElement<T>>>();
+
+                        
+
+                        //ParseTableExceptionType exType;
+                        ////if we have a shift-reduce conflict
                         if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
                         {
-                            exType = ParseTableExceptionType.SHIFT_REDUCE;
+                            conflicts.Add(new Tuple<ParseTableExceptionType,int,GrammarElement<T>>(ParseTableExceptionType.SHIFT_REDUCE, colRow.Key.Row, colRow.Key.Column));
 
                             //then check for a reduce-reduce conflict
                             if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
                             {
-                                exType = ParseTableExceptionType.SHIFT_REDUCE | ParseTableExceptionType.REDUCE_REDUCE;
+                                conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
                             }
                         }
                         //otherwise we have a reduce-reduce conflict
                         else
                         {
-                            exType = ParseTableExceptionType.REDUCE_REDUCE;
+                            conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
                         }
 
                         //throw invalid parse table exception
-                        throw new InvalidParseTableException<T>(exType, value);
+                        throw new InvalidParseTableException<T>(value, conflicts.ToArray());
                     }
                 }
                 this.parseTable = value;
@@ -87,10 +91,14 @@ namespace Parser.Parsers
             //push the first state
             stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(0, null));
 
-            List<Terminal<T>> augmentedInput = new List<Terminal<T>>(input);
-            augmentedInput.Add(EndOfInputElement);
+            //List<Terminal<T>> augmentedInput = new List<Terminal<T>>(input);
+            //augmentedInput.Add(EndOfInputElement);
 
-            for (int i = 0; i < augmentedInput.Count; i++)
+            Terminal<T>[] augmentedInput = input.Concat(new[] { EndOfInputElement }).ToArray();
+
+            int length = augmentedInput.Length;
+
+            for (int i = 0; i < length; i++)
             {
                 Terminal<T> item = augmentedInput[i];
                 int s = stateStack.Peek().Key;
@@ -272,7 +280,7 @@ namespace Parser.Parsers
                             {
                                 e.Add(stateStack.Pop().Value);
                             }
-                            e.Reverse();
+                            //e.Reverse();
 
                             ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
 

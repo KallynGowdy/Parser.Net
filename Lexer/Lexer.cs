@@ -81,7 +81,7 @@ namespace LexicalAnalysis
                 //itterate through the groups
                 for (int i = 0; i < Definitions.Count; i++)
                 {
-                    Group g = m.Groups[(int.MaxValue - i).ToString()];
+                    Group g = m.Groups[(int.MaxValue - i)];
                     if (g.Success)
                     {
                         tokens.Add(Definitions[i].GetToken(g));

@@ -14,7 +14,7 @@ namespace Parser.Definitions
     /// Specifically, the generated terminal's equality comparer is mapped to the TokenDefintions's TokenType property. 
     /// </summary>
     [Serializable]
-    public abstract class ParserTokenDefinition<T> : TokenDefinition<T>
+    public abstract class ParserTokenDefinition<T> : TokenDefinition<T>, ITerminalMatch<T> where T : IEquatable<T>
     {
 
         /// <summary>
@@ -26,6 +26,8 @@ namespace Parser.Definitions
             set;
         }
 
+
+
         public abstract override Token<T> GetToken(Capture match);
 
         public ParserTokenDefinition(Regex regex, string tokenType, bool keep)
@@ -35,17 +37,15 @@ namespace Parser.Definitions
         }
 
         /// <summary>
-        /// Gets the terminal that represents this definition that can be used in a CFG.
+        /// Gets a terminal object based on the given token object.
         /// </summary>
+        /// <param name="token"></param>
         /// <returns></returns>
-        public virtual Terminal<Token<T>> GetTerminal()
+        public virtual Terminal<Token<T>> GetTerminal(Token<T> token)
         {
-            return (new Token<T>(0, TokenTypeToMatch, default(T))).ToTerminal(Keep, a => a != null && this.TokenTypeToMatch.Equals(a.TokenType));
+            return token.ToTerminal(Keep);
         }
 
-        public virtual Terminal<Token<T>> GetTerminal(T value)
-        {
-            return (new Token<T>(0, TokenTypeToMatch, value)).ToTerminal(Keep, a => a != null && this.TokenTypeToMatch.Equals(a.TokenType));
-        }
+        public abstract bool TerminalMatch(Terminal<T> terminal);
     }
 }

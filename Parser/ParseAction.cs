@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using Parser.StateMachine;
 
@@ -10,11 +11,13 @@ namespace Parser
     /// Provides an abstract class that defines an action that the parser should take when input is read based on the current state.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class ParserAction<T>
+    [DataContract]
+    public abstract class ParserAction<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets the parse table that the Action uses to determine what to perform.
         /// </summary>
+        [DataMember]
         public LRParseTable<T> ParseTable
         {
             get;
@@ -31,11 +34,13 @@ namespace Parser
     /// Provides a class that defines that a "shift" should occur at the location that the action is stored in the table.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class ShiftAction<T> : ParserAction<T>
+    [DataContract]
+    public sealed class ShiftAction<T> : ParserAction<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets the next state that the parser should move to.
         /// </summary>
+        [DataMember]
         public int NextState
         {
             get;
@@ -62,11 +67,13 @@ namespace Parser
     /// Provides a class that defines that a "reduce" should occur at the location that the action is stored in the table.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class ReduceAction<T> : ParserAction<T>
+    [DataContract]
+    public sealed class ReduceAction<T> : ParserAction<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets the item that defines the reduction to perform.
         /// </summary>
+        [DataMember]
         public LRItem<T> ReduceItem
         {
             get;
@@ -95,11 +102,13 @@ namespace Parser
     /// <summary>
     /// Provides a class that defines that the parse should be accepted(and therefore successful).
     /// </summary>
-    public sealed class AcceptAction<T> : ParserAction<T>
+    [DataContract]
+    public sealed class AcceptAction<T> : ParserAction<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets the item that defines that the parse should be accepted.
         /// </summary>
+        [DataMember]
         public LRItem<T> AcceptItem
         {
             get;

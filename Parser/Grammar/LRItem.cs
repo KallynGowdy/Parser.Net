@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Parser.Grammar;
@@ -10,7 +11,8 @@ namespace Parser.StateMachine
     /// <summary>
     /// Defines an LR(1) item that describes the current state of reducing a production.
     /// </summary>
-    public class LRItem<T> : IEquatable<LRItem<T>>
+    [DataContract]
+    public class LRItem<T> : IEquatable<LRItem<T>> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets the IEQuality(LRItem(T)) comparer for LRItems(T)
@@ -20,6 +22,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Gets the elements on the Right hand side of the production.
         /// </summary>
+        [DataMember(Name = "ProductionElements")]
         public GrammarElement<T>[] ProductionElements
         {
             get;
@@ -29,6 +32,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Gets the non-terminal of the left hand side of the production.
         /// </summary>
+        [DataMember(Name = "LeftHandSide")]
         public NonTerminal<T> LeftHandSide
         {
             get;
@@ -38,6 +42,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Gets the index of the dot, this defines how much of the production we have already seen.
         /// </summary>
+        [DataMember(Name = "DotIndex")]
         public int DotIndex
         {
             get;
@@ -47,6 +52,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Gets or sets the lookahead element.
         /// </summary>
+        [DataMember(Name = "LookaheadElement")]
         public Terminal<T> LookaheadElement
         {
             get;
@@ -124,7 +130,14 @@ namespace Parser.StateMachine
             //otherwise put it in front of the last element.
             else
             {
-                this.DotIndex = ProductionElements.Length - 1;
+                if (ProductionElements.Length > 0)
+                {
+                    this.DotIndex = ProductionElements.Length - 1;
+                }
+                else
+                {
+                    this.DotIndex = 0;
+                }
             }
         }
 
@@ -153,7 +166,14 @@ namespace Parser.StateMachine
             //otherwise put it in front of the last element.
             else
             {
-                this.DotIndex = ProductionElements.Length - 1;
+                if (ProductionElements.Length > 0)
+                {
+                    this.DotIndex = ProductionElements.Length - 1;
+                }
+                else
+                {
+                    this.DotIndex = 0;
+                }
             }
             this.LookaheadElement = lookahead;
         }
@@ -204,7 +224,7 @@ namespace Parser.StateMachine
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return ProductionElements.GetHashCode() ^ DotIndex ^ LookaheadElement.GetHashCode();
         }
 
         /// <summary>
@@ -238,8 +258,9 @@ namespace Parser.StateMachine
         public override string ToString()
         {
             StringBuilder b = new StringBuilder();
-            b.AppendFormat("{0} -> ", LeftHandSide);
-
+            // b.AppendFormat("{0} -> ", LeftHandSide);
+            b.Append(LeftHandSide);
+            b.Append(" -> ");
 
             for (int i = 0; i < ProductionElements.Length; i++)
             {

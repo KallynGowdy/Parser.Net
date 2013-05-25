@@ -10,7 +10,7 @@ namespace Parser
     /// <summary>
     /// Provides an interface for a parser that can parse input into either an AST or Parse Tree.
     /// </summary>
-    public interface IParser<T>
+    public interface IParser<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Parses an Abstract Sentax Tree.
@@ -29,7 +29,7 @@ namespace Parser
     /// Provides an interface for a parser that can parse input with a grammar into either an AST or Parse Tree.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IGrammarParser<T> : IParser<T>
+    public interface IGrammarParser<T> : IParser<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Sets the internal parse table of the parser from the given grammar.
@@ -42,7 +42,7 @@ namespace Parser
     /// Provides an interface for a parser that can parse input with a StateGraph into either an AST or Parse Tree.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IGraphParser<T> : IParser<T>
+    public interface IGraphParser<T> : IParser<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Sets the internal parse table of the parser from the given graph.
@@ -55,7 +55,7 @@ namespace Parser
     /// Provides an interface for a parser that can parse input with a StateGraph into either an AST or Parse Tree.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface ITableParser<T> : IParser<T>
+    public interface ITableParser<T> : IParser<T> where T : IEquatable<T>
     {
         IParseTable<T> Table
         {

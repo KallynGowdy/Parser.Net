@@ -12,7 +12,7 @@ namespace Parser.Definitions
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public class ParserTokenDefinitionCollection<T> : IList<ParserTokenDefinition<T>>
+    public class ParserTokenDefinitionCollection<T> : IList<ParserTokenDefinition<T>> where T : IEquatable<T>
     {
         /// <summary>
         /// The defintions that this collection contains.

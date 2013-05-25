@@ -10,31 +10,32 @@ namespace Parser.Grammar
     /// Defines a value that cannot be derived into a further 'child' element.
     /// </summary>
     [Serializable]
-    public class Terminal<T> : GrammarElement<T>, IEquatable<Terminal<T>>
+    public class Terminal<T> : GrammarElement<T>, IEquatable<Terminal<T>> where T : IEquatable<T>
     {
 
-        public Terminal(T value, bool keep = true, Predicate<T> equalityOperator = null)
+        public Terminal(T value, bool keep = true)
             : base(value)
         {
             this.Keep = keep;
-            if (equalityOperator == null)
-            {
-                this.EqualityOperator = a => this.InnerValue.Equals(a);
-            }
-            else
-            {
-                this.EqualityOperator = equalityOperator;
-            }
+            //if (equalityOperator == null)
+            //{
+            //    this.EqualityOperator = a => this.InnerValue.Equals(a);
+            //}
+            //else
+            //{
+            //    this.EqualityOperator = equalityOperator;
+            //}
         }
 
         /// <summary>
         /// Gets or sets the equality operator that determines if this terminal equals another terminal.
         /// </summary>
-        public Predicate<T> EqualityOperator
-        {
-            get;
-            set;
-        }
+
+        //public Predicate<T> EqualityOperator
+        //{
+        //    get;
+        //    set;
+        //}
 
         /// <summary>
         /// Gets a unique interger value that describes this object that is garenteed not to change.
@@ -82,7 +83,14 @@ namespace Parser.Grammar
         {
             if (terminal != null)
             {
-                return this.EqualityOperator(terminal.InnerValue);
+                if (this.InnerValue != null && terminal.InnerValue != null)
+                {
+                    return this.InnerValue.Equals(terminal.InnerValue);
+                }
+                else
+                {
+                    return (object)this.InnerValue == (object)terminal.InnerValue;
+                }
             }
             else
             {

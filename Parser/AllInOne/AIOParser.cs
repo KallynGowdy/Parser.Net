@@ -13,7 +13,7 @@ namespace Parser.AllInOne
     /// <summary>
     /// Defines an All-in-One LR parser, that provided a collection of ParserTokenDefinitions can successfully parse a given string of input characters.
     /// </summary>
-    public class AIOLRParser<T> : IParser<Token<T>>, IAllInOneParser<T>
+    public class AIOLRParser<T> : IParser<Token<T>>, IAllInOneParser<T> where T : IEquatable<T>
     {
 
         /// <summary>
@@ -35,14 +35,14 @@ namespace Parser.AllInOne
         {
             get
             {
-                if (Definitions == null)
+                if (Definitions == null && parser == null)
                 {
                     throw new InvalidOperationException("Defintions must be set before trying to get a Parser from it.");
                 }
                 if (parser == null)
                 {
-                    Production<Token<T>>[] productions = Definitions.GetProductions();
-                    ContextFreeGrammar<Token<T>> cfg = new ContextFreeGrammar<Token<T>>(productions.First().NonTerminal, new Terminal<Token<T>>(null, false, a => a == null), productions);
+                    
+                    ContextFreeGrammar<Token<T>> cfg = Definitions.GetGrammar();
                     parser = new LRParser<Token<T>>();
                     parser.SetParseTable(cfg);
                 }
@@ -51,22 +51,13 @@ namespace Parser.AllInOne
         }
 
         /// <summary>
-        /// Converts the given collection of Token objects to Terminal objects that contain tokens.
+        /// Sets the parse table used to parse the input.
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public IEnumerable<Terminal<Token<T>>> ConvertToTerminals(IEnumerable<Token<T>> input)
+        /// <param name="table"></param>
+        public void SetParseTable(LRParseTable<Token<T>> table)
         {
-            List<Terminal<Token<T>>> tokens = new List<Terminal<Token<T>>>(input.Count());
-            foreach (var token in input)
-            {
-                ParserTokenDefinition<T> def = Definitions.Definitions.GetDefinition(token);
-                if (def != null)
-                {
-                    tokens.Add(def.GetTerminal(token.Value));
-                }
-            }
-            return tokens;
+            parser = new LRParser<Token<T>>();
+            parser.ParseTable = table;
         }
 
         /// <summary>
@@ -81,9 +72,14 @@ namespace Parser.AllInOne
                 throw new InvalidOperationException("Definitions must be set before calling ParseAST");
             }
 
-            return Parser.ParseAST(ConvertToTerminals(input));
+            return Parser.ParseAST(Definitions.ConvertToTerminals(input));
         }
 
+        /// <summary>
+        /// Parses a concrete sentax tree from the given input.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public ParseTree<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input)
         {
             if (Definitions == null)
@@ -91,7 +87,7 @@ namespace Parser.AllInOne
                 throw new InvalidOperationException("Definitions must be set before calling ParseAST");
             }
 
-            return Parser.ParseSentaxTree(ConvertToTerminals(input));
+            return Parser.ParseSentaxTree(Definitions.ConvertToTerminals(input));
         }
 
         /// <summary>
@@ -110,7 +106,7 @@ namespace Parser.AllInOne
         }
 
         /// <summary>
-        /// Parses a Sentaxt Tree from the given input.
+        /// Parses a Concrete Sentax Tree from the given input.
         /// </summary>
         /// <param name="input"></param>
         /// <exception cref="System.InvalidOperationException"/>

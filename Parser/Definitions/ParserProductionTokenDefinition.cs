@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using LexicalAnalysis;
+using LexicalAnalysis.Defininitions;
 using Parser.Grammar;
 
 namespace Parser.Definitions
 {
     /// <summary>
-    /// Defines a relation between a production and a ParserTokenDefintionCollection.
+    /// Defines a relation between a production and a ParserTokenDefintionCollection. This is done in two parts, The Productions and the Definitions.
+    /// The Productions define the productions of the language, were each terminal's value is the TokenType of the desired token.
+    /// The Definitions define the different possible Tokens, and how find them(using regex). The tokenTypeToMatch of each definition matches to any terminal on the
+    /// right hand side of a production with the same value.
     /// </summary>
-    [Serializable]
-    public class ParserProductionTokenDefinition<T>
+    [DataContract]
+    public class ParserProductionTokenDefinition<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets or sets the productions matching TokenTypes as terminals.
         /// </summary>
+        [DataMember(Name="Productions")]
         public List<Production<string>> Productions
         {
             get;
@@ -25,10 +31,31 @@ namespace Parser.Definitions
         /// <summary>
         /// Gets or sets the Defintions matching Tokens to Terminals.
         /// </summary>
+        [DataMember(Name="Definitions")]
         public ParserTokenDefinitionCollection<T> Definitions
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets the TokenDefininitionCollection from this definition used for a lexer.
+        /// </summary>
+        /// <returns></returns>
+        public TokenDefinitionCollection<T> GetLexerDefinitions()
+        {
+            return new TokenDefinitionCollection<T>(Definitions);
+        }
+
+        /// <summary>
+        /// Gets the context free grammar that defines this definition for a parser.
+        /// </summary>
+        /// <returns></returns>
+        public ContextFreeGrammar<Token<T>> GetGrammar()
+        {
+            var productions = GetProductions();
+
+            return new ContextFreeGrammar<Token<T>>(productions.First().NonTerminal, new Terminal<Token<T>>(null, false), productions);
         }
 
         /// <summary>
@@ -49,8 +76,8 @@ namespace Parser.Definitions
                     if (e is Terminal<T>)
                     {
                         //get the first defintion whose token type matches the value of the current terminal
-                        ParserTokenDefinition<T> def = Definitions.First(a => a.TokenTypeToMatch.Equals(e.InnerValue));
-                        newP.DerivedElements.Add(new Terminal<Token<T>>(new Token<T>(0, e.InnerValue, default(T)), def.Keep, a => a != null && def.TokenTypeToMatch.Equals(a.TokenType)));
+                        ParserTokenDefinition<T> def = Definitions.First(a => a.TerminalMatch((Terminal<T>)(object)e));
+                        newP.DerivedElements.Add(new Terminal<Token<T>>(new Token<T>(0, e.InnerValue, default(T)), def.Keep));
                     }
                     else
                     {
@@ -61,6 +88,25 @@ namespace Parser.Definitions
             }
 
             return productions.ToArray();
+        }
+
+        /// <summary>
+        /// Converts the given collection of input tokens into terminals that can be parsed.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public IEnumerable<Terminal<Token<T>>> ConvertToTerminals(IEnumerable<Token<T>> input)
+        {
+            List<Terminal<Token<T>>> tokens = new List<Terminal<Token<T>>>(input.Count());
+            foreach (Token<T> token in input)
+            {
+                ParserTokenDefinition<T> def = Definitions.GetDefinition(token);
+                if (def != null)
+                {
+                    tokens.Add(def.GetTerminal(token));
+                }
+            }
+            return tokens;
         }
     }
 }
