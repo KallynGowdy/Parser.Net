@@ -399,73 +399,73 @@ namespace ParserGUI
 
             #region Def
             //// build the definitions
-            //ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-            //{
-            //    Definitions = new ParserTokenDefinitionCollection<string>
-            //    {
+            ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
+            {
+                Definitions = new ParserTokenDefinitionCollection<string>
+                {
 
-            //        Definitions = new List<ParserTokenDefinition<string>>
-            //        {
-            //            //map 'n' to a number, define that we should keep this terminal
-            //            new StringedParserTokenDefinition(@"(?:\b|^)[\d]+(?:\b|$)", "n", true),
-            //            //map '(', define that we should discard this terminal
-            //            new StringedParserTokenDefinition(@"\(", "(", false),
-            //            //map ')', define that we should discard this terminal
-            //            new StringedParserTokenDefinition(@"\)", ")", false),
-            //            //map '+', define that we should keep this terminal
-            //            new StringedParserTokenDefinition(@"\+", "+", false),
-            //            //map '*'
-            //            new StringedParserTokenDefinition(@"\*", "*", false),
-            //            //map '/'
-            //            new StringedParserTokenDefinition(@"/|\\", "/", false),
-            //            //map '-'
-            //            new StringedParserTokenDefinition(@"\-", "-", false),
-            //            //map '^'
-            //            new StringedParserTokenDefinition(@"\^", "^", false)
-            //        }
-            //    },
-            //    Productions = new List<Production<string>>
-            //    {
-            //        //E -> T
-            //        new Production<string>("E".ToNonTerminal<string>(false), "T".ToNonTerminal<string>()),
+                    Definitions = new List<ParserTokenDefinition<string>>
+                    {
+                        //map 'n' to a number, define that we should keep this terminal
+                        new StringedParserTokenDefinition(@"(?:\b|^)[\d]+(?:\b|$)", "n", true),
+                        //map '(', define that we should discard this terminal
+                        new StringedParserTokenDefinition(@"\(", "(", false),
+                        //map ')', define that we should discard this terminal
+                        new StringedParserTokenDefinition(@"\)", ")", false),
+                        //map '+', define that we should keep this terminal
+                        new StringedParserTokenDefinition(@"\+", "+", false),
+                        //map '*'
+                        new StringedParserTokenDefinition(@"\*", "*", false),
+                        //map '/'
+                        new StringedParserTokenDefinition(@"/|\\", "/", false),
+                        //map '-'
+                        new StringedParserTokenDefinition(@"\-", "-", false),
+                        //map '^'
+                        new StringedParserTokenDefinition(@"\^", "^", false)
+                    }
+                },
+                Productions = new List<Production<string>>
+                {
+                    //E -> T
+                    new Production<string>("E".ToNonTerminal<string>(false), "T".ToNonTerminal<string>()),
 
-            //        //T -> n
-            //        //the 'n' terminal generated into another terminal which contains the properties to map to a Token with the same TokenType as this terminal's value
-            //        //therefore 'n' will map to the number token definition defined above.
-            //        //since 'n'(Terminal) == 'n'(TokenDefinition).TokenType then 'n' maps to Terminal<Token<string>>((new Token(0, 'n', null).ToTerminal(keep, where evaluated token.TokenType == 'n')
-            //        new Production<string>("T".ToNonTerminal<string>(), "n".ToTerminal()),
+                    //T -> n
+                    //the 'n' terminal generated into another terminal which contains the properties to map to a Token with the same TokenType as this terminal's value
+                    //therefore 'n' will map to the number token definition defined above.
+                    //since 'n'(Terminal) == 'n'(TokenDefinition).TokenType then 'n' maps to Terminal<Token<string>>((new Token(0, 'n', null).ToTerminal(keep, where evaluated token.TokenType == 'n')
+                    new Production<string>("T".ToNonTerminal<string>(), "n".ToTerminal()),
 
-            //        //E -> ( E )
-            //        new Production<string>("E".ToNonTerminal<string>(), "(".ToTerminal(), "E".ToNonTerminal<string>(), ")".ToTerminal()),
+                    //E -> ( E )
+                    new Production<string>("E".ToNonTerminal<string>(), "(".ToTerminal(), "E".ToNonTerminal<string>(), ")".ToTerminal()),
 
-            //        //T -> E + n
-            //        new Production<string>("T".ToNonTerminal<string>(), "T".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
+                    //T -> E + n
+                    new Production<string>("T".ToNonTerminal<string>(), "T".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
 
-            //        //M -> E * n
-            //        new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
+                    //M -> E * n
+                    new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
 
-            //        //D -> E / n
-            //        new Production<string>("D".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "/".ToTerminal(), "n".ToTerminal()),
+                    //D -> E / n
+                    new Production<string>("D".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "/".ToTerminal(), "n".ToTerminal()),
 
-            //        //S -> E - n
-            //        new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
+                    //S -> E - n
+                    new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
 
-            //        //P -> E ^ n
-            //        new Production<string>("P".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "^".ToTerminal(), "n".ToTerminal()),
+                    //P -> E ^ n
+                    new Production<string>("P".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "^".ToTerminal(), "n".ToTerminal()),
 
-            //        ////E -> A
-            //        //new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
+                    ////E -> A
+                    //new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
 
-            //        //E -> M
-            //        new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
+                    //E -> M
+                    new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
 
-            //        //E -> D
-            //        new Production<string>("E".ToNonTerminal<string>(false), "D".ToNonTerminal<string>()),
+                    //E -> D
+                    new Production<string>("E".ToNonTerminal<string>(false), "D".ToNonTerminal<string>()),
 
-            //        //E -> S
-            //        new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
-            //    }
-            //};
+                    //E -> S
+                    new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
+                }
+            };
             #endregion
 
             #region Def
@@ -519,65 +519,67 @@ namespace ParserGUI
             //}; 
             #endregion
 
-            ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-            {
-                Definitions = new ParserTokenDefinitionCollection<string>
-                {
-                    Definitions = new List<ParserTokenDefinition<string>>
-                    {
-                        new StringedParserTokenDefinition(@"\w+", "id", true),
-                        new StringedParserTokenDefinition(@"->", "->", false),
-                        new StringedParserTokenDefinition(@";|\.", ";", false),
-                        new StringedParserTokenDefinition(@"\|", "|", false),
-                        new StringedParserTokenDefinition(@"\(", "(", false),
-                        new StringedParserTokenDefinition(@"\)", ")", false)
-                    }
-                },
-                Productions = new List<Production<string>>
-                {
-                    //L -> P P
-                    new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
+            #region Def
+            //ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
+            //{
+            //    Definitions = new ParserTokenDefinitionCollection<string>
+            //    {
+            //        Definitions = new List<ParserTokenDefinition<string>>
+            //        {
+            //            new StringedParserTokenDefinition(@"\w+", "id", true),
+            //            new StringedParserTokenDefinition(@"->", "->", false),
+            //            new StringedParserTokenDefinition(@";|\.", ";", false),
+            //            new StringedParserTokenDefinition(@"\|", "|", false),
+            //            new StringedParserTokenDefinition(@"\(", "(", false),
+            //            new StringedParserTokenDefinition(@"\)", ")", false)
+            //        }
+            //    },
+            //    Productions = new List<Production<string>>
+            //    {
+            //        //L -> P P
+            //        new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
 
-                    //L -> P
-                    new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
+            //        //L -> P
+            //        new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
 
-                    //P -> Term "->" Group ;
-                    new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ";".ToTerminal<string>()),
+            //        //P -> Term "->" Group ;
+            //        new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ";".ToTerminal<string>()),
 
-                    //P -> Term "->" Stmt ;
-                   // new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ";".ToTerminal<string>()),
+            //        //P -> Term "->" Stmt ;
+            //       // new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ";".ToTerminal<string>()),
 
-                    //Group ->  Stmt
-                    new Production<string>("Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>()),
+            //        //Group ->  Stmt
+            //        new Production<string>("Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>()),
 
-                    //Group -> Group | Stmt
-                    new Production<string>("Group".ToNonTerminal<string>(), "Group".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Stmt".ToNonTerminal<string>()),
+            //        //Group -> Group | Stmt
+            //        new Production<string>("Group".ToNonTerminal<string>(), "Group".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Stmt".ToNonTerminal<string>()),
 
-                    //Stmt -> ( Group )
-                    new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ")".ToTerminal<string>()),
+            //        //Stmt -> ( Group )
+            //        new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ")".ToTerminal<string>()),
 
-                    //Stmt -> Terms
-                    new Production<string>("Stmt".ToNonTerminal<string>(false), "Terms".ToNonTerminal<string>()),
+            //        //Stmt -> Terms
+            //        new Production<string>("Stmt".ToNonTerminal<string>(false), "Terms".ToNonTerminal<string>()),
 
-                    //Terms ->  Term
-                    new Production<string>("Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
-                    
-                    //Terms -> Terms Term
-                    new Production<string>("Terms".ToNonTerminal<string>(), "Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
+            //        //Terms ->  Term
+            //        new Production<string>("Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
+
+            //        //Terms -> Terms Term
+            //        new Production<string>("Terms".ToNonTerminal<string>(), "Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
 
 
 
-                    //Stmt -> ( Stmt )
-                    //new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ")".ToTerminal<string>()),
-                    
-                    //Stmt -> Stmt "|" Term
-                    //new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Term".ToNonTerminal<string>()),
+            //        //Stmt -> ( Stmt )
+            //        //new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ")".ToTerminal<string>()),
 
-                    //Term -> id
-                    new Production<string>("Term".ToNonTerminal<string>(), "id".ToTerminal<string>())
+            //        //Stmt -> Stmt "|" Term
+            //        //new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Term".ToNonTerminal<string>()),
 
-                }
-            };
+            //        //Term -> id
+            //        new Production<string>("Term".ToNonTerminal<string>(), "id".ToTerminal<string>())
+
+            //    }
+            //}; 
+            #endregion
 
             long totalParseTime = 0;
             long totalLexTime = 0;
