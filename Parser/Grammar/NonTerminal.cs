@@ -12,6 +12,7 @@ namespace Parser.Grammar
     /// Equality is determined by the name of the Non-Terminal.
     /// </summary>
     [DataContract(Name="NonTerminal")]
+    [Serializable]
     public class NonTerminal<T> : GrammarElement<T>, IEquatable<NonTerminal<T>>
     {
         /// <summary>

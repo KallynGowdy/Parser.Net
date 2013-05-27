@@ -65,7 +65,7 @@ namespace Parser.AllInOne
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public ParseTree<Token<T>> ParseAST(IEnumerable<Token<T>> input)
+        public ParseResult<Token<T>> ParseAST(IEnumerable<Token<T>> input)
         {
             if (Definitions == null)
             {
@@ -80,7 +80,7 @@ namespace Parser.AllInOne
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public ParseTree<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input)
+        public ParseResult<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input)
         {
             if (Definitions == null)
             {
@@ -96,7 +96,7 @@ namespace Parser.AllInOne
         /// <param name="input"></param>
         /// <exception cref="System.InvalidOperationException"/>
         /// <returns></returns>
-        public ParseTree<Token<T>> ParseAST(IEnumerable<Terminal<Token<T>>> input)
+        public ParseResult<Token<T>> ParseAST(IEnumerable<Terminal<Token<T>>> input)
         {
             if (Definitions == null)
             {
@@ -111,7 +111,7 @@ namespace Parser.AllInOne
         /// <param name="input"></param>
         /// <exception cref="System.InvalidOperationException"/>
         /// <returns></returns>
-        public ParseTree<Token<T>> ParseSentaxTree(IEnumerable<Terminal<Token<T>>> input)
+        public ParseResult<Token<T>> ParseSentaxTree(IEnumerable<Terminal<Token<T>>> input)
         {
             if (Definitions == null)
             {

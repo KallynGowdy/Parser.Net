@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LexicalAnalysis;
+using Parser.Parsers;
 
 namespace Parser.AllInOne
 {
@@ -10,7 +11,7 @@ namespace Parser.AllInOne
     /// <typeparam name="T"></typeparam>
     public interface IAllInOneParser<T>
     {
-        ParseTree<Token<T>> ParseAST(IEnumerable<Token<T>> input);
-        ParseTree<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input);
+        ParseResult<Token<T>> ParseAST(IEnumerable<Token<T>> input);
+        ParseResult<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input);
     }
 }

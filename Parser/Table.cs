@@ -13,7 +13,9 @@ namespace Parser
     /// <typeparam name="TColumn">The type of the column objects</typeparam>
     /// <typeparam name="TValue">The type of the values to store in the table</typeparam>
     [Serializable]
-    public class Table<TRow, TColumn, TValue> : IDictionary<ColumnRowPair<TRow, TColumn>, TValue> where TRow : IEquatable<TRow> where TColumn : IEquatable<TColumn>
+    public class Table<TRow, TColumn, TValue> : IDictionary<ColumnRowPair<TRow, TColumn>, TValue>
+        where TRow : IEquatable<TRow>
+        where TColumn : IEquatable<TColumn>
     {
         Dictionary<ColumnRowPair<TRow, TColumn>, TValue> lookup;
 
@@ -131,7 +133,8 @@ namespace Parser
 
 
         /// <summary>
-        /// Gets or sets the value at the given row and column
+        /// Gets or sets the value at the given row and column.
+        /// Returns default (TValue) if the given row, column pair cannot be found.
         /// </summary>
         /// <param name="row"></param>
         /// <param name="column"></param>
@@ -140,20 +143,9 @@ namespace Parser
         {
             get
             {
-                //box once to prevent multiple boxes
-                //object r = (object)row;
-
-                //object c = (object)column;
-
-                //KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> v = lookup.FirstOrDefault(a =>
-                //{
-                //    return r.Equals(a.Key.Row) && c.Equals(a.Key.Column);
-                //});
-
-                //return v.Value;
-                
-                return lookup[new ColumnRowPair<TRow,TColumn>(row, column)];
-
+                TValue result;
+                lookup.TryGetValue(new ColumnRowPair<TRow, TColumn>(row, column), out result);
+                return result;
             }
             set
             {
@@ -164,6 +156,7 @@ namespace Parser
 
         /// <summary>
         /// Gets or sets the value of the value at the given column and row.
+        /// Returns default(TValue) if the key cannot be found.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -171,7 +164,9 @@ namespace Parser
         {
             get
             {
-                return lookup[key];
+                TValue result;
+                lookup.TryGetValue(key, out result);
+                return result;
             }
             set
             {
@@ -181,9 +176,9 @@ namespace Parser
 
         /// <summary>
         /// Gets the value at the given index.
-        /// 
         /// </summary>
         /// <param name="index"></param>
+        /// <exception cref="System.ArgumentOutOfRangeException"/>
         /// <returns></returns>
         public TValue this[int index]
         {
@@ -194,29 +189,23 @@ namespace Parser
         }
 
         /// <summary>
-        /// Gets the columns related to the given row.
-        /// </summary>
-        /// <param name="row"></param>
-        /// <returns></returns>
-        public TColumn[] this[TRow row]
-        {
-            get
-            {
-                return lookup.Where(p => p.Key.Row.Equals(row)).Select(c => c.Key.Column).ToArray();
-            }
-        }
-
-        /// <summary>
-        /// Gets the rows related to the given column.
+        /// Gets the rows of the table given the column.
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        public TRow[] this[TColumn column]
+        public TRow[] GetRows(TColumn column)
         {
-            get
-            {
-                return lookup.Where(p => p.Key.Column.Equals(column)).Select(r => r.Key.Row).ToArray();
-            }
+            return lookup.Where(r => r.Key.Column.Equals(column)).Select(r => r.Key.Row).ToArray();
+        }
+
+        /// <summary>
+        /// Gets the columns of the table given the row.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public TColumn[] GetColumns(TRow row)
+        {
+            return lookup.Where(c => c.Key.Row.Equals(row)).Select(c => c.Key.Column).ToArray();
         }
 
         /// <summary>

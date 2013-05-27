@@ -31,6 +31,10 @@ namespace Parser
                 }
             }
 
+            /// <summary>
+            /// Gets the children of the branch.
+            /// </summary>
+            /// <returns></returns>
             public List<ParseTreebranch> GetChildren()
             {
                 return children;
@@ -86,6 +90,16 @@ namespace Parser
                 this.children.AddRange(branches);
             }
 
+            /// <summary>
+            /// Creates an new parse tree branch copied from the original.
+            /// </summary>
+            /// <param name="original"></param>
+            public ParseTreebranch(ParseTreebranch original)
+            {
+                this.Value = original.Value.DeepCopy();
+                this.children = original.children.Select(a => new ParseTreebranch(a)).ToList();
+            }
+
             private ParseTreebranch(GrammarElement<T> value, ParseTree<T> tree)
             {
                 this.Value = value;
@@ -123,6 +137,18 @@ namespace Parser
             this.Root.ParentTree = this;
         }
 
+        /// <summary>
+        /// Creates a new parse tree from the given other tree.
+        /// </summary>
+        /// <param name="otherTree"></param>
+        public ParseTree(ParseTree<T> otherTree)
+        {
+            this.Root = new ParseTreebranch(otherTree.Root);
+        }
+
+        /// <summary>
+        /// Creates a new empty parse tree.
+        /// </summary>
         public ParseTree()
         {
 

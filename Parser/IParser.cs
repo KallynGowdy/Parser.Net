@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Parser.Grammar;
+using Parser.Parsers;
 using Parser.StateMachine;
 
 namespace Parser
@@ -16,13 +17,13 @@ namespace Parser
         /// Parses an Abstract Sentax Tree.
         /// </summary>
         /// <returns></returns>
-        ParseTree<T> ParseAST(IEnumerable<Terminal<T>> input);
+        ParseResult<T> ParseAST(IEnumerable<Terminal<T>> input);
 
         /// <summary>
         /// Parses a sentax tree that completely describes the parsed input.
         /// </summary>
         /// <returns></returns>
-        ParseTree<T> ParseSentaxTree(IEnumerable<Terminal<T>> input);
+        ParseResult<T> ParseSentaxTree(IEnumerable<Terminal<T>> input);
     }
 
     /// <summary>

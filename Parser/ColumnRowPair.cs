@@ -30,6 +30,11 @@ namespace Parser
             set;
         }
 
+        /// <summary>
+        /// Creates a new column row pair object from the given row and column.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
         public ColumnRowPair(TRow row, TColumn column)
             : this()
         {
@@ -37,11 +42,21 @@ namespace Parser
             this.Row = row;
         }
 
+        /// <summary>
+        /// Determines if this column row pair object is equal to the given other object.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(ColumnRowPair<TRow, TColumn> other)
         {
             return other.Row.Equals(this.Row) && other.Column.Equals(this.Column);
         }
 
+        /// <summary>
+        /// Determines if this column row pair object is equal to the given other object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (obj is ColumnRowPair<TRow, TColumn>)
@@ -51,6 +66,10 @@ namespace Parser
             return base.Equals(obj);
         }
 
+        /// <summary>
+        /// Gets the hash code for this ColumnRowPair.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return Row.GetHashCode() ^ Column.GetHashCode();

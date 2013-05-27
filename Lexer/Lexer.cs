@@ -75,6 +75,9 @@ namespace LexicalAnalysis
             buildRegex();
         }
 
+        /// <summary>
+        /// Generates a regular expression object from the definitions set in the lexer.
+        /// </summary>
         private void buildRegex()
         {
             StringBuilder b = new StringBuilder();
@@ -88,10 +91,8 @@ namespace LexicalAnalysis
             }
 
             //append the error group to the regex, if we get to this group, then there is a sentax error.
-            b.AppendFormat(@"(?<{0}>[^\s])", refID);
+            b.AppendFormat(@"(?<{0}>[^\s\s])", refID);
 
-            //remove the last '|' char
-            //b = b.Remove(b.Length - 1, 1);
 
             completeRegex = new Regex(b.ToString());
         }
@@ -109,26 +110,10 @@ namespace LexicalAnalysis
         /// <returns></returns>
         public Token<string>[] ReadTokens(string input)
         {
-
-
-            //Find all of the matches for all of the definitions,
-            //then find which matches encapsulate other matches
-            //and remove the contained matches
-            //List<Token<string>> matches = new List<Token<string>>();
-
-            //MatchCollection[] allMatches = new MatchCollection[Definitions.Count];
-            //
-            ////Get all of the matches based on the regex defined in the definitions
-            //for (int i = 0; i < Definitions.Count; i++)
-            //{
-            //    allMatches[i] = Definitions[i].Regex.Matches(input);
-            //}
-
+            //get the matches from our generated regex object.
             MatchCollection matches = completeRegex.Matches(input);
 
 
-            //flatten the array of MatchCollection objects into a single Match collection and create Tokens from
-            //that collection.
             List<Token<string>> tokens = new List<Token<string>>();
 
             //itterate through the matches
@@ -170,14 +155,6 @@ namespace LexicalAnalysis
 
             tokens = tokens.OrderBy(a => a.Index).ToList();
 
-            //for (int i = 0; i < allMatches.Length; i++)
-            //{
-            //    int count = allMatches[i].Count;
-            //    for (int m = 0; m < count; m++)
-            //    {
-            //        tokens.Add(Definitions[i].GetToken(allMatches[i][m]));
-            //    }
-            //}
 
             //tokens = allMatches.SelectMany<MatchCollection, Token<string>>((a, i) => a.Cast<Match>().Select(t => Definitions[i].GetToken(t))).OrderBy(t => t.Index).ToList();
 

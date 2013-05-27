@@ -424,7 +424,7 @@ namespace Parser.Grammar
             //Follow(item) is First(b) where item is:
             //A -> a•Eb
 
-            GrammarElement<T> element = item.GetLookaheadElement(1);
+            GrammarElement<T> element = item.GetNextElement(1);
 
             if (element != null)
             {

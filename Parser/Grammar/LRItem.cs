@@ -92,11 +92,11 @@ namespace Parser.StateMachine
 
 
         /// <summary>
-        /// Gets the element that is lookahead indexes in front of the next element.
+        /// Gets the element that is lookahead items in front of the next element.
         /// Returns Null if it is the end of the production.
         /// </summary>
         /// <returns></returns>
-        public GrammarElement<T> GetLookaheadElement(int lookahead)
+        public GrammarElement<T> GetNextElement(int lookahead)
         {
             if (DotIndex + lookahead < ProductionElements.Length)
             {
@@ -141,6 +141,11 @@ namespace Parser.StateMachine
             }
         }
 
+        /// <summary>
+        /// Creates a new LRItem with the given dot index from the given other item.
+        /// </summary>
+        /// <param name="dotIndex"></param>
+        /// <param name="otherItem"></param>
         public LRItem(int dotIndex, LRItem<T> otherItem)
         {
             LeftHandSide = otherItem.LeftHandSide;
@@ -149,6 +154,12 @@ namespace Parser.StateMachine
             this.LookaheadElement = otherItem.LookaheadElement;
         }
 
+        /// <summary>
+        /// Creates a new LRItem with the given dot index from the given production with the given lookahead element.
+        /// </summary>
+        /// <param name="dotIndex"></param>
+        /// <param name="production"></param>
+        /// <param name="lookahead"></param>
         public LRItem(int dotIndex, Production<T> production, Terminal<T> lookahead)
         {
             this.LeftHandSide = production.NonTerminal;
@@ -237,7 +248,7 @@ namespace Parser.StateMachine
         }
 
         /// <summary>
-        /// Gets the element that is before the dot(•)
+        /// Gets the element that is before the dot(•). Returns null if the dot is a the end of the production.
         /// </summary>
         /// <returns></returns>
         public GrammarElement<T> LastElement()

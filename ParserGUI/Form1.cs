@@ -614,8 +614,8 @@ namespace ParserGUI
                 //    }
                 //}
 
-                try
-                {
+                //try
+                //{
                 if (lexer == null)
                 {
                     lexer = new Lexer();
@@ -638,12 +638,12 @@ namespace ParserGUI
                 totalLexTime += w.ElapsedMilliseconds;
                 totalParseTime += sw.ElapsedMilliseconds;
 
-                }
-                catch(Exception e)
-                {
-                    MessageBox.Show(e.Message);
-                    return;
-                }
+                //}
+                //catch(Exception e)
+                //{
+                //    MessageBox.Show(e.Message);
+                //    return;
+                //}
                 //(new Thread(OnParseDone)).Start(new
                 //{
                 //    w = w,

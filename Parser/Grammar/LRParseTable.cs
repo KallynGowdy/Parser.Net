@@ -328,59 +328,7 @@ namespace Parser.StateMachine
             }
         }
 
-        /// <summary>
-        /// builds the parse table from the current node.
-        /// </summary>
-        /// <param name="currentNode"></param>
-        /// <param name="currentStateIndex">The interger identifier of the given currentNode</param>
-        //private void buildParseTable(StateNode<GrammarElement<T>, LRItem<T>[]> currentNode, int currentStateIndex, NonTerminal<T> startingElement, ref int nextIndex)
-        //{
-        //    int currentState = currentStateIndex;
-
-        //    if (nextIndex == 0)
-        //    {
-        //        nextIndex = 1;
-        //    }
-
-        //    foreach (var transition in currentNode.FromTransitions)
-        //    {
-        //        int index = (nextIndex);
-        //        //add a shift transition to the ActionTable
-        //        if (transition.Key is Terminal<T>)
-        //        {
-        //            //add a shift action from the current state to the next state
-        //            addAction((Terminal<T>)transition.Key, currentStateIndex, new[] { new ShiftAction(this, index) });
-        //        }
-        //        //otherwise add to goto table
-        //        else
-        //        {
-        //            addGoto((NonTerminal<T>)transition.Key, currentStateIndex, index);
-        //        }
-        //        nextIndex++;
-        //    }
-
-        //    //add the nodes of the transition nodes to the table
-        //    foreach (var trans in currentNode.FromTransitions)
-        //    {
-        //        buildParseTable(trans.Value, nextIndex, startingElement, ref nextIndex);
-        //    }
-
-        //    //add a reduce for every item that is at the end of the production
-        //    foreach (LRItem<T> i in currentNode.Value.Where(a => a.IsAtEndOfProduction()))
-        //    {
-        //        if (i.LeftHandSide.Equals(startingElement))
-        //        {
-        //            //accept
-        //            addAction(i.LookaheadElement, currentStateIndex, new[] { new AcceptAction(this, i) });
-        //        }
-        //        else
-        //        {
-        //            //reduce
-        //            addAction(i.LookaheadElement, currentStateIndex, new[] { new ReduceAction(this, i) });
-        //        }
-        //    }
-        //}
-
+        
         /// <summary>
         /// Creates a new parse table with the given states as rows, and possibleTerminals with possibleNonTerminals as columns for the Action and Goto tables respectively.
         /// </summary>

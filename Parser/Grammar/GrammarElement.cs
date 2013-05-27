@@ -12,6 +12,7 @@ namespace Parser.Grammar
     /// This class is abstract.
     /// </summary>
     [DataContract(Name="GrammarElement")]
+    [Serializable]
     public abstract class GrammarElement<T>
     {
         /// <summary>

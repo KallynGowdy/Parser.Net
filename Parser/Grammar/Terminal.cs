@@ -17,25 +17,8 @@ namespace Parser.Grammar
             : base(value)
         {
             this.Keep = keep;
-            //if (equalityOperator == null)
-            //{
-            //    this.EqualityOperator = a => this.InnerValue.Equals(a);
-            //}
-            //else
-            //{
-            //    this.EqualityOperator = equalityOperator;
-            //}
         }
 
-        /// <summary>
-        /// Gets or sets the equality operator that determines if this terminal equals another terminal.
-        /// </summary>
-
-        //public Predicate<T> EqualityOperator
-        //{
-        //    get;
-        //    set;
-        //}
 
         /// <summary>
         /// Gets a unique interger value that describes this object that is garenteed not to change.
