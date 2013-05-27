@@ -12,10 +12,10 @@ namespace LexicalAnalysis
     /// Defines an exception that is thrown when an unexpected character is encountered.
     /// </summary>
     [Serializable]
-    public class SentaxErrorException : Exception
+    public class SyntaxErrorException : Exception
     {
         /// <summary>
-        /// Gets the line number that the sentax error occured at. (Default = -1)
+        /// Gets the line number that the Syntax error occured at. (Default = -1)
         /// </summary>
         public int LineNumber
         {
@@ -24,7 +24,7 @@ namespace LexicalAnalysis
         }
 
         /// <summary>
-        /// Gets the column number that the sentax error occured at. (Default = -1)
+        /// Gets the column number that the Syntax error occured at. (Default = -1)
         /// </summary>
         public int ColumnNumber
         {
@@ -34,22 +34,22 @@ namespace LexicalAnalysis
 
         private static string buildExceptionMessage(int lineNumber, int columnNumber, string message)
         {
-            return string.Format("Sentax error occured:\nLineNumber: {0}\nColumnNumber: {1}\nMessage: {2}", lineNumber, columnNumber, message);
+            return string.Format("Syntax error occured:\nLineNumber: {0}\nColumnNumber: {1}\nMessage: {2}", lineNumber, columnNumber, message);
         }
 
-        public SentaxErrorException(int lineNumber, int columnNumber, string message, Exception innerException = null)
+        public SyntaxErrorException(int lineNumber, int columnNumber, string message, Exception innerException = null)
             : base(buildExceptionMessage(lineNumber, columnNumber, message), innerException)
         {
             this.LineNumber = lineNumber;
             this.ColumnNumber = columnNumber;
         }
 
-        public SentaxErrorException(string message)
+        public SyntaxErrorException(string message)
             : this(-1, -1, message)
         {
         }
 
-        public SentaxErrorException(string message, Exception innerException)
+        public SyntaxErrorException(string message, Exception innerException)
             : this(-1, -1, message, innerException)
         {
         }
@@ -67,6 +67,21 @@ namespace LexicalAnalysis
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets or sets wether to throw a syntax error when an unidentified character is encountered.
+        /// Default = true.
+        /// </summary>
+        public bool ThrowSyntaxErrors
+        {
+            get;
+            set;
+        }
+
+        public Lexer()
+        {
+            ThrowSyntaxErrors = true;
         }
 
         public void SetDefintions(TokenDefinitionCollection<string> definitions)
@@ -90,7 +105,7 @@ namespace LexicalAnalysis
                 b.AppendFormat("(?<{1}>{0})|", def.Regex.ToString(), refID--);
             }
 
-            //append the error group to the regex, if we get to this group, then there is a sentax error.
+            //append the error group to the regex, if we get to this group, then there is a Syntax error.
             b.AppendFormat(@"(?<{0}>[^\s\s])", refID);
 
 
@@ -126,28 +141,41 @@ namespace LexicalAnalysis
                     Group g = m.Groups[currentIndex];
                     if (g.Success)
                     {
-                        //if we have not reached the last group. if we have then a sentax error has occured.
+                        //if we have not reached the last group. if we have then a Syntax error has occured.
                         if (currentIndex != int.MaxValue - Definitions.Count)
                         {
                             tokens.Add(Definitions[i].GetToken(g));
                         }
                         else
                         {
-                            //find the line number.
-                            int lineNumber = input.Take(g.Index).Count(a => a == '\n') + 1;
-
-                            //find the absolute index of the last newline before the error index.
-                            var lastLine = input.Select((value, index) => new {value, index}).LastOrDefault(a => a.value == '\n');
-
-                            //get the column number
-                            int columnNumber = g.Index + 1;
-                            if(lastLine != null)
+                            //throw a syntax error if we should.
+                            if (ThrowSyntaxErrors)
                             {
-                                columnNumber = g.Index - lastLine.index + 1;
-                            }
+                                //find the line number.
+                                int lineNumber = input.Take(g.Index).Count(a => a == '\n') + 1;
 
-                            //sentax error
-                            throw new SentaxErrorException(lineNumber, columnNumber, string.Format("Found {0}.", g.Value));
+                                //find the absolute index of the last newline before the error index.
+                                var lastLine = input.Select((value, index) => new
+                                {
+                                    value,
+                                    index
+                                }).LastOrDefault(a => a.value == '\n');
+
+                                //get the column number
+                                int columnNumber = g.Index + 1;
+                                if (lastLine != null)
+                                {
+                                    columnNumber = g.Index - lastLine.index + 1;
+                                }
+
+                                //Syntax error
+                                throw new SyntaxErrorException(lineNumber, columnNumber, string.Format("Found {0}.", g.Value));
+                            }
+                            //otherwise, add as a token with TokenType 'UNKNOWN'.
+                            else
+                            {
+                                tokens.Add(new Token<string>(g.Index, TokenTypes.UNKNOWN, g.Value));
+                            }
                         }
                     }
                 }

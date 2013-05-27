@@ -61,7 +61,7 @@ namespace Parser.AllInOne
         }
 
         /// <summary>
-        /// Parses an abstract sentax tree from the given input.
+        /// Parses an abstract Syntax tree from the given input.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -76,22 +76,22 @@ namespace Parser.AllInOne
         }
 
         /// <summary>
-        /// Parses a concrete sentax tree from the given input.
+        /// Parses a concrete Syntax tree from the given input.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public ParseResult<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input)
+        public ParseResult<Token<T>> ParseSyntaxTree(IEnumerable<Token<T>> input)
         {
             if (Definitions == null)
             {
                 throw new InvalidOperationException("Definitions must be set before calling ParseAST");
             }
 
-            return Parser.ParseSentaxTree(Definitions.ConvertToTerminals(input));
+            return Parser.ParseSyntaxTree(Definitions.ConvertToTerminals(input));
         }
 
         /// <summary>
-        /// Parses an Abstract Sentax tree from the given input.
+        /// Parses an Abstract Syntax tree from the given input.
         /// </summary>
         /// <param name="input"></param>
         /// <exception cref="System.InvalidOperationException"/>
@@ -106,18 +106,18 @@ namespace Parser.AllInOne
         }
 
         /// <summary>
-        /// Parses a Concrete Sentax Tree from the given input.
+        /// Parses a Concrete Syntax Tree from the given input.
         /// </summary>
         /// <param name="input"></param>
         /// <exception cref="System.InvalidOperationException"/>
         /// <returns></returns>
-        public ParseResult<Token<T>> ParseSentaxTree(IEnumerable<Terminal<Token<T>>> input)
+        public ParseResult<Token<T>> ParseSyntaxTree(IEnumerable<Terminal<Token<T>>> input)
         {
             if (Definitions == null)
             {
-                throw new InvalidOperationException("Definitions must be set before calling ParseSentaxTree");
+                throw new InvalidOperationException("Definitions must be set before calling ParseSyntaxTree");
             }
-            return Parser.ParseSentaxTree(input);
+            return Parser.ParseSyntaxTree(input);
         }
     }
 }

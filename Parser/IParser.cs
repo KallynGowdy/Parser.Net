@@ -14,16 +14,16 @@ namespace Parser
     public interface IParser<T> where T : IEquatable<T>
     {
         /// <summary>
-        /// Parses an Abstract Sentax Tree.
+        /// Parses an Abstract Syntax Tree.
         /// </summary>
         /// <returns></returns>
         ParseResult<T> ParseAST(IEnumerable<Terminal<T>> input);
 
         /// <summary>
-        /// Parses a sentax tree that completely describes the parsed input.
+        /// Parses a Syntax tree that completely describes the parsed input.
         /// </summary>
         /// <returns></returns>
-        ParseResult<T> ParseSentaxTree(IEnumerable<Terminal<T>> input);
+        ParseResult<T> ParseSyntaxTree(IEnumerable<Terminal<T>> input);
     }
 
     /// <summary>

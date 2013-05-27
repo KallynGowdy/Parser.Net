@@ -12,6 +12,6 @@ namespace Parser.AllInOne
     public interface IAllInOneParser<T>
     {
         ParseResult<Token<T>> ParseAST(IEnumerable<Token<T>> input);
-        ParseResult<Token<T>> ParseSentaxTree(IEnumerable<Token<T>> input);
+        ParseResult<Token<T>> ParseSyntaxTree(IEnumerable<Token<T>> input);
     }
 }

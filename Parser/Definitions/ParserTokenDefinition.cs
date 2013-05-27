@@ -18,7 +18,7 @@ namespace Parser.Definitions
     {
 
         /// <summary>
-        /// Determines if the produced Token should be kept in the Abstract Sentax Tree.
+        /// Determines if the produced Token should be kept in the Abstract Syntax Tree.
         /// </summary>
         public bool Keep
         {

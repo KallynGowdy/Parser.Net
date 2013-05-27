@@ -79,7 +79,7 @@ namespace Parser.Parsers
         }
 
         /// <summary>
-        /// Parses an Abstract sentax tree from the given input based on the rules defined in the Terminal elements.
+        /// Parses an Abstract Syntax tree from the given input based on the rules defined in the Terminal elements.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -194,7 +194,7 @@ namespace Parser.Parsers
                             return getSyntaxError(currentBranches, stateStack, item);
                         }
                     }
-                    //otherwise, there is no action and a sentax error has occured.
+                    //otherwise, there is no action and a Syntax error has occured.
                     else
                     {
                         return getSyntaxError(currentBranches, stateStack, item);
@@ -203,9 +203,7 @@ namespace Parser.Parsers
 
                 if(currentBranches.Count > 0)
                 {
-                    ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
-                    root.AddChildren(currentBranches);
-                    return new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new ParseResult<T>.ParseError("No valid accept action found by end of input"));
+                    return getSyntaxError(currentBranches, stateStack, "END_OF_FILE");
                 }
                 else
                 {
@@ -248,16 +246,39 @@ namespace Parser.Parsers
                 }
                 return a;
             });
-            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new ParseResult<T>.ParseError(string.Format("Syntax Error. Expected one of {{{0}}} but found {1}", rows.ConcatArray(", "), item.ToString())));
+            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new ParseResult<T>.ParseError(string.Format("Syntax Error. Expected one of {{{0}}} but found \'{1}\'", rows.ConcatArray(", "), item.InnerValue)));
             return result;
         }
 
         /// <summary>
-        /// Parses a concrete sentax tree from the given input.
+        /// Gets a syntax error result from the current branches, stack and item.
+        /// </summary>
+        /// <param name="currentBranches">The current branches in the parse.</param>
+        /// <param name="stateStack">The current state stack in the parse.</param>
+        /// <param name="invalidItem">The next terminal item from the augmented input.</param>
+        /// <returns></returns>
+        private ParseResult<T> getSyntaxError(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string invalidItem)
+        {
+            ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+            root.AddChildren(currentBranches);
+            var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null).Select<Terminal<T>, object>(a =>
+            {
+                if (a == EndOfInputElement)
+                {
+                    return "END_OF_INPUT";
+                }
+                return a;
+            });
+            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new ParseResult<T>.ParseError(string.Format("Syntax Error. Expected one of: {{{0}}} but found \'{1}\'", rows.ConcatArray(", "), invalidItem)));
+            return result;
+        }
+
+        /// <summary>
+        /// Parses a concrete Syntax tree from the given input.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public ParseResult<T> ParseSentaxTree(IEnumerable<Terminal<T>> input)
+        public ParseResult<T> ParseSyntaxTree(IEnumerable<Terminal<T>> input)
         {
             checkParseTable();
 
