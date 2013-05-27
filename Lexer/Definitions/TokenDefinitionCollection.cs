@@ -5,7 +5,7 @@ using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
 
-namespace LexicalAnalysis.Defininitions
+namespace LexicalAnalysis.Definitions
 {
     /// <summary>
     /// Defines a serializable collection of TokenDefiniton(T) objects.

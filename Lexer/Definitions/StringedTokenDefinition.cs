@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace LexicalAnalysis.Defininitions
+namespace LexicalAnalysis.Definitions
 {
     /// <summary>
     /// A TokenDefinition(string) that provides support for GetToken(Match)

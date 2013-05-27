@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Parser.Grammar;
 using Parser.StateMachine;
-using LexicalAnalysis.Defininitions;
+using LexicalAnalysis.Definitions;
 using LexicalAnalysis;
 using Parser.Parsers;
 using Parser.Definitions;
@@ -614,7 +614,8 @@ namespace ParserGUI
                 //    }
                 //}
 
-
+                try
+                {
                 if (lexer == null)
                 {
                     lexer = new Lexer();
@@ -637,6 +638,12 @@ namespace ParserGUI
                 totalLexTime += w.ElapsedMilliseconds;
                 totalParseTime += sw.ElapsedMilliseconds;
 
+                }
+                catch(Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    return;
+                }
                 //(new Thread(OnParseDone)).Start(new
                 //{
                 //    w = w,

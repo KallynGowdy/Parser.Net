@@ -4,9 +4,60 @@ using System.Text.RegularExpressions;
 
 namespace LexicalAnalysis
 {
+    using System;
     using System.Text;
-    using Defininitions;
+    using Definitions;
 
+    /// <summary>
+    /// Defines an exception that is thrown when an unexpected character is encountered.
+    /// </summary>
+    [Serializable]
+    public class SentaxErrorException : Exception
+    {
+        /// <summary>
+        /// Gets the line number that the sentax error occured at. (Default = -1)
+        /// </summary>
+        public int LineNumber
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the column number that the sentax error occured at. (Default = -1)
+        /// </summary>
+        public int ColumnNumber
+        {
+            get;
+            private set;
+        }
+
+        private static string buildExceptionMessage(int lineNumber, int columnNumber, string message)
+        {
+            return string.Format("Sentax error occured:\nLineNumber: {0}\nColumnNumber: {1}\nMessage: {2}", lineNumber, columnNumber, message);
+        }
+
+        public SentaxErrorException(int lineNumber, int columnNumber, string message, Exception innerException = null)
+            : base(buildExceptionMessage(lineNumber, columnNumber, message), innerException)
+        {
+            this.LineNumber = lineNumber;
+            this.ColumnNumber = columnNumber;
+        }
+
+        public SentaxErrorException(string message)
+            : this(-1, -1, message)
+        {
+        }
+
+        public SentaxErrorException(string message, Exception innerException)
+            : this(-1, -1, message, innerException)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Defines a class that, given a set of definitions, can convert a given string into a set of tokens.
+    /// </summary>
     public class Lexer
     {
         /// <summary>
@@ -32,11 +83,15 @@ namespace LexicalAnalysis
 
             foreach (var def in Definitions)
             {
+                //add the regex definition as a named group with the id counting down from int.MaxValue
                 b.AppendFormat("(?<{1}>{0})|", def.Regex.ToString(), refID--);
             }
 
+            //append the error group to the regex, if we get to this group, then there is a sentax error.
+            b.AppendFormat(@"(?<{0}>[^\s])", refID);
+
             //remove the last '|' char
-            b = b.Remove(b.Length - 1, 1);
+            //b = b.Remove(b.Length - 1, 1);
 
             completeRegex = new Regex(b.ToString());
         }
@@ -54,20 +109,20 @@ namespace LexicalAnalysis
         /// <returns></returns>
         public Token<string>[] ReadTokens(string input)
         {
-            
+
 
             //Find all of the matches for all of the definitions,
             //then find which matches encapsulate other matches
             //and remove the contained matches
             //List<Token<string>> matches = new List<Token<string>>();
 
-            MatchCollection[] allMatches = new MatchCollection[Definitions.Count];
-
-            //Get all of the matches based on the regex defined in the definitions
-            for (int i = 0; i < Definitions.Count; i++)
-            {
-                allMatches[i] = Definitions[i].Regex.Matches(input);
-            }
+            //MatchCollection[] allMatches = new MatchCollection[Definitions.Count];
+            //
+            ////Get all of the matches based on the regex defined in the definitions
+            //for (int i = 0; i < Definitions.Count; i++)
+            //{
+            //    allMatches[i] = Definitions[i].Regex.Matches(input);
+            //}
 
             MatchCollection matches = completeRegex.Matches(input);
 
@@ -75,16 +130,40 @@ namespace LexicalAnalysis
             //flatten the array of MatchCollection objects into a single Match collection and create Tokens from
             //that collection.
             List<Token<string>> tokens = new List<Token<string>>();
+
             //itterate through the matches
             foreach (Match m in matches)
             {
                 //itterate through the groups
-                for (int i = 0; i < Definitions.Count; i++)
+                for (int i = 0; i < Definitions.Count + 1; i++)
                 {
-                    Group g = m.Groups[(int.MaxValue - i)];
+                    int currentIndex = (int.MaxValue - i);
+                    Group g = m.Groups[currentIndex];
                     if (g.Success)
                     {
-                        tokens.Add(Definitions[i].GetToken(g));
+                        //if we have not reached the last group. if we have then a sentax error has occured.
+                        if (currentIndex != int.MaxValue - Definitions.Count)
+                        {
+                            tokens.Add(Definitions[i].GetToken(g));
+                        }
+                        else
+                        {
+                            //find the line number.
+                            int lineNumber = input.Take(g.Index).Count(a => a == '\n') + 1;
+
+                            //find the absolute index of the last newline before the error index.
+                            var lastLine = input.Select((value, index) => new {value, index}).LastOrDefault(a => a.value == '\n');
+
+                            //get the column number
+                            int columnNumber = g.Index + 1;
+                            if(lastLine != null)
+                            {
+                                columnNumber = g.Index - lastLine.index + 1;
+                            }
+
+                            //sentax error
+                            throw new SentaxErrorException(lineNumber, columnNumber, string.Format("Found {0}.", g.Value));
+                        }
                     }
                 }
             }

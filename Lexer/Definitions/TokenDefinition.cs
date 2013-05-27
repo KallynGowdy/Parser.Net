@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LexicalAnalysis.Defininitions
+namespace LexicalAnalysis.Definitions
 {
     /// <summary>
     /// Defines a serializable relation between a regex pattern and a token.

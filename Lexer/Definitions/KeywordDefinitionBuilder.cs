@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace LexicalAnalysis.Defininitions
+namespace LexicalAnalysis.Definitions
 {
     /// <summary>
     /// A class that provides a way to build a single regular expression that matches all of the given keywords.

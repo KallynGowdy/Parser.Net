@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using LexicalAnalysis;
-using LexicalAnalysis.Defininitions;
+using LexicalAnalysis.Definitions;
 using Parser.Grammar;
 
 namespace Parser.Definitions
