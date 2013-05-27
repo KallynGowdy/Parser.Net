@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Parser</RootNamespace>
     <AssemblyName>Parser</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -36,7 +36,6 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -73,6 +72,7 @@
     <Compile Include="StateGraph.cs" />
     <Compile Include="StateNode.cs" />
     <Compile Include="Table.cs" />
+    <Compile Include="Tuple.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lexer\LexicalAnalysis.csproj">

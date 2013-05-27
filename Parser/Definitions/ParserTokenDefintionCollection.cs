@@ -12,7 +12,7 @@ namespace Parser.Definitions
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public class ParserTokenDefinitionCollection<T> : IList<ParserTokenDefinition<T>> where T : IEquatable<T>
+    public class ParserTokenDefinitionCollection<T> : IEnumerable<ParserTokenDefinition<T>>, IList<ParserTokenDefinition<T>> where T : IEquatable<T>
     {
         /// <summary>
         /// The defintions that this collection contains.
@@ -36,7 +36,7 @@ namespace Parser.Definitions
         /// <returns></returns>
         public TokenDefinitionCollection<T> GetNormalDefinitions()
         {
-            return new TokenDefinitionCollection<T>(Definitions);
+            return new TokenDefinitionCollection<T>(Definitions.Select(a => a));
         }
 
         public int IndexOf(ParserTokenDefinition<T> item)
