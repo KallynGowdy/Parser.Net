@@ -80,5 +80,10 @@ namespace Parser
         {
             return Item1.GetHashCode() ^ Item2.GetHashCode() ^ Item3.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return string.Format("({0}, {1}, 2})", Item1.ToString(), Item2.ToString(), Item3.ToString());
+        }
     }
 }

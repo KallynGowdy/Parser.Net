@@ -47,8 +47,6 @@ namespace Parser.Parsers
                     {
                         List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>> conflicts = new List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>>();
 
-
-
                         //ParseTableExceptionType exType;
                         ////if we have a shift-reduce conflict
                         if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
