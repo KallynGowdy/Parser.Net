@@ -8,7 +8,7 @@ using Parser.Grammar;
 using Parser.Parsers;
 using Parser.StateMachine;
 
-namespace Parser.AllInOne
+namespace Parser.Parsers.AllInOne
 {
     /// <summary>
     /// Defines an All-in-One LR parser, that provided a collection of ParserTokenDefinitions can successfully parse a given string of input characters.
@@ -54,7 +54,7 @@ namespace Parser.AllInOne
         /// Sets the parse table used to parse the input.
         /// </summary>
         /// <param name="table"></param>
-        public void SetParseTable(LRParseTable<Token<T>> table)
+        public void SetParseTable(ParseTable<Token<T>> table)
         {
             parser = new LRParser<Token<T>>();
             parser.ParseTable = table;

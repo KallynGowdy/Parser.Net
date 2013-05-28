@@ -26,13 +26,13 @@ namespace Parser.Parsers
         /// <summary>
         /// The parse table.
         /// </summary>
-        private LRParseTable<T> parseTable;
+        private ParseTable<T> parseTable;
 
         /// <summary>
         /// Gets or sets the parse table used to parse input.
         /// </summary>
         /// <exception cref="Parser.InvalidParseTableException">Thrown if an invalid parse table is provided when trying to set the parse table.</exception>
-        public LRParseTable<T> ParseTable
+        public ParseTable<T> ParseTable
         {
             get
             {
@@ -410,7 +410,7 @@ namespace Parser.Parsers
 
             if (graph.Root.Value.FirstOrDefault() != null)
             {
-                ParseTable = new LRParseTable<T>(graph, graph.Root.Value.First().LeftHandSide);
+                ParseTable = new ParseTable<T>(graph, graph.Root.Value.First().LeftHandSide);
                 this.EndOfInputElement = endOfInputElement;
             }
             else
@@ -431,7 +431,7 @@ namespace Parser.Parsers
                 throw new ArgumentNullException("grammar", "The given grammar must be non-null");
             }
 
-            ParseTable = new LRParseTable<T>(grammar.CreateStateGraph(), grammar.StartElement);
+            ParseTable = new ParseTable<T>(grammar.CreateStateGraph(), grammar.StartElement);
             EndOfInputElement = grammar.EndOfInputElement;
         }
     }

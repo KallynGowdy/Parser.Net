@@ -5,6 +5,12 @@ using System.Text;
 
 namespace Parser
 {
+    /// <summary>
+    /// Represents a triple of items.
+    /// </summary>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
+    /// <typeparam name="T3"></typeparam>
     public class Tuple<T1, T2, T3>
     {
         /// <summary>

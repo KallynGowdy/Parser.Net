@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using LexicalAnalysis;
+using Parser.Collections;
 using Parser.Grammar;
 
 namespace Parser.Grammar

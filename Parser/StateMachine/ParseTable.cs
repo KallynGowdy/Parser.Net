@@ -5,15 +5,18 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
+using Parser.Collections;
 using Parser.Grammar;
+using Parser.Parsers;
 
 namespace Parser.StateMachine
 {
     /// <summary>
-    /// Provides an implementation of a LR(1) DFA parse table.
+    /// Provides an implementation of a parse table.
+    /// Stores the Deterministic/Nondeterministic Finite Automa for a parser.
     /// </summary>
     [DataContract(IsReference = true, Name = "LRParseTable")]
-    public class LRParseTable<T> : IParseTable<T> where T : IEquatable<T>
+    public class ParseTable<T> : IParseTable<T> where T : IEquatable<T>
     {
         //A DFA for a parser contains two tables
         //1). The ACTION table
@@ -50,7 +53,7 @@ namespace Parser.StateMachine
         /// <exception cref="System.ArgumentNullException"/>
         public void WriteToStream(Stream stream)
         {
-            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>),
+            DataContractSerializer ser = new DataContractSerializer(typeof(ParseTable<T>),
             new[]
             {
                 typeof(ShiftAction<T>),
@@ -78,9 +81,9 @@ namespace Parser.StateMachine
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static LRParseTable<T> ReadFromStream(Stream stream)
+        public static ParseTable<T> ReadFromStream(Stream stream)
         {
-            DataContractSerializer ser = new DataContractSerializer(typeof(LRParseTable<T>),
+            DataContractSerializer ser = new DataContractSerializer(typeof(ParseTable<T>),
             new[]
             {
                 typeof(ShiftAction<T>),
@@ -90,7 +93,7 @@ namespace Parser.StateMachine
                 typeof(Terminal<T>),
                 typeof(NonTerminal<T>)
             });
-            return (LRParseTable<T>)ser.ReadObject(stream);
+            return (ParseTable<T>)ser.ReadObject(stream);
         }
 
         /// <summary>
@@ -177,7 +180,7 @@ namespace Parser.StateMachine
         /// <summary>
         /// Creates a new, empty parse table.
         /// </summary>
-        public LRParseTable()
+        public ParseTable()
         {
             ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
@@ -187,7 +190,7 @@ namespace Parser.StateMachine
         /// Creates a new parse table from the given context free grammar.
         /// </summary>
         /// <param name="cfg"></param>
-        public LRParseTable(ContextFreeGrammar<T> cfg)
+        public ParseTable(ContextFreeGrammar<T> cfg)
         {
             ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
@@ -199,7 +202,7 @@ namespace Parser.StateMachine
         /// Creates a new parse table from the given graph.
         /// </summary>
         /// <param name="graph"></param>
-        public LRParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
+        public ParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, NonTerminal<T> startingElement)
         {
             ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
@@ -334,7 +337,7 @@ namespace Parser.StateMachine
         /// <param name="possibleTerminals"></param>
         /// <param name="possibleNonTerminals"></param>
         /// <param name="states"></param>
-        public LRParseTable(IEnumerable<Terminal<T>> possibleTerminals, IEnumerable<NonTerminal<T>> possibleNonTerminals, IEnumerable<int> states)
+        public ParseTable(IEnumerable<Terminal<T>> possibleTerminals, IEnumerable<NonTerminal<T>> possibleNonTerminals, IEnumerable<int> states)
         {
             this.ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             foreach (Terminal<T> t in possibleTerminals)

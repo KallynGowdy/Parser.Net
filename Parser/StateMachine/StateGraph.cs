@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Parser.StateMachine;
 
-namespace Parser
+namespace Parser.StateMachine
 {
     /// <summary>
     /// Provides a graph that relates states to other states based on transitions.

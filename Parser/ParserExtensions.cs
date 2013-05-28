@@ -45,7 +45,7 @@ namespace Parser
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static string ConcatArray(this object obj, string seperator = " ")
+        internal static string ConcatArray(this object obj, string seperator = " ")
         {
             
             if (obj is IEnumerable<object>)

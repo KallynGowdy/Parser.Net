@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Parser
+namespace Parser.Collections
 {
     /// <summary>
     /// Defines a table that uses T1 and T2 to relate to T.
@@ -149,8 +149,7 @@ namespace Parser
             }
             set
             {
-                var columnRow = lookup.Where(a => a.Key.Row.Equals(row) && a.Key.Column.Equals(column)).First().Key;
-                lookup[columnRow] = value;
+                lookup[new ColumnRowPair<TRow,TColumn>(row, column)] = value;                
             }
         }
 

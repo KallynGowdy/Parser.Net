@@ -14,10 +14,10 @@ using LexicalAnalysis.Definitions;
 using LexicalAnalysis;
 using Parser.Parsers;
 using Parser.Definitions;
-using Parser.AllInOne;
 using System.Threading;
 using System.IO;
 using System.IO.Compression;
+using Parser.Parsers.AllInOne;
 
 namespace ParserGUI
 {
@@ -354,7 +354,7 @@ namespace ParserGUI
 
             var graph = grammar.CreateStateGraph();
 
-            var table = new LRParseTable<Token<string>>(graph, grammar.StartElement);
+            var table = new ParseTable<Token<string>>(graph, grammar.StartElement);
 
             var parser = new LRParser<Token<string>>();
 

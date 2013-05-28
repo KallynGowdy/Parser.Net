@@ -40,9 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllInOne\AIOParser.cs" />
-    <Compile Include="AllInOne\IAllInOneParser.cs" />
-    <Compile Include="ColumnRowPair.cs" />
+    <Compile Include="Parsers\AllInOne\AIOParser.cs" />
+    <Compile Include="Parsers\AllInOne\IAllInOneParser.cs" />
+    <Compile Include="Collections\ColumnRowPair.cs" />
     <Compile Include="Definitions\ITokenMatch.cs" />
     <Compile Include="Definitions\KeywordParserTokenDefinition.cs" />
     <Compile Include="Definitions\ParserProductionTokenDefinition.cs" />
@@ -51,7 +51,7 @@
     <Compile Include="Definitions\StringedParserTokenDefinition.cs" />
     <Compile Include="Grammar\ContextFreeGrammar.cs" />
     <Compile Include="Grammar\IParseTable.cs" />
-    <Compile Include="Grammar\LRParseTable.cs" />
+    <Compile Include="StateMachine\ParseTable.cs" />
     <Compile Include="Grammar\GrammarElement.cs" />
     <Compile Include="Grammar\GrammarExtensions.cs" />
     <Compile Include="Grammar\LRItem.cs" />
@@ -59,19 +59,18 @@
     <Compile Include="Grammar\NonTerminal.cs" />
     <Compile Include="Grammar\Production.cs" />
     <Compile Include="Grammar\Terminal.cs" />
-    <Compile Include="InvalidParseTableException.cs" />
-    <Compile Include="IParser.cs" />
-    <Compile Include="ParseAction.cs" />
-    <Compile Include="Parser.cs" />
+    <Compile Include="Parsers\InvalidParseTableException.cs" />
+    <Compile Include="Parsers\IParser.cs" />
+    <Compile Include="Parsers\ParseAction.cs" />
     <Compile Include="ParserExtensions.cs" />
     <Compile Include="Parsers\LRParser.cs" />
     <Compile Include="Parsers\ParseResult.cs" />
     <Compile Include="Parsers\ReadOnlyCollection.cs" />
-    <Compile Include="ParseTree.cs" />
+    <Compile Include="Parsers\ParseTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateGraph.cs" />
-    <Compile Include="StateNode.cs" />
-    <Compile Include="Table.cs" />
+    <Compile Include="StateMachine\StateGraph.cs" />
+    <Compile Include="StateMachine\StateNode.cs" />
+    <Compile Include="Collections\Table.cs" />
     <Compile Include="Tuple.cs" />
   </ItemGroup>
   <ItemGroup>

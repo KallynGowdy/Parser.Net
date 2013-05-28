@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LexicalAnalysis;
 using Parser.Parsers;
 
-namespace Parser.AllInOne
+namespace Parser.Parsers.AllInOne
 {
     /// <summary>
     /// Defines an interface for an All-in-One parser.

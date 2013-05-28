@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Parser
+namespace Parser.StateMachine
 {
     /// <summary>
     /// Defines a state that leads to other states based on "transitions" determined by "Keys".

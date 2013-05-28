@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using Parser.Grammar;
 using Parser.StateMachine;
 
-namespace Parser
+namespace Parser.Parsers
 {
     /// <summary>
     /// Provides an abstract class that defines an action that the parser should take when input is read based on the current state.
@@ -18,13 +19,13 @@ namespace Parser
         /// Gets the parse table that the Action uses to determine what to perform.
         /// </summary>
         [DataMember]
-        public LRParseTable<T> ParseTable
+        public ParseTable<T> ParseTable
         {
             get;
             private set;
         }
 
-        public ParserAction(LRParseTable<T> table)
+        public ParserAction(ParseTable<T> table)
         {
             this.ParseTable = table;
         }
@@ -47,7 +48,7 @@ namespace Parser
             private set;
         }
 
-        public ShiftAction(LRParseTable<T> table, int nextState)
+        public ShiftAction(ParseTable<T> table, int nextState)
             : base(table)
         {
             if (nextState < 0)
@@ -80,7 +81,7 @@ namespace Parser
             private set;
         }
 
-        public ReduceAction(LRParseTable<T> table, LRItem<T> reduceItem)
+        public ReduceAction(ParseTable<T> table, LRItem<T> reduceItem)
             : base(table)
         {
             if (reduceItem != null)
@@ -115,7 +116,7 @@ namespace Parser
             private set;
         }
 
-        public AcceptAction(LRParseTable<T> table, LRItem<T> acceptItem)
+        public AcceptAction(ParseTable<T> table, LRItem<T> acceptItem)
             : base(table)
         {
             if (acceptItem != null)

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Parser.Grammar;
 
-namespace Parser
+namespace Parser.Parsers
 {
     /// <summary>
     /// Represents a parse tree.

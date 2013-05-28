@@ -6,7 +6,7 @@ using Parser.Grammar;
 using Parser.Parsers;
 using Parser.StateMachine;
 
-namespace Parser
+namespace Parser.Parsers
 {
     /// <summary>
     /// Provides an interface for a parser that can parse input into either an AST or Parse Tree.
