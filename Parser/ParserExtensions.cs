@@ -47,11 +47,11 @@ namespace Parser
         /// <returns></returns>
         public static string ConcatArray(this object obj, string seperator = " ")
         {
-            dynamic a = (dynamic)obj;
-            if (a is IEnumerable<dynamic>)
+            
+            if (obj is IEnumerable<object>)
             {
                 StringBuilder b = new StringBuilder();
-                foreach (dynamic e in a)
+                foreach (object e in (IEnumerable<object>)obj)
                 {
                     b.Append(e.ToString());
                     b.Append(seperator);
@@ -61,7 +61,7 @@ namespace Parser
             }
             else
             {
-                return a.ToString();
+                return obj.ToString();
             }
         }
     }

@@ -36,7 +36,7 @@ namespace Parser.Definitions
         /// <returns></returns>
         public TokenDefinitionCollection<T> GetNormalDefinitions()
         {
-            return new TokenDefinitionCollection<T>(Definitions.Select(a => a));
+            return new TokenDefinitionCollection<T>(Definitions.Cast<TokenDefinition<T>>());
         }
 
         public int IndexOf(ParserTokenDefinition<T> item)

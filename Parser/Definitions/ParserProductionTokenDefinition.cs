@@ -44,7 +44,7 @@ namespace Parser.Definitions
         /// <returns></returns>
         public TokenDefinitionCollection<T> GetLexerDefinitions()
         {
-            return new TokenDefinitionCollection<T>(Definitions);
+            return Definitions.GetNormalDefinitions();
         }
 
         /// <summary>
