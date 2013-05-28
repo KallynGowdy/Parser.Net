@@ -8,6 +8,70 @@ using Parser.Grammar;
 namespace Parser.Parsers
 {
     /// <summary>
+    /// Defines a parse error.
+    /// </summary>
+    public interface IParseError
+    {
+        /// <summary>
+        /// Gets the message of the error.
+        /// </summary>
+        string Message
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the state that the error occured at.
+        /// </summary>
+        int State
+        {
+            get;
+        }
+    }
+
+    public struct SyntaxParseError<T> : IParseError where T : IEquatable<T>
+    {
+        /// <summary>
+        /// Gets the message of the error.
+        /// </summary>
+        public string Message
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the invalid input element.
+        /// </summary>
+        public Terminal<T> UnexpectedInputElement
+        {
+            get;
+            private set;
+        }   
+
+        public SyntaxParseError(string message, Terminal<T> unexpectedInput = null, int state = -1) : this()
+        {
+            this.Message = message;
+            this.UnexpectedInputElement = unexpectedInput;
+            this.State = state;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Syntax Error At State: '{0}' Message: \"{1}\"", State >= 0 ? State.ToString() : "UNKNOWN", Message);
+        }
+
+        /// <summary>
+        /// Gets the state that the syntax error occured at.
+        /// </summary>
+        public int State
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
     /// Defines a class that contains information about the parsing action.
     /// This class is thread-safe (because it is immutable).
     /// </summary>
@@ -41,7 +105,7 @@ namespace Parser.Parsers
         /// <summary>
         /// Gets the errors that occured from the parse.
         /// </summary>
-        public ReadOnlyCollection<ParseError> Errors
+        public ReadOnlyCollection<IParseError> Errors
         {
             get;
             private set;
@@ -56,7 +120,7 @@ namespace Parser.Parsers
             private set;
         }
 
-        public ParseResult(bool success, ParseTree<T> tree, IList<KeyValuePair<int, GrammarElement<T>>> parseStack, params ParseError[] errors)
+        public ParseResult(bool success, ParseTree<T> tree, IList<KeyValuePair<int, GrammarElement<T>>> parseStack, params IParseError[] errors)
             : this()
         {
             this.Success = success;
@@ -67,29 +131,10 @@ namespace Parser.Parsers
             }
             if (errors != null)
             {
-                this.Errors = new ReadOnlyCollection<ParseError>(errors);
+                this.Errors = new ReadOnlyCollection<IParseError>(errors);
             }
         }
 
-        /// <summary>
-        /// Defines a parse error.
-        /// </summary>
-        public struct ParseError
-        {
-            /// <summary>
-            /// Gets the message of the error.
-            /// </summary>
-            public string Message
-            {
-                get;
-                private set;
-            }
 
-            public ParseError(string message)
-                : this()
-            {
-                this.Message = message;
-            }
-        }
     }
 }

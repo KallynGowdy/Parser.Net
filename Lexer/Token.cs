@@ -7,7 +7,7 @@ namespace LexicalAnalysis
     /// Defines a token at a certian location with a given value and type.
     /// </summary>
     /// <typeparam name="T">The type of the value of the Token</typeparam>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public class Token<T> : ITokenElement, IEquatable<Token<T>>
     {
         /// <summary>
@@ -63,6 +63,10 @@ namespace LexicalAnalysis
 
         public override string ToString()
         {
+            if (Value != null)
+            {
+                return Value.ToString();
+            }
             return TokenType;
         }
 
