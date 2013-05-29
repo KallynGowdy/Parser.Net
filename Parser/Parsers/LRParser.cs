@@ -26,13 +26,13 @@ namespace Parser.Parsers
         /// <summary>
         /// The parse table.
         /// </summary>
-        private ParseTable<T> parseTable;
+        protected ParseTable<T> parseTable;
 
         /// <summary>
         /// Gets or sets the parse table used to parse input.
         /// </summary>
         /// <exception cref="Parser.InvalidParseTableException">Thrown if an invalid parse table is provided when trying to set the parse table.</exception>
-        public ParseTable<T> ParseTable
+        public virtual ParseTable<T> ParseTable
         {
             get
             {
@@ -118,7 +118,8 @@ namespace Parser.Parsers
                     {
                         if (actions.Count > 1)
                         {
-                            return new ParseResult<T>(false, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(currentBranches)), stateStack.ToList());
+                            KeyValuePair<int, GrammarElement<T>> currentState = stateStack.Peek();
+                            return new ParseResult<T>(false, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(currentBranches)), stateStack.ToList(), new MultipleActionsParseError<T>("", currentState.Key, item, i, actions.ToArray()));
                         }
 
                         ParserAction<T> action = actions.First();
@@ -198,19 +199,19 @@ namespace Parser.Parsers
                         }
                         else
                         {
-                            return getSyntaxErrorResult(currentBranches, stateStack, item);
+                            return GetSyntaxErrorResult(currentBranches, stateStack, item);
                         }
                     }
 
                     //otherwise, there is no action and a Syntax error has occured.
                     else
                     {
-                        return getSyntaxErrorResult(currentBranches, stateStack, item);
+                        return GetSyntaxErrorResult(currentBranches, stateStack, item);
                     }
                 }
 
                 //Found "END_OF_FILE" but was expecting "stuff"
-                return getSyntaxErrorResult(currentBranches, stateStack, "END_OF_FILE");
+                return GetSyntaxErrorResult(currentBranches, stateStack, "END_OF_FILE");
             }
             else
             {
@@ -243,142 +244,9 @@ namespace Parser.Parsers
                 throw new ArgumentNullException("input");
             }
 
-            checkParseTable();
+            CheckParseTable();
 
             return LRParse(false, input.ToArray());
-            #region Old
-            //List<ParseTree<T>.ParseTreebranch> currentBranches = new List<ParseTree<T>.ParseTreebranch>();
-
-            ////create a stack to record which states we have been to.
-            //Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = new Stack<KeyValuePair<int, GrammarElement<T>>>();
-
-            ////push the first state
-            //stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(0, null));
-
-            ////add the EndOfInput element to the input so we can consume that as a valid lookahead element.
-            //Terminal<T>[] augmentedInput = input.Concat(new[] { EndOfInputElement }).ToArray();
-
-            ////cache the length
-            //int length = augmentedInput.Length;
-
-            ////always true
-            //if (length > 0)
-            //{
-            //    for (int i = 0; i < length; i++)
-            //    {
-            //        Terminal<T> item = augmentedInput[i];
-            //        int s = stateStack.Peek().Key;
-            //        var actions = ParseTable.ActionTable[s, item];
-
-            //        if (actions != null)
-            //        {
-            //            ParserAction<T> action = actions.First();
-            //            //if there is an action
-            //            if (action != null)
-            //            {
-            //                //if we should shift
-            //                if (action is ShiftAction<T>)
-            //                {
-            //                    //push the state and item
-            //                    stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(((ShiftAction<T>)action).NextState, item));
-            //                }
-            //                //otherwise if we should reduce
-            //                else if (action is ReduceAction<T>)
-            //                {
-            //                    ReduceAction<T> r = (ReduceAction<T>)action;
-
-            //                    List<GrammarElement<T>> e = new List<GrammarElement<T>>();
-
-            //                    //pop the number of elements in the RHS of the item
-            //                    for (int c = 0; c < r.ReduceItem.ProductionElements.Length; c++)
-            //                    {
-            //                        e.Add(stateStack.Pop().Value);
-            //                    }
-            //                    e.Reverse();
-
-            //                    //create a new branch with the value as the LHS of the reduction item.
-            //                    ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
-
-            //                    //Determine whether to add each element to the new branch based on whether it should be kept.
-            //                    foreach (GrammarElement<T> element in e)
-            //                    {
-            //                        if (element is NonTerminal<T>)
-            //                        {
-            //                            if (element.Keep)
-            //                            {
-            //                                //find the first branch that matches the reduce element
-            //                                var b = currentBranches.First(a => a.Value.Equals(element));
-            //                                newBranch.AddChild(b);
-            //                                currentBranches.Remove(b);
-            //                            }
-            //                            else
-            //                            {
-            //                                //find the first branch that matches the reduce element
-            //                                var b = currentBranches.First(a => a.Value.Equals(element));
-            //                                //get the children of the branch since we dont want the current value
-            //                                IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.GetChildren();
-            //                                //add the children
-            //                                newBranch.AddChildren(branches);
-            //                                currentBranches.Remove(b);
-            //                            }
-            //                        }
-            //                        else
-            //                        {
-            //                            //if we should keep the terminal object, then add it to the new branch
-            //                            if (element.Keep)
-            //                            {
-            //                                newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
-            //                            }
-            //                        }
-            //                    }
-
-            //                    currentBranches.Add(newBranch);
-
-            //                    //push the LHS non-terminal and the next state
-            //                    stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(parseTable.GotoTable[stateStack.Peek().Key, r.ReduceItem.LeftHandSide].Value, r.ReduceItem.LeftHandSide));
-
-            //                    //subtract 1 from i so we don't consume the current item
-            //                    i--;
-            //                }
-            //                //otherwise if the parse if finished and we should accept
-            //                else if (action is AcceptAction<T>)
-            //                {
-            //                    //return a new ParseTree with the root as the current branch
-            //                    return new ParseResult<T>(true, new ParseTree<T>(currentBranches.First()), stateStack.ToList());
-            //                }
-            //            }
-            //            else
-            //            {
-            //                return getSyntaxErrorResult(currentBranches, stateStack, item);
-            //            }
-            //        }
-
-            //        //otherwise, there is no action and a Syntax error has occured.
-            //        else
-            //        {
-            //            return getSyntaxErrorResult(currentBranches, stateStack, item);
-            //        }
-            //    }
-
-            //    //Found "END_OF_FILE" but was expecting "stuff"
-            //    return getSyntaxErrorResult(currentBranches, stateStack, "END_OF_FILE");
-            //}
-            //else
-            //{
-            //    //check for Start -> epsilon
-            //    IEnumerable<ParserAction<T>> actions = parseTable.ActionTable[0, null];
-            //    if (actions != null && actions.Count() > 0)
-            //    {
-            //        var action = (ReduceAction<T>)actions.First();
-
-            //        return new ParseResult<T>(true, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(action.ReduceItem.LeftHandSide)), null);
-            //    }
-            //    else
-            //    {
-            //        return new ParseResult<T>(false, null, null, new SyntaxParseError<T>("Empty input is invalid. There is no reduction of Start -> epsilon"));
-            //    }
-            //} 
-            #endregion
         }
 
         /// <summary>
@@ -388,7 +256,7 @@ namespace Parser.Parsers
         /// <param name="stateStack">The current state stack in the parse.</param>
         /// <param name="item">The next terminal item from the augmented input.</param>
         /// <returns></returns>
-        private ParseResult<T> getSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
+        protected ParseResult<T> GetSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
         {
             ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
             root.AddChildren(currentBranches);
@@ -411,7 +279,7 @@ namespace Parser.Parsers
         /// <param name="stateStack">The current state stack in the parse.</param>
         /// <param name="invalidItem">The next terminal item from the augmented input.</param>
         /// <returns></returns>
-        private ParseResult<T> getSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string invalidItem)
+        protected ParseResult<T> GetSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string invalidItem)
         {
             ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
             root.AddChildren(currentBranches);
@@ -441,113 +309,15 @@ namespace Parser.Parsers
                 throw new ArgumentNullException("input");
             }
 
-            checkParseTable();
+            CheckParseTable();
 
             return LRParse(true, input.ToArray());
-
-            #region Old
-            //List<ParseTree<T>.ParseTreebranch> currentBranches = new List<ParseTree<T>.ParseTreebranch>();
-
-            ////create a stack to record which states we have been to.
-            //Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = new Stack<KeyValuePair<int, GrammarElement<T>>>();
-
-            ////push the first state
-            //stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(0, null));
-
-            //List<Terminal<T>> augmentedInput = new List<Terminal<T>>(input);
-            //augmentedInput.Add(EndOfInputElement);
-
-            //int length = augmentedInput.Count;
-
-            //for (int i = 0; i < length; i++)
-            //{
-            //    Terminal<T> item = augmentedInput[i];
-            //    int s = stateStack.Peek().Key;
-            //    var actions = ParseTable.ActionTable[s, item];
-
-            //    if (actions != null)
-            //    {
-            //        ParserAction<T> action = actions.First();
-            //        //if there is an action
-            //        if (action != null)
-            //        {
-            //            //if we should shift
-            //            if (action is ShiftAction<T>)
-            //            {
-            //                //push the state and item
-            //                stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(((ShiftAction<T>)action).NextState, item));
-            //            }
-            //            //otherwise if we should reduce
-            //            else if (action is ReduceAction<T>)
-            //            {
-            //                ReduceAction<T> r = (ReduceAction<T>)action;
-
-            //                List<GrammarElement<T>> e = new List<GrammarElement<T>>();
-
-            //                //pop the number of elements in the RHS of the item
-            //                for (int c = 0; c < r.ReduceItem.ProductionElements.Length; c++)
-            //                {
-            //                    e.Add(stateStack.Pop().Value);
-            //                }
-            //                //e.Reverse();
-
-            //                ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
-
-            //                foreach (GrammarElement<T> element in e)
-            //                {
-            //                    if (element is NonTerminal<T>)
-            //                    {
-            //                        var b = currentBranches.First(a => a.Value.Equals(element));
-            //                        newBranch.AddChild(b);
-            //                        currentBranches.Remove(b);
-            //                    }
-            //                    else
-            //                    {
-            //                        newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
-            //                    }
-            //                }
-
-            //                currentBranches.Add(newBranch);
-
-            //                //push the LHS non-terminal and the next state
-            //                stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(parseTable.GotoTable[stateStack.Peek().Key, r.ReduceItem.LeftHandSide].Value, r.ReduceItem.LeftHandSide));
-
-            //                //subtract 1 from i so we don't consume the current item
-            //                i--;
-            //            }
-            //            //otherwise if the parse if finished and we should accept
-            //            else if (action is AcceptAction<T>)
-            //            {
-            //                //if we have more than one current branch
-            //                if (currentBranches.Count > 1)
-            //                {
-            //                    //then something went wrong
-            //                }
-            //                //return a new ParseTree with the root as the current branch
-            //                return new ParseResult<T>(true, new ParseTree<T>(currentBranches.First()), stateStack.ToList());
-            //            }
-            //        }
-            //        else
-            //        {
-            //            return getSyntaxErrorResult(currentBranches, stateStack, item);
-            //        }
-            //    }
-            //    //otherwise, there is no action and a syntax error has occured.
-            //    else
-            //    {
-            //        return getSyntaxErrorResult(currentBranches, stateStack, item);
-            //    }
-            //}
-
-            ////Found "END_OF_FILE" but was expecting "stuff"
-            //return getSyntaxErrorResult(currentBranches, stateStack, "END_OF_FILE"); 
-            #endregion
         }
 
         /// <summary>
         /// Throws InvalidOperationException if the parse table is not set.
         /// </summary>
-        private void checkParseTable()
+        protected void CheckParseTable()
         {
             if (ParseTable == null)
             {

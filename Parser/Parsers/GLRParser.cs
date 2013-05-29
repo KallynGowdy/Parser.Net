@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using Parser.Grammar;
 using Parser.Collections;
@@ -12,131 +13,86 @@ namespace Parser.Parsers
     /// <summary>
     /// Provides an implementation of a GLR Parser that can parse any table.
     /// </summary>
-    public class GLRParser<T> where T : IEquatable<T>
+    public class GLRParser<T> : LRParser<T> where T : IEquatable<T>
     {
+
         /// <summary>
-        /// Gets or sets the parse table that is currently being used.
+        /// Gets or sets the parse table to use.
         /// </summary>
-        public ParseTable<T> ParseTable
+        public override ParseTable<T> ParseTable
         {
-            get;
-            set;
+            get
+            {
+                return parseTable;
+            }
+            set
+            {
+                parseTable = value;
+            }
         }
 
-        /// <summary>
-        /// Gets the end of input element that determines 
-        /// </summary>
-        public Terminal<T> EndOfInputElement
+        protected ParseResult<T>[] ParseAbstractSyntaxTrees(IEnumerable<Terminal<T>> input, int inputProgression = 0, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = null, List<ParseTree<T>.ParseTreebranch> currentBranches = null, List<ParseResult<T>> results = null)
         {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Sets the parse table from the given graph and end of input element.
-        /// </summary>
-        /// <param name="graph"></param>
-        /// <param name="endOfInputElement"></param>
-        public void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement)
-        {
-            if (graph == null)
+            if (results == null)
             {
-                throw new ArgumentNullException("graph", "The given graph must be non-null");
+                results = new List<ParseResult<T>>();
             }
 
-            if (endOfInputElement == null)
+            //run in parallel
+            ThreadPool.QueueUserWorkItem(a =>
             {
-                throw new ArgumentNullException("endOfInputElement");
-            }
-            if (graph.Root != null)
-            {
-                if (graph.Root.Value.FirstOrDefault() != null)
+                //parse
+                ParseResult<T> result = LRParse(false, input.ToArray(), inputProgression, stateStack, currentBranches);
+
+                //if not successfull
+                if (!result.Success)
                 {
-                    this.ParseTable = new ParseTable<T>(graph, graph.Root.Value.First().LeftHandSide);
-                    this.EndOfInputElement = endOfInputElement;
+                    
+                    if (result.Errors.Count > 0)
+                    {
+                        //if there are multiple parse actions for the current state.
+                        if (result.Errors[0] is MultipleActionsParseError<T>)
+                        {
+                            MultipleActionsParseError<T> e = (MultipleActionsParseError<T>)result.Errors[0];
+
+                            //parse each action in its own thread.
+                            foreach (ParserAction<T> action in e.PossibleActions)
+                            {
+                                //TODO: Perform the action and then LRParse to prevent loops
+                                ParseAbstractSyntaxTrees(input, e.Progression, new Stack<KeyValuePair<int, GrammarElement<T>>>(result.Stack), new List<ParseTree<T>.ParseTreebranch>(result.GetParseTree().Root.Children), results);
+                            }
+                        }
+                    }
+                    lock (results)
+                    {
+                        results.Add(result);
+                    }
                 }
-            }
-            throw new ArgumentException("The given graph must have at least one state with at least one item.");
-        }
-
-        /// <summary>
-        /// Sets the parse table from the given grammar.
-        /// </summary>
-        /// <param name="grammar"></param>
-        public void SetParseTable(ContextFreeGrammar<T> grammar)
-        {
-            if (grammar == null)
-            {
-                throw new ArgumentNullException("grammar");
-            }
-
-            this.ParseTable = new ParseTable<T>(grammar);
-            this.EndOfInputElement = grammar.EndOfInputElement;
-        }
-        
-
-        /// <summary>
-        /// Gets a syntax error result from the current branches, stack and item.
-        /// </summary>
-        /// <param name="currentBranches">The current branches in the parse.</param>
-        /// <param name="stateStack">The current state stack in the parse.</param>
-        /// <param name="item">The next terminal item from the augmented input.</param>
-        /// <returns></returns>
-        private ParseResult<T> getSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
-        {
-            ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
-            root.AddChildren(currentBranches);
-            var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null).Select<Terminal<T>, object>(a =>
-            {
-                if (a == EndOfInputElement)
+                else
                 {
-                    return "END_OF_INPUT";
+                    lock (results)
+                    {
+                        results.Add(result);
+                    }
                 }
-                return a;
             });
-            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(string.Format("Syntax Error. Expected one of {{{0}}} but found \'{1}\'", rows.ConcatArray(", "), item.InnerValue), item, stateStack.Peek().Key));
-            return result;
+
+            return results.ToArray();
         }
 
-        /// <summary>
-        /// Gets a syntax error result from the current branches, stack and item.
-        /// </summary>
-        /// <param name="currentBranches">The current branches in the parse.</param>
-        /// <param name="stateStack">The current state stack in the parse.</param>
-        /// <param name="item">The next terminal item from the augmented input.</param>
-        /// <returns></returns>
-        private ParseResult<T> getSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string item)
+        public ParseResult<T>[] ParseAbstractSyntaxTrees(IEnumerable<Terminal<T>> input)
         {
-            ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
-            root.AddChildren(currentBranches);
-            var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null).Select<Terminal<T>, object>(a =>
-            {
-                if (a == EndOfInputElement)
-                {
-                    return "END_OF_INPUT";
-                }
-                return a;
-            });
-            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(string.Format("Syntax Error. Expected one of {{{0}}} but found \'{1}\'", rows.ConcatArray(", "), item)));
-            return result;
+            return ParseAbstractSyntaxTrees(input, 0);
         }
 
-        /// <summary>
-        /// Gets the glr parse results given the input.
-        /// </summary>
-        public IEnumerable<ParseResult<T>> glrParse(IEnumerable<Terminal<T>> input, bool syntax)
+        public override ParseResult<T> ParseAST(IEnumerable<Terminal<T>> input)
         {
-            
+            return base.ParseAST(input);
         }
 
-        public ParseResult<T>[] ParseAST(IEnumerable<Terminal<T>> input)
+        public override ParseResult<T> ParseSyntaxTree(IEnumerable<Terminal<T>> input)
         {
-            
-        }
-
-        public ParseResult<T>[] ParseSyntaxTree(IEnumerable<Terminal<T>> input)
-        {
-            throw new NotImplementedException();
+            return base.ParseSyntaxTree(input);
         }
     }
 }
