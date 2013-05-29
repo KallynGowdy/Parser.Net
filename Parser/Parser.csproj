@@ -51,6 +51,9 @@
     <Compile Include="Definitions\StringedParserTokenDefinition.cs" />
     <Compile Include="Grammar\ContextFreeGrammar.cs" />
     <Compile Include="Grammar\IParseTable.cs" />
+    <Compile Include="Parsers\GLRParser.cs" />
+    <Compile Include="Parsers\IGLRParser.cs" />
+    <Compile Include="Parsers\ITree.cs" />
     <Compile Include="StateMachine\ParseTable.cs" />
     <Compile Include="Grammar\GrammarElement.cs" />
     <Compile Include="Grammar\GrammarExtensions.cs" />

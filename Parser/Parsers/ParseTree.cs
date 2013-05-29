@@ -19,6 +19,7 @@ namespace Parser.Parsers
         public class ParseTreebranch
         {
             private List<ParseTreebranch> children;
+            private List<ParseTreebranch> currentBranches;
 
             /// <summary>
             /// Gets the list of children of this branch.
@@ -119,6 +120,12 @@ namespace Parser.Parsers
             {
                 this.Value = value;
                 this.children = new List<ParseTreebranch>();
+            }
+
+            public ParseTreebranch(List<ParseTreebranch> currentBranches)
+            {
+                // TODO: Complete member initialization
+                this.currentBranches = currentBranches;
             }
         }
 
