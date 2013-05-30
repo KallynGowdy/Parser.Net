@@ -19,7 +19,6 @@ namespace Parser.Parsers
         public class ParseTreebranch
         {
             private List<ParseTreebranch> children;
-            private List<ParseTreebranch> currentBranches;
 
             /// <summary>
             /// Gets the list of children of this branch.
@@ -97,8 +96,22 @@ namespace Parser.Parsers
             /// <param name="original"></param>
             public ParseTreebranch(ParseTreebranch original)
             {
-                this.Value = original.Value.DeepCopy();
-                this.children = original.children.Select(a => new ParseTreebranch(a)).ToList();
+                if (original.Value != null)
+                {
+                    this.Value = original.Value.DeepCopy();
+                }
+                else
+                {
+                    this.Value = null;
+                }
+                if (original.children != null)
+                {
+                    this.children = original.children.Select(a => new ParseTreebranch(a)).ToList();
+                }
+                else
+                {
+                    this.children = new List<ParseTreebranch>();
+                }
             }
 
             private ParseTreebranch(GrammarElement<T> value, ParseTree<T> tree)
@@ -124,8 +137,14 @@ namespace Parser.Parsers
 
             public ParseTreebranch(List<ParseTreebranch> currentBranches)
             {
-                // TODO: Complete member initialization
-                this.currentBranches = currentBranches;
+                if (currentBranches != null)
+                {
+                    this.children = currentBranches;
+                }
+                else
+                {
+                    this.children = new List<ParseTreebranch>();
+                }
             }
         }
 

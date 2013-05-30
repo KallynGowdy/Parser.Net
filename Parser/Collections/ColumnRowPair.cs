@@ -52,6 +52,16 @@ namespace Parser.Collections
             return other.Row.Equals(this.Row) && other.Column.Equals(this.Column);
         }
 
+        public static bool operator ==(ColumnRowPair<TRow, TColumn> left, ColumnRowPair<TRow, TColumn> right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ColumnRowPair<TRow, TColumn> left, ColumnRowPair<TRow, TColumn> right)
+        {
+            return !left.Equals(right);
+        }
+
         /// <summary>
         /// Determines if this column row pair object is equal to the given other object.
         /// </summary>

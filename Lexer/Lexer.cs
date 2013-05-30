@@ -53,6 +53,13 @@ namespace LexicalAnalysis
             : this(-1, -1, message, innerException)
         {
         }
+
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+            info.AddValue("LineNumber", LineNumber);
+            info.AddValue("ColumnNumber", ColumnNumber);
+            base.GetObjectData(info, context);
+        }
     }
 
     /// <summary>
@@ -151,22 +158,9 @@ namespace LexicalAnalysis
                             //throw a syntax error if we should.
                             if (ThrowSyntaxErrors)
                             {
-                                //find the line number.
-                                int lineNumber = input.Take(g.Index).Count(a => a == '\n') + 1;
+                                int lineNumber = input.GetLineNumber(g.Index);
 
-                                //find the absolute index of the last newline before the error index.
-                                var lastLine = input.Select((value, index) => new
-                                {
-                                    value,
-                                    index
-                                }).LastOrDefault(a => a.value == '\n');
-
-                                //get the column number
-                                int columnNumber = g.Index + 1;
-                                if (lastLine != null)
-                                {
-                                    columnNumber = g.Index - lastLine.index + 1;
-                                }
+                                int columnNumber = input.GetColumnNumber(g.Index);
 
                                 //Syntax error
                                 throw new SyntaxErrorException(lineNumber, columnNumber, string.Format("Found {0}.", g.Value));

@@ -109,7 +109,7 @@ namespace Parser.Grammar
             }
             else
             {
-                return base.ToString();
+                return "END_OF_INPUT";
             }
         }
     }

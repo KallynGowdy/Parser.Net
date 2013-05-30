@@ -8,6 +8,7 @@ namespace LexicalAnalysis
     /// </summary>
     /// <typeparam name="T">The type of the value of the Token</typeparam>
     [DataContract(IsReference = true)]
+    [Serializable]
     public class Token<T> : ITokenElement, IEquatable<Token<T>>
     {
         /// <summary>
