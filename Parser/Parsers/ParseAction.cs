@@ -25,7 +25,7 @@ namespace Parser.Parsers
             private set;
         }
 
-        public ParserAction(ParseTable<T> table)
+        protected ParserAction(ParseTable<T> table)
         {
             this.ParseTable = table;
         }

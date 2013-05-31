@@ -30,7 +30,7 @@ namespace Parser.Definitions
 
         public abstract override Token<T> GetToken(Capture match);
 
-        public ParserTokenDefinition(Regex regex, string tokenType, bool keep)
+        protected ParserTokenDefinition(Regex regex, string tokenType, bool keep)
             : base(regex, tokenType)
         {
             this.Keep = keep;

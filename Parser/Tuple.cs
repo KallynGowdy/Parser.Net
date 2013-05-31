@@ -89,7 +89,7 @@ namespace Parser
 
         public override string ToString()
         {
-            return string.Format("({0}, {1}, 2})", Item1.ToString(), Item2.ToString(), Item3.ToString());
+            return string.Format("({0}, {1}, {2})", Item1.ToString(), Item2.ToString(), Item3.ToString());
         }
 
         public string ToString(string format)
