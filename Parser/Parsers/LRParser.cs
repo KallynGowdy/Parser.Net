@@ -27,7 +27,11 @@ namespace Parser.Parsers
         /// <summary>
         /// The parse table.
         /// </summary>
-        protected ParseTable<T> parseTable;
+        protected ParseTable<T> InternalParseTable
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the parse table used to parse input.
@@ -37,7 +41,7 @@ namespace Parser.Parsers
         {
             get
             {
-                return parseTable;
+                return InternalParseTable;
             }
             set
             {
@@ -71,7 +75,7 @@ namespace Parser.Parsers
                     }
 
                 }
-                this.parseTable = value;
+                this.InternalParseTable = value;
             }
         }
 
@@ -140,7 +144,63 @@ namespace Parser.Parsers
                             //otherwise if we should reduce
                             else if (action is ReduceAction<T>)
                             {
-                                Reduce(syntax, stateStack, currentBranches, action, ref i);
+                                if (action is ReduceAction<T>)
+                                {
+                                    ReduceAction<T> r = (ReduceAction<T>)action;
+
+                                    List<GrammarElement<T>> e = new List<GrammarElement<T>>();
+
+                                    //pop the number of elements in the RHS of the item
+                                    for (int c = 0; c < r.ReduceItem.ProductionElements.Length; c++)
+                                    {
+                                        e.Add(stateStack.Pop().Value);
+                                    }
+                                    //e.Reverse();
+
+                                    //create a new branch with the value as the LHS of the reduction item.
+                                    ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
+
+                                    //Determine whether to add each element to the new branch based on whether it should be kept.
+                                    foreach (GrammarElement<T> element in e)
+                                    {
+                                        if (element is NonTerminal<T>)
+                                        {
+                                            if (element.Keep || syntax)
+                                            {
+                                                //find the first branch that matches the reduce element
+                                                var b = currentBranches.First(a => a.Value.Equals(element));
+                                                newBranch.AddChild(b);
+                                                currentBranches.Remove(b);
+                                            }
+                                            else
+                                            {
+                                                //find the first branch that matches the reduce element
+                                                var b = currentBranches.First(a => a.Value.Equals(element));
+                                                //get the children of the branch since we dont want the current value
+                                                IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.GetChildren();
+                                                //add the children
+                                                newBranch.AddChildren(branches);
+                                                currentBranches.Remove(b);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //if we should keep the terminal object, then add it to the new branch
+                                            if (element == null || element.Keep || syntax)
+                                            {
+                                                newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
+                                            }
+                                        }
+
+                                    }
+
+                                    currentBranches.Add(newBranch);
+
+                                    //push the LHS non-terminal and the next state
+                                    stateStack.Push(new KeyValuePair<int, GrammarElement<T>>(ParseTable.GotoTable[stateStack.Peek().Key, r.ReduceItem.LeftHandSide].Value, r.ReduceItem.LeftHandSide));
+
+                                    i--;
+                                }
                             }
                             //otherwise if the parse if finished and we should accept
                             else if (action is AcceptAction<T>)
@@ -431,23 +491,20 @@ namespace Parser.Parsers
         /// </summary>
         /// <param name="graph"></param>
         /// <exception cref="Parser.InvalidParseTableException"/>
-        public void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement)
+        public void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
         {
             if (graph == null)
             {
                 throw new ArgumentNullException("graph", "The given graph must be non-null");
             }
 
-            if (endOfInputElement == null)
-            {
-                throw new ArgumentNullException("endOfInputElement");
-            }
             if (graph.Root != null)
             {
-                if (graph.Root.Value.FirstOrDefault() != null)
+                LRItem<T> firstItem;
+                if ((firstItem = graph.Root.Value.FirstOrDefault()) != null)
                 {
-                    ParseTable = new ParseTable<T>(graph, graph.Root.Value.First().LeftHandSide);
-                    this.EndOfInputElement = endOfInputElement;
+                    ParseTable = new ParseTable<T>(graph, firstItem.LeftHandSide);
+                    this.EndOfInputElement = firstItem.LookaheadElement;
                 }
             }
 
@@ -466,7 +523,7 @@ namespace Parser.Parsers
                 throw new ArgumentNullException("grammar", "The given grammar must be non-null");
             }
 
-            ParseTable = new ParseTable<T>(grammar.CreateStateGraph(), grammar.StartElement);
+            ParseTable = new ParseTable<T>((new ParserGenerator<T>{Grammar=grammar}).CreateStateGraph(), grammar.StartElement);
             EndOfInputElement = grammar.EndOfInputElement;
         }
     }

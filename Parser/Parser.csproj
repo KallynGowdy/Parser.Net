@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ParserGraphGenerator.cs" />
     <Compile Include="Parsers\AllInOne\AIOParser.cs" />
     <Compile Include="Parsers\AllInOne\IAllInOneParser.cs" />
     <Compile Include="Collections\ColumnRowPair.cs" />

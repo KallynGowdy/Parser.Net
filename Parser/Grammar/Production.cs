@@ -19,13 +19,17 @@ namespace Parser.Grammar
             set;
         }
 
+        private List<GrammarElement<T>> derivedElements;
+
         /// <summary>
         /// Gets or sets the elements that relate to the non-terminal.
         /// </summary>
-        public List<GrammarElement<T>> DerivedElements
+        public IList<GrammarElement<T>> DerivedElements
         {
-            get;
-            set;
+            get
+            {
+                return derivedElements;
+            }
         }
 
         /// <summary>
@@ -35,7 +39,7 @@ namespace Parser.Grammar
         /// <returns></returns>
         public GrammarElement<T> GetElement(int index)
         {
-            if(index >= 0 && index < DerivedElements.Count)
+            if (index >= 0 && index < DerivedElements.Count)
             {
                 return DerivedElements[index];
             }
@@ -48,7 +52,7 @@ namespace Parser.Grammar
         public Production(NonTerminal<T> nonTerminal, params GrammarElement<T>[] derivedElements)
         {
             this.NonTerminal = nonTerminal;
-            this.DerivedElements = new List<GrammarElement<T>>(derivedElements);
+            this.derivedElements = new List<GrammarElement<T>>(derivedElements);
         }
 
         /// <summary>
@@ -65,7 +69,7 @@ namespace Parser.Grammar
             b.Append(" -> ");
 
             //add each of the derived elements
-            foreach(GrammarElement<T> element in DerivedElements)
+            foreach (GrammarElement<T> element in DerivedElements)
             {
                 b.Append(element);
             }

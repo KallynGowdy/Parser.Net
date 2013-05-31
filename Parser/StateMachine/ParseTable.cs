@@ -32,7 +32,7 @@ namespace Parser.StateMachine
         public Table<int, Terminal<T>, List<ParserAction<T>>> ActionTable
         {
             get;
-            set;
+            private set;
         }
 
         /// <summary>
@@ -42,7 +42,17 @@ namespace Parser.StateMachine
         public Table<int, NonTerminal<T>, int?> GotoTable
         {
             get;
-            set;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the Terminal element that signifies that the end of the input has been reached.
+        /// </summary>
+        [DataMember(Name = "EndOfInput")]
+        public Terminal<T> EndOfInputElement
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -177,14 +187,6 @@ namespace Parser.StateMachine
             }
         }
 
-        /// <summary>
-        /// Creates a new, empty parse table.
-        /// </summary>
-        public ParseTable()
-        {
-            ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
-            GotoTable = new Table<int, NonTerminal<T>, int?>();
-        }
 
         /// <summary>
         /// Creates a new parse table from the given context free grammar.
@@ -195,7 +197,12 @@ namespace Parser.StateMachine
             ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
 
-            buildParseTable(cfg.CreateStateGraph(), cfg.StartElement);
+            EndOfInputElement = cfg.EndOfInputElement;
+
+            buildParseTable((new ParserGenerator<T>
+            {
+                Grammar = cfg
+            }).CreateStateGraph(), cfg.StartElement);
         }
 
         /// <summary>
@@ -207,7 +214,9 @@ namespace Parser.StateMachine
             ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
             GotoTable = new Table<int, NonTerminal<T>, int?>();
 
-            //int state = 0;
+            //The end of input element is always the lookahead of the first item in the first state
+            EndOfInputElement = graph.Root.Value.First().LookaheadElement;
+
             //build the parse table from the root of the graph
             buildParseTable(graph, startingElement);//, state, startingElement, ref state);
         }
@@ -330,7 +339,7 @@ namespace Parser.StateMachine
             }
         }
 
-        
+
         /// <summary>
         /// Creates a new parse table with the given states as rows, and possibleTerminals with possibleNonTerminals as columns for the Action and Goto tables respectively.
         /// </summary>

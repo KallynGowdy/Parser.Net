@@ -49,7 +49,7 @@ namespace Parser.Parsers
         /// Sets the internal parse table of the parser from the given graph.
         /// </summary>
         /// <param name="grammar"></param>
-        void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement);
+        void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph);
     }
 
     /// <summary>

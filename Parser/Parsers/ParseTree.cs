@@ -35,7 +35,7 @@ namespace Parser.Parsers
             /// Gets the children of the branch.
             /// </summary>
             /// <returns></returns>
-            public List<ParseTreebranch> GetChildren()
+            public IList<ParseTreebranch> GetChildren()
             {
                 return children;
             }
@@ -135,11 +135,11 @@ namespace Parser.Parsers
                 this.children = new List<ParseTreebranch>();
             }
 
-            public ParseTreebranch(List<ParseTreebranch> currentBranches)
+            public ParseTreebranch(IEnumerable<ParseTreebranch> currentBranches)
             {
                 if (currentBranches != null)
                 {
-                    this.children = currentBranches;
+                    this.children = new List<ParseTreebranch>(currentBranches);
                 }
                 else
                 {
