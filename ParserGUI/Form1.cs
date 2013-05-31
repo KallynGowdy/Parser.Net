@@ -200,29 +200,29 @@ namespace ParserGUI
                     //T -> E + n
                     new Production<string>("T".ToNonTerminal<string>(), "T".ToNonTerminal<string>(false), "+".ToTerminal(), "n".ToTerminal()),
 
-                    //M -> E * n
-                    new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
+                    ////M -> E * n
+                    //new Production<string>("M".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "*".ToTerminal(), "n".ToTerminal()),
 
-                    //D -> E / n
-                    new Production<string>("D".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "/".ToTerminal(), "n".ToTerminal()),
+                    ////D -> E / n
+                    //new Production<string>("D".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "/".ToTerminal(), "n".ToTerminal()),
 
-                    //S -> E - n
-                    new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
+                    ////S -> E - n
+                    //new Production<string>("S".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "-".ToTerminal(), "n".ToTerminal()),
 
-                    //P -> E ^ n
-                    new Production<string>("P".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "^".ToTerminal(), "n".ToTerminal()),
+                    ////P -> E ^ n
+                    //new Production<string>("P".ToNonTerminal<string>(), "E".ToNonTerminal<string>(false), "^".ToTerminal(), "n".ToTerminal()),
 
-                    ////E -> A
-                    //new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
+                    //////E -> A
+                    ////new Production<string>("E".ToNonTerminal<string>(false), "A".ToNonTerminal<string>()),
 
-                    //E -> M
-                    new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
+                    ////E -> M
+                    //new Production<string>("E".ToNonTerminal<string>(false), "M".ToNonTerminal<string>()),
 
-                    //E -> D
-                    new Production<string>("E".ToNonTerminal<string>(false), "D".ToNonTerminal<string>()),
+                    ////E -> D
+                    //new Production<string>("E".ToNonTerminal<string>(false), "D".ToNonTerminal<string>()),
 
-                    //E -> S
-                    new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
+                    ////E -> S
+                    //new Production<string>("E".ToNonTerminal<string>(false), "S".ToNonTerminal<string>()),
                 }
             );
             #endregion
@@ -400,7 +400,7 @@ namespace ParserGUI
             long totalLexTime = 0;
 
 
-            LRParser<Token<string>> parser = new LRParser<Token<string>>();
+            GLRParser<Token<string>> parser = new GLRParser<Token<string>>();
             parser.SetParseTable(def.GetGrammar());
 
 
@@ -412,13 +412,12 @@ namespace ParserGUI
             Stopwatch w = Stopwatch.StartNew();
 
 
-
             tokens = lexer.ReadTokens(text);
 
             w.Stop();
 
             Stopwatch sw = Stopwatch.StartNew();
-            var tree = parser.ParseAST(def.ConvertToTerminals(tokens));
+            var tree = parser.ParseAbstractSyntaxTrees(def.ConvertToTerminals(tokens));
             sw.Stop();
 
             totalLexTime += w.ElapsedMilliseconds;

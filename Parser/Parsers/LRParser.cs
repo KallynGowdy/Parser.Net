@@ -148,12 +148,12 @@ namespace Parser.Parsers
                                 {
                                     ReduceAction<T> r = (ReduceAction<T>)action;
 
-                                    List<GrammarElement<T>> e = new List<GrammarElement<T>>();
+                                    GrammarElement<T>[] e = new GrammarElement<T>[r.ReduceItem.ProductionElements.Length];
 
                                     //pop the number of elements in the RHS of the item
                                     for (int c = 0; c < r.ReduceItem.ProductionElements.Length; c++)
                                     {
-                                        e.Add(stateStack.Pop().Value);
+                                        e[c] = stateStack.Pop().Value;
                                     }
                                     //e.Reverse();
 
