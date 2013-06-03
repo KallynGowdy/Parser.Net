@@ -12,7 +12,7 @@ namespace Parser.Grammar
     /// </summary>
     [DataContract(Name="GrammarElement")]
     [Serializable]
-    public abstract class GrammarElement<T>
+    public abstract class GrammarElement<T> : IGrammarElement<T>
     {
         /// <summary>
         /// Gets the Value stored inside this GrammarElement.

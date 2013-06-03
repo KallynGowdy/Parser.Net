@@ -31,11 +31,10 @@ namespace LexicalAnalysis.Definitions
             set;
         }
 
-        private int precedence = 0;
-
         /// <summary>
         /// The order that this definition should be at.
         /// </summary>
+        [Obsolete("Not used at all")]
         public int Precedence
         {
             get;

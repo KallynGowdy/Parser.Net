@@ -72,7 +72,7 @@ namespace Parser.Definitions
             //add a new production for each production in the class
             foreach (var p in Productions)
             {
-                Production<Token<T>> newP = new Production<Token<T>>(p.NonTerminal.Name.ToNonTerminal<Token<T>>(p.NonTerminal.Keep));
+                Production<Token<T>> newP = new Production<Token<T>>(new NonTerminal<Token<T>>(p.NonTerminal.Name, p.NonTerminal.Keep));
                 //create a new terminal or non-terminal for each production
                 foreach (var e in p.DerivedElements)
                 {
@@ -85,7 +85,7 @@ namespace Parser.Definitions
                     }
                     else
                     {
-                        newP.DerivedElements.Add(((NonTerminal<string>)e).Name.ToNonTerminal<Token<T>>(e.Keep));
+                        newP.DerivedElements.Add(new NonTerminal<Token<T>>(((NonTerminal<string>)e).Name, e.Keep));
                     }
                 }
                 productions.Add(newP);

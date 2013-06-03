@@ -16,6 +16,10 @@ namespace Parser.Definitions
     {
         private List<ParserTokenDefinition<T>> definitions;
 
+        /// <summary>
+        /// Creates a new collection of parser token definitions that allow matching of token types to terminal elements.
+        /// </summary>
+        /// <param name="list">The list of parser token definition objects to use in the collection, precedence(highest to lowest) is from the first element to the last element</param>
         public ParserTokenDefinitionCollection(IEnumerable<ParserTokenDefinition<T>> list)
         {
             definitions = new List<ParserTokenDefinition<T>>(list);

@@ -19,19 +19,19 @@ namespace Parser
         public static T DeepCopy<T>(this T obj)
         {
             Type valType = typeof(T);
-            if(valType.IsSerializable)
+            if (valType.IsSerializable)
             {
-                using(MemoryStream s = new MemoryStream())
+                using (MemoryStream s = new MemoryStream())
                 {
                     //serialize the object.
                     BinaryFormatter formatter = new BinaryFormatter();
                     formatter.Serialize(s, obj);
-                    
+
                     //reset the stream position
                     s.Position = 0;
 
                     //return the deserialized object as a new object.
-                    return (T) formatter.Deserialize(s);
+                    return (T)formatter.Deserialize(s);
                 }
             }
             else
@@ -47,17 +47,21 @@ namespace Parser
         /// <returns></returns>
         internal static string ConcatArray(this object obj, string seperator = " ")
         {
-            
+
             if (obj is IEnumerable<object>)
             {
-                StringBuilder b = new StringBuilder();
-                foreach (object e in (IEnumerable<object>)obj)
+                if (((IEnumerable<object>)obj).Count() > 0)
                 {
-                    b.Append(e.ToString());
-                    b.Append(seperator);
+                    StringBuilder b = new StringBuilder();
+                    foreach (object e in (IEnumerable<object>)obj)
+                    {
+                        b.Append(e.ToString());
+                        b.Append(seperator);
+                    }
+                    b = b.Remove(b.Length - seperator.Length, seperator.Length);
+                    return b.ToString();
                 }
-                b = b.Remove(b.Length - seperator.Length, seperator.Length);
-                return b.ToString();
+                return "";
             }
             else
             {
