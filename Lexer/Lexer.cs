@@ -5,16 +5,13 @@ using System.Text.RegularExpressions;
 namespace LexicalAnalysis
 {
     using System;
-using System.Security.Permissions;
-using System.Text;
-using Definitions;
+    using System.Text;
+    using Definitions;
 
     /// <summary>
     /// Defines an exception that is thrown when an unexpected character is encountered.
     /// </summary>
     [Serializable]
-    [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.SerializationFormatter)]
-    [SecurityPermission(SecurityAction.InheritanceDemand, Flags=SecurityPermissionFlag.SerializationFormatter)]
     public class SyntaxErrorException : Exception
     {
         /// <summary>

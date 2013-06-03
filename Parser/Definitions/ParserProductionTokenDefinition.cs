@@ -16,7 +16,7 @@ namespace Parser.Definitions
     /// right hand side of a production with the same value.
     /// </summary>
     [DataContract]
-    public class ParserProductionTokenDefinition<T> : IList<Production<string>> where T : IEquatable<T>
+    public class ParserProductionTokenDefinition<T> where T : IEquatable<T>
     {
         /// <summary>
         /// Gets or sets the productions matching TokenTypes as terminals.
@@ -107,84 +107,6 @@ namespace Parser.Definitions
                 }
             }
             return tokens;
-        }
-
-        public int IndexOf(Production<string> item)
-        {
-            return Productions.IndexOf(item);
-        }
-
-        public void Insert(int index, Production<string> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Production<string> this[int index]
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public void Add(Production<string> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Contains(Production<string> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CopyTo(Production<string>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int Count
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public bool IsReadOnly
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public bool Remove(Production<string> item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<Production<string>> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
         }
     }
 }

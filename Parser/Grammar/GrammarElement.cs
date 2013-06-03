@@ -34,18 +34,18 @@ namespace Parser.Grammar
             set;
         }
 
-        protected GrammarElement(bool keep = true)
+        public GrammarElement(bool keep = true)
         {
             this.InnerValue = default(T);
             this.Keep = keep;
         }
 
-        protected GrammarElement(T value)
+        public GrammarElement(T value)
         {
             this.InnerValue = value;
         }
 
-        protected GrammarElement(GrammarElement<T> other)
+        public GrammarElement(GrammarElement<T> other)
         {
             this.InnerValue = other.InnerValue;
         }

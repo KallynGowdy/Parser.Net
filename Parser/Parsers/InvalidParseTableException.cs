@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Permissions;
 using System.Text;
 using Parser.Grammar;
 
@@ -23,8 +22,6 @@ namespace Parser.Parsers
     /// Defines an exception that is thrown when given a parse table cannot be used with a certian parser.
     /// </summary>
     [Serializable]
-    [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-    [SecurityPermission(SecurityAction.InheritanceDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
     public class InvalidParseTableException<T> : Exception where T : IEquatable<T>
     {
         private Tuple<ParseTableExceptionType, int, GrammarElement<T>>[] conflicts;
@@ -98,6 +95,8 @@ namespace Parser.Parsers
             this.ParseTable = invalidTable;
         }
 
+
+
         private static string createExceptionMsg(Tuple<ParseTableExceptionType, int, GrammarElement<T>>[] conflicts)
         {
             StringBuilder b = new StringBuilder();
@@ -152,10 +151,7 @@ namespace Parser.Parsers
 
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            info.AddValue("conflicts", conflicts);
-            info.AddValue("ParseTable", ParseTable);
-            info.AddValue("State", State);
-            info.AddValue("NextInput", NextInput);
+            
             base.GetObjectData(info, context);
         }
     }

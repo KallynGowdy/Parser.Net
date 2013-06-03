@@ -16,30 +16,16 @@ namespace LexicalAnalysis.Definitions
         /// <summary>
         /// The regular expression describing the input pattern.
         /// </summary>
-        public Regex Regex
-        {
-            get;
-            set;
-        }
+        public Regex Regex;
 
         /// <summary>
         /// The type describing the token to match to.
         /// </summary>
-        public string TokenTypeToMatch
-        {
-            get;
-            set;
-        }
-
+        public string TokenTypeToMatch;
         /// <summary>
         /// The order that this definition should be at.
         /// </summary>
         [Obsolete("Not used at all")]
-        public int Precedence
-        {
-            get;
-            set;
-        }
 
         /// <summary>
         /// Gets the coresponding Token for the given match.
@@ -48,7 +34,7 @@ namespace LexicalAnalysis.Definitions
         /// <returns></returns>
         public abstract Token<T> GetToken(Capture match); 
 
-        protected TokenDefinition(Regex regex, string typeToMatch)
+        public TokenDefinition(Regex regex, string typeToMatch)
         {
             this.Regex = regex;
             this.TokenTypeToMatch = typeToMatch;
@@ -60,14 +46,14 @@ namespace LexicalAnalysis.Definitions
         /// </summary>
         /// <param name="pattern"></param>
         /// <param name="typeToMatch"></param>
-        protected TokenDefinition(string pattern, string typeToMatch)
+        public TokenDefinition(string pattern, string typeToMatch)
         {
             //build a new regex object from the given pattern, define 
             this.Regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Multiline);
             this.TokenTypeToMatch = typeToMatch;
         }
 
-        protected TokenDefinition()
+        public TokenDefinition()
         {
             this.Regex = null;
             this.TokenTypeToMatch = string.Empty;
