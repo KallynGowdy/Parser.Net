@@ -36,7 +36,7 @@
   </PostinstrumentEvent>
   <Binaries>
     <ProjBinary>
-      <Path>ParserGUI\obj\Release\ParserGUI.exe</Path>
+      <Path>ParserGUI\obj\Debug\ParserGUI.exe</Path>
       <ArgumentTimestamp>01/01/0001 00:00:00</ArgumentTimestamp>
       <Instrument>true</Instrument>
       <Sample>true</Sample>
@@ -48,8 +48,8 @@
       <LaunchProject>true</LaunchProject>
       <OverrideProjectSettings>false</OverrideProjectSettings>
       <LaunchMethod>Executable</LaunchMethod>
-      <ExecutablePath>ParserGUI\bin\Release\ParserGUI.exe</ExecutablePath>
-      <StartupDirectory>ParserGUI\bin\Release\</StartupDirectory>
+      <ExecutablePath>ParserGUI\bin\Debug\ParserGUI.exe</ExecutablePath>
+      <StartupDirectory>ParserGUI\bin\Debug\</StartupDirectory>
       <Arguments>
       </Arguments>
       <NetAppHost>IIS</NetAppHost>
@@ -69,7 +69,22 @@
   </Binaries>
   <Reports>
     <Report>
-      <Path>ParserGUI130530(4).vsp</Path>
+      <Path>ParserGUI130524(4).vsp</Path>
+    </Report>
+    <Report>
+      <Path>ParserGUI130524(5).vsp</Path>
+    </Report>
+    <Report>
+      <Path>ParserGUI130524(6).vsp</Path>
+    </Report>
+    <Report>
+      <Path>ParserGUI130524(7).vsp</Path>
+    </Report>
+    <Report>
+      <Path>ParserGUI130524(8).vsp</Path>
+    </Report>
+    <Report>
+      <Path>ParserGUI130524(9).vsp</Path>
     </Report>
   </Reports>
   <Launches>

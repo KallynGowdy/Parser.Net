@@ -14,27 +14,19 @@ namespace LexicalAnalysis.Definitions
     [Serializable]
     public class TokenDefinitionCollection<T> : IList<TokenDefinition<T>>
     {
-        private List<TokenDefinition<T>> definitions;
-
         /// <summary>
         /// A list of token definitions.
         /// </summary>
-        public IList<TokenDefinition<T>> Definitions
-        {
-            get
-            {
-                return definitions;
-            }
-        }
+        public List<TokenDefinition<T>> Definitions;
 
         public TokenDefinitionCollection(IEnumerable<TokenDefinition<T>> definitions)
         {
-            this.definitions = new List<TokenDefinition<T>>(definitions);
+            this.Definitions = new List<TokenDefinition<T>>(definitions);
         }
 
         public TokenDefinitionCollection()
         {
-            this.definitions = new List<TokenDefinition<T>>();
+            this.Definitions = new List<TokenDefinition<T>>();
         }
 
         /// <summary>

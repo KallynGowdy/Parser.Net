@@ -24,11 +24,11 @@ namespace Parser.Parsers
         {
             get
             {
-                return InternalParseTable;
+                return parseTable;
             }
             set
             {
-                InternalParseTable = value;
+                parseTable = value;
             }
         }
 

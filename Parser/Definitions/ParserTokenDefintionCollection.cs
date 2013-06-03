@@ -14,24 +14,14 @@ namespace Parser.Definitions
     [Serializable]
     public class ParserTokenDefinitionCollection<T> : IEnumerable<ParserTokenDefinition<T>>, IList<ParserTokenDefinition<T>> where T : IEquatable<T>
     {
-        private List<ParserTokenDefinition<T>> definitions;
-
         /// <summary>
         /// Creates a new collection of parser token definitions that allow matching of token types to terminal elements.
         /// </summary>
         /// <param name="list">The list of parser token definition objects to use in the collection, precedence(highest to lowest) is from the first element to the last element</param>
-        public ParserTokenDefinitionCollection(IEnumerable<ParserTokenDefinition<T>> list)
-        {
-            definitions = new List<ParserTokenDefinition<T>>(list);
-        }
-
         /// <summary>
         /// The defintions that this collection contains.
         /// </summary>
-        public IList<ParserTokenDefinition<T>> Definitions
-        {
-            get{return definitions;}
-        }
+        public List<ParserTokenDefinition<T>> Definitions = new List<ParserTokenDefinition<T>>();
 
         /// <summary>
         /// Gets the definition for the given token.
