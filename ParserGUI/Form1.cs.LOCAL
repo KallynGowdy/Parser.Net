@@ -18,6 +18,7 @@ using System.Threading;
 using System.IO;
 using System.IO.Compression;
 using Parser.Parsers.AllInOne;
+using Parser;
 
 namespace ParserGUI
 {
@@ -31,8 +32,6 @@ namespace ParserGUI
         private void button1_Click(object sender, EventArgs e)
         {
             (new Thread(aio)).Start(txtCFG.Text);
-
-
 
             #region Parse Table Builder
             //List<dynamic> gridCollection = new List<dynamic>();
@@ -121,139 +120,6 @@ namespace ParserGUI
             //    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             //    column.Width = colw;
             //} 
-            #endregion
-        }
-
-        #region Keywords
-        static readonly string[] CSharpKeywords = new string[] 
-        {
-            "new",
-            "class",
-            "struct",
-            "using",
-            "namespace",
-            "static",
-            "void",
-            "int",
-            "float",
-            "double",
-            "decimal",
-            "abstract",
-            "as",
-            "bool",
-            "break",
-            "byte",
-            "case",
-            "catch",
-            "char",
-            "checked",
-            "class",
-            "const",
-            "continue",
-            "default",
-            "delegate",
-            "do",
-            "else",
-            "enum",
-            "event",
-            "explicit",
-            "extern",
-            "false",
-            "finally",
-            "fixed",
-            "for",
-            "foreach",
-            "goto",
-            "if",
-            "implicit",
-            "in",
-            "interface",
-            "internal",
-            "is",
-            "lock",
-            "long",
-            "null",
-            "object",
-            "operator",
-            "out",
-            "override",
-            "params",
-            "private",
-            "protected",
-            "public",
-            "readonly",
-            "ref",
-            "return",
-            "sbyte",
-            "sealed",
-            "short",
-            "sizeof",
-            "stackalloc",
-            "static",
-            "struct",
-            "switch",
-            "this",
-            "throw",
-            "true",
-            "try",
-            "typeof",
-            "uint",
-            "ulong",
-            "unchecked",
-            "unsafe",
-            "ushort",
-            "using",
-            "virtual",
-            "volatile",
-            "while",
-            "string"
-        };
-        #endregion
-
-        private void NewMethod()
-        {
-            //productions.ToArray());
-
-            //    var closure = grammar.Closure(grammar.Productions[0]);
-
-            //string text = File.ReadAllText("../../Program.cs");
-
-
-
-            #region Definitions
-            TokenDefinitionCollection<string> collection = new TokenDefinitionCollection<string>
-            {
-                Definitions = new List<TokenDefinition<string>>
-                {
-                    //precedence is based on the order that they are defined
-                    new StringedTokenDefinition(String.Format(@"//.*(?={0})|/\*.*\*/", Environment.NewLine), "COMMENT"),
-                    new StringedTokenDefinition(@"#\w+", "PREPROCESSOR_Directive"),
-                    new StringedTokenDefinition(@"(\b|^)-?[\d]+(\b|$)", "NUMBER"),
-                    new StringedTokenDefinition(@"[\s\n]+", "WHITESPACE"),
-                    new StringedTokenDefinition(KeywordDefinitionBuilder.GetPattern(CSharpKeywords), "KEYWORD"),
-                    new StringedTokenDefinition(@"(@""([^""]|"""")*""|""(\\.|[^\\""])*"")", "STRING"),
-                    new StringedTokenDefinition(@"'.'|'\\['""\\0abfnrtuUxv]'", "CHARACTER_STRING"),
-                    new StringedTokenDefinition(@"\.", "DOT"),
-                    new StringedTokenDefinition(@"{|\(", "OPEN_BRACE"),
-                    new StringedTokenDefinition(@"}|\)", "CLOSE_BRACE"),
-                    new StringedTokenDefinition(@";", "SEMICOLIN"),
-                    new StringedTokenDefinition(@",", "COMMA"),
-                    new StringedTokenDefinition(@"=", "SET_OPERATOR"),
-                    new StringedTokenDefinition(@"==", "EQUALS_OPERATOR"),
-                    new StringedTokenDefinition(@"!=", "NOT_EQUALS_OPERATOR"),
-                    new StringedTokenDefinition(@"<=", "LESS_THAN_OR_EQUAL"),
-                    new StringedTokenDefinition(@">=", "GREATER_THAN_OR_EQUAL"),
-                    new StringedTokenDefinition(@"<", "LEFT_CARROT"),
-                    new StringedTokenDefinition(@">", "RIGHT_CARROT"),
-                    new StringedTokenDefinition(@"\+", "PLUS_OPERATOR"),
-                    new StringedTokenDefinition(@"-", "MINUS_OPERATOR"),
-                    new StringedTokenDefinition(@"\*", "TIMES_OPERATOR"),
-                    new StringedTokenDefinition(@"/", "DIVIDE_OPERATOR"),
-                    new StringedTokenDefinition(@"\[", "LEFT_BRACKET"),
-                    new StringedTokenDefinition(@"\]", "RIGHT_BRACKET"), 
-                    new StringedTokenDefinition(@"\b[a-zA-Z@_][\w_]*\b", "IDENTIFIER")
-                }
-            };
             #endregion
         }
 
@@ -364,11 +230,10 @@ namespace ParserGUI
             #region Def
             //C# Definition
             ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-            {
-
-                Definitions = new ParserTokenDefinitionCollection<string>
-                {
-                    Definitions = new List<ParserTokenDefinition<string>>
+            (
+                new ParserTokenDefinitionCollection<string>
+                (
+                    new List<ParserTokenDefinition<string>>
                     {
                         //Matches to the 'public' keyword, we should keep this keyword.
                         new KeywordParserTokenDefinition("public", true),
@@ -391,8 +256,8 @@ namespace ParserGUI
                         //matches to a comma, we should discard this token
                         new StringedParserTokenDefinition(@",", ",", false)
                     }
-                },
-                Productions = new List<Production<string>>
+                ),
+                new List<Production<string>>
                 {
                     //Method -> AccessMod Id ( ) { StmtLst }
                     //new Production<string>("Method".ToNonTerminal(), "AccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
@@ -442,7 +307,7 @@ namespace ParserGUI
                     new Production<string>("Arg".ToNonTerminal(), "Id".ToTerminal(), "Id".ToTerminal()),
                     
                 }
-            };
+            ); 
             #endregion
 
             #region Def
@@ -515,10 +380,10 @@ namespace ParserGUI
 
             #region Def
             //ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-            //{
-            //    Definitions = new ParserTokenDefinitionCollection<string>
-            //    {
-            //        Definitions = new List<ParserTokenDefinition<string>>
+            //(
+            //    new ParserTokenDefinitionCollection<string>
+            //    (
+            //        new List<ParserTokenDefinition<string>>
             //        {
             //            new StringedParserTokenDefinition(@"\w+", "id", true),
             //            new StringedParserTokenDefinition(@"->", "->", false),
@@ -527,11 +392,11 @@ namespace ParserGUI
             //            new StringedParserTokenDefinition(@"\(", "(", false),
             //            new StringedParserTokenDefinition(@"\)", ")", false)
             //        }
-            //    },
-            //    Productions = new List<Production<string>>
+            //    ),
+            //    new List<Production<string>>
             //    {
             //        //L -> P P
-            //        new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
+            //        new Production<string>("L".ToNonTerminal<string>(), "L".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
 
             //        //L -> P
             //        new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
@@ -539,40 +404,28 @@ namespace ParserGUI
             //        //P -> Term "->" Group ;
             //        new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ";".ToTerminal<string>()),
 
-            //        //P -> Term "->" Stmt ;
-            //       // new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ";".ToTerminal<string>()),
-
             //        //Group ->  Stmt
             //        new Production<string>("Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>()),
 
-            //        //Group -> Group Stmt
-            //        new Production<string>("Group".ToNonTerminal<string>(), "Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>()),
+            //        //Group -> Stmt | Stmt
+            //        new Production<string>("Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Stmt".ToNonTerminal<string>()),
 
-            //        //Stmt -> Stmt | Stmt
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Stmt".ToNonTerminal<string>()),
+            //        //Stmt -> ( Group )
+            //        new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ")".ToTerminal<string>()),
 
-            //        //Stmt -> ( Stmt )
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ")".ToTerminal<string>()),
+            //        //Stmt ->  Terms
+            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Terms".ToNonTerminal<string>()),
 
-            //        //Stmt ->  Term
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
+            //        //Terms -> Terms Term
+            //        new Production<string>("Terms".ToNonTerminal<string>(), "Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
 
-            //        //Stmt -> Stmt Term
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
-
-
-
-            //        //Stmt -> ( Stmt )
-            //        //new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ")".ToTerminal<string>()),
-
-            //        //Stmt -> Stmt "|" Term
-            //        //new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Term".ToNonTerminal<string>()),
+            //        //Terms -> Term
+            //        new Production<string>("Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
 
             //        //Term -> id
             //        new Production<string>("Term".ToNonTerminal<string>(), "id".ToTerminal<string>())
-
             //    }
-            //};
+            //); 
             #endregion
 
             long totalParseTime = 0;
@@ -591,15 +444,14 @@ namespace ParserGUI
             Stopwatch w = Stopwatch.StartNew();
 
 
-
             tokens = lexer.ReadTokens(text);
 
             w.Stop();
 
             Stopwatch sw = Stopwatch.StartNew();
-
+            
             ParseResult<Token<string>> tree = parser.ParseAST(def.ConvertToTerminals(tokens));
-
+            
             sw.Stop();
 
             totalLexTime += w.ElapsedMilliseconds;
