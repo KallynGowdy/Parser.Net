@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Grammar\IGrammarElement.cs" />
+    <Compile Include="Grammar\INonTerminal.cs" />
+    <Compile Include="Grammar\ITerminal.cs" />
     <Compile Include="Parsers\AllInOne\AIOParser.cs" />
     <Compile Include="Parsers\AllInOne\IAllInOneParser.cs" />
     <Compile Include="Collections\ColumnRowPair.cs" />

@@ -9,7 +9,7 @@ namespace Parser.Grammar
     /// Defines a value that cannot be derived into a further 'child' element.
     /// </summary>
     [Serializable]
-    public class Terminal<T> : GrammarElement<T>, IEquatable<Terminal<T>> where T : IEquatable<T>
+    public class Terminal<T> : GrammarElement<T>, ITerminal<T>, IEquatable<Terminal<T>> where T : IEquatable<T>
     {
 
         public Terminal(T value, bool keep = true)
@@ -61,7 +61,7 @@ namespace Parser.Grammar
         /// </summary>
         /// <param name="terminal"></param>
         /// <returns></returns>
-        public bool Equals(Terminal<T> terminal)
+        public bool Equals(ITerminal<T> terminal)
         {
             if (terminal != null)
             {
@@ -87,9 +87,9 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj is Terminal<T> || obj == null)
+            if (obj is ITerminal<T> || obj == null)
             {
-                return Equals((Terminal<T>)obj);
+                return Equals((ITerminal<T>)obj);
             }
             else
             {
@@ -111,6 +111,11 @@ namespace Parser.Grammar
             {
                 return "END_OF_INPUT";
             }
+        }
+
+        public bool Equals(Terminal<T> other)
+        {
+            return Equals((ITerminal<T>)other);
         }
     }
 }

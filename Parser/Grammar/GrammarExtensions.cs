@@ -82,9 +82,9 @@ namespace Parser.Grammar
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static NonTerminal<T> ToNonTerminal<T>(this string value, bool keep = true)
+        public static NonTerminal<string> ToNonTerminal(this string value, bool keep = true)
         {
-            return new NonTerminal<T>(value.ToString(), keep);
+            return new NonTerminal<string>(value.ToString(), keep);
         }
 
 
