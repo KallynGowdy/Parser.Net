@@ -260,10 +260,10 @@ namespace ParserGUI
                 new List<Production<string>>
                 {
                     //Method -> AccessMod Id ( ) { StmtLst }
-                    //new Production<string>("Method".ToNonTerminal(), "AccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
+                    new Production<string>("Method".ToNonTerminal(), "AccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
 
                     //Method -> AccessMod Id ( ArgLst ) { StmtLst }
-                    new Production<string>("Method".ToNonTerminal(), "AccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "ArgLst".ToNonTerminal(), ")".ToNonTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
+                    new Production<string>("Method".ToNonTerminal(), "AccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "ArgLst".ToNonTerminal(), ")".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
 
                     //AccessMod -> public | private | protected
                     new Production<string>("AccessMod".ToNonTerminal(), "public".ToTerminal()),
@@ -298,7 +298,7 @@ namespace ParserGUI
                     new Production<string>("ArgLst".ToNonTerminal(), "ArgLst".ToNonTerminal(), ",".ToTerminal(), "Arg".ToNonTerminal()),
 
                     //ArgLst -> nothing
-                    new Production<string>("ArgLst".ToNonTerminal()),
+                    //new Production<string>("ArgLst".ToNonTerminal()),
 
                     //ArgLst -> Arg
                     new Production<string>("ArgLst".ToNonTerminal(), "Arg".ToNonTerminal()),

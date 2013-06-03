@@ -18,14 +18,25 @@ namespace Parser.Definitions
     [DataContract]
     public class ParserProductionTokenDefinition<T> : IList<Production<string>> where T : IEquatable<T>
     {
+
+        public ParserProductionTokenDefinition(ParserTokenDefinitionCollection<T> parserTokenDefinitionCollection, IEnumerable<Production<string>> list)
+        {
+            productions = new List<Production<string>>(list);
+            Definitions = parserTokenDefinitionCollection;
+        }
+
+        public List<Production<string>> productions;
+
         /// <summary>
         /// Gets or sets the productions matching TokenTypes as terminals.
         /// </summary>
         [DataMember(Name="Productions")]
-        public List<Production<string>> Productions
+        public IList<Production<string>> Productions
         {
-            get;
-            set;
+            get
+            {
+                return productions;
+            }
         }
 
         /// <summary>
