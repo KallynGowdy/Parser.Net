@@ -254,7 +254,17 @@ namespace ParserGUI
                         //matches to a closing curly-brace, we should discard this token.
                         new StringedParserTokenDefinition(@"\}", "}", false),
                         //matches to a comma, we should discard this token
-                        new StringedParserTokenDefinition(@",", ",", false)
+                        new StringedParserTokenDefinition(@",", ",", false),
+                        //matches to the plus sign, we should keep this token
+                        new StringedParserTokenDefinition(@"\+", "+", true),
+                        //matches to the minus sign, we should keep this token
+                        new StringedParserTokenDefinition(@"\-", "-", true),
+                        //matches to the times sign, we should keep this token
+                        new StringedParserTokenDefinition(@"\*", "*", true),
+                        //matches to the division sign, we should keep this token
+                        new StringedParserTokenDefinition(@"/", "/", true),
+                        //matches to the assignment operator, we should keep this token
+                        new StringedParserTokenDefinition(@"=", "=", true),
                     }
                 ),
                 new List<Production<string>>
@@ -285,12 +295,41 @@ namespace ParserGUI
                     //Expr -> Term
                     new Production<string>("Expr".ToNonTerminal(), "Term".ToNonTerminal()),
 
-                    //Term -> Id ( Expr )
-                    new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "Expr".ToNonTerminal(), ")".ToTerminal()),
+                    //Expr -> Id = Term
+                    new Production<string>("Expr".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Term".ToNonTerminal()),
+
+                    //Term -> Expr BiOp Term
+                    new Production<string>("Expr".ToNonTerminal(), "Expr".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()),
+
+                    //Term -> UnaryOp Term
+                    new Production<string>("Term".ToNonTerminal(), "UnaryOp".ToNonTerminal(), "Term".ToNonTerminal()),
+
+                    //Term -> ( Term )
+                    new Production<string>("Term".ToNonTerminal(), "(".ToTerminal(), "Term".ToNonTerminal(), ")".ToTerminal()),
+
+                    //BiOp -> +
+                    new Production<string>("BiOp".ToNonTerminal(), "+".ToTerminal()),
+
+                    //BiOp -> -
+                    new Production<string>("BiOp".ToNonTerminal(), "-".ToTerminal()),
+
+                    //BiOp -> *
+                    new Production<string>("BiOp".ToNonTerminal(), "*".ToTerminal()),
+
+                    //BiOp -> /
+                    new Production<string>("BiOp".ToNonTerminal(), "/".ToTerminal()),
+
+                    //UnaryOp -> -
+                    new Production<string>("UnaryOp".ToNonTerminal(), "-".ToTerminal()),
+
+                    //Term -> Id ( ParamLst )
+                    new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "ParamLst".ToNonTerminal(), ")".ToTerminal()),
 
                     //Term -> Id ( )
                     new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal()),
                     
+                    //Term -> Id
+                    new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal()),
 
                     //Defines an argument list(e.g. the signature of the method)
 
@@ -305,6 +344,15 @@ namespace ParserGUI
 
                     //Arg -> Id Id
                     new Production<string>("Arg".ToNonTerminal(), "Id".ToTerminal(), "Id".ToTerminal()),
+
+                    //ParamLst -> Param
+                    new Production<string>("ParamLst".ToNonTerminal(), "Param".ToNonTerminal()),
+
+                    //ParamLst -> ParamLst , Param
+                    new Production<string>("ParamLst".ToNonTerminal(), "ParamLst".ToNonTerminal(), ",".ToTerminal(), "Param".ToNonTerminal()),
+
+                    //Param -> Term
+                    new Production<string>("Param".ToNonTerminal(), "Expr".ToNonTerminal())
                     
                 }
             ); 
