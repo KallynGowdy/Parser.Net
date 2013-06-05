@@ -152,10 +152,94 @@ namespace ParserGUI
 
         AIOLRParser<string> aioParser;
 
+        static readonly string[] CSharpKeywords = new string[] 
+        {
+            "new",
+            "class",
+            "struct",
+            "using",
+            "namespace",
+            "static",
+            "void",
+            "int",
+            "float",
+            "double",
+            "decimal",
+            "abstract",
+            "as",
+            "bool",
+            "break",
+            "byte",
+            "case",
+            "catch",
+            "char",
+            "checked",
+            "class",
+            "const",
+            "continue",
+            "default",
+            "delegate",
+            "do",
+            "else",
+            "enum",
+            "event",
+            "explicit",
+            "extern",
+            "false",
+            "finally",
+            "fixed",
+            "for",
+            "foreach",
+            "goto",
+            "if",
+            "implicit",
+            "in",
+            "interface",
+            "internal",
+            "is",
+            "lock",
+            "long",
+            "null",
+            "object",
+            "operator",
+            "out",
+            "override",
+            "params",
+            "private",
+            "protected",
+            "public",
+            "readonly",
+            "ref",
+            "return",
+            "sbyte",
+            "sealed",
+            "short",
+            "sizeof",
+            "stackalloc",
+            "static",
+            "struct",
+            "switch",
+            "this",
+            "throw",
+            "true",
+            "try",
+            "typeof",
+            "uint",
+            "ulong",
+            "unchecked",
+            "unsafe",
+            "ushort",
+            "using",
+            "virtual",
+            "volatile",
+            "while",
+            "string"
+        };
+
         private static IEnumerable<ParserTokenDefinition<string>> GetKeywords(IEnumerable<string> keywords)
         {
             List<ParserTokenDefinition<string>> words = new List<ParserTokenDefinition<string>>(keywords.Count());
-            foreach(string keyword in keywords)
+            foreach (string keyword in keywords)
             {
                 words.Add(new KeywordParserTokenDefinition(keyword, true));
             }
@@ -244,104 +328,114 @@ namespace ParserGUI
                 new ParserTokenDefinitionCollection<string>
                 (
                     new List<ParserTokenDefinition<string>>
-                    {
-                        #region Keywords
-		                //Matches to the 'public' keyword, we should keep this keyword.
-                        new KeywordParserTokenDefinition("public", true),
-                        //Matches to the 'private' keyword, we should keep this keyword.
-                        new KeywordParserTokenDefinition("private", true),
-                        //Matches to the 'protected' keyword, we should keep this keyword.
-                        new KeywordParserTokenDefinition("protected", true),
-                        new KeywordParserTokenDefinition("internal", true),
+                    (
+            #region Keywords
+                ////Matches to the 'public' keyword, we should keep this keyword.
+                //new KeywordParserTokenDefinition("public", true),
+                ////Matches to the 'private' keyword, we should keep this keyword.
+                //new KeywordParserTokenDefinition("private", true),
+                ////Matches to the 'protected' keyword, we should keep this keyword.
+                //new KeywordParserTokenDefinition("protected", true),
+                //new KeywordParserTokenDefinition("internal", true),
 
-                        //Matches to the 'void' keyword
-                        new KeywordParserTokenDefinition("void", true),
-                        
-                        //Matches to the 'null' keyword
-                        new KeywordParserTokenDefinition("null", true),
-                        new KeywordParserTokenDefinition("bool", true),
-                        new KeywordParserTokenDefinition("int", true),
-                        new KeywordParserTokenDefinition("short", true),
-                        new KeywordParserTokenDefinition("float", true),
-                        new KeywordParserTokenDefinition("double", true),
-                        new KeywordParserTokenDefinition("decimal", true),
-                        new KeywordParserTokenDefinition("uint", true),
-                        new KeywordParserTokenDefinition("ulong", true),
-                        new KeywordParserTokenDefinition("long", true),
-                        new KeywordParserTokenDefinition("byte", true),
-                        new KeywordParserTokenDefinition("sbyte", true),
-                        new KeywordParserTokenDefinition("char", true),
-                        new KeywordParserTokenDefinition("string", true),
+                        ////Matches to the 'void' keyword
+                //new KeywordParserTokenDefinition("void", true),
 
-                        //Matches to the 'class' keyword
-                        new KeywordParserTokenDefinition("class", true),
-                        new KeywordParserTokenDefinition("struct", true),
-                        new KeywordParserTokenDefinition("enum", true),
-                        new KeywordParserTokenDefinition("interface", true),
-                        new KeywordParserTokenDefinition("abstract", true),
-                        new KeywordParserTokenDefinition("sealed", true),
+                        ////Matches to the 'null' keyword
+                //new KeywordParserTokenDefinition("null", true),
+                //new KeywordParserTokenDefinition("bool", true),
+                //new KeywordParserTokenDefinition("int", true),
+                //new KeywordParserTokenDefinition("short", true),
+                //new KeywordParserTokenDefinition("float", true),
+                //new KeywordParserTokenDefinition("double", true),
+                //new KeywordParserTokenDefinition("decimal", true),
+                //new KeywordParserTokenDefinition("uint", true),
+                //new KeywordParserTokenDefinition("ulong", true),
+                //new KeywordParserTokenDefinition("long", true),
+                //new KeywordParserTokenDefinition("byte", true),
+                //new KeywordParserTokenDefinition("sbyte", true),
+                //new KeywordParserTokenDefinition("char", true),
+                //new KeywordParserTokenDefinition("string", true),
 
-                        //Matches to the 'true' keyword
-                        new KeywordParserTokenDefinition("true", true),
-                        new KeywordParserTokenDefinition("false", true),
+                        ////Matches to the 'class' keyword
+                //new KeywordParserTokenDefinition("class", true),
+                //new KeywordParserTokenDefinition("struct", true),
+                //new KeywordParserTokenDefinition("enum", true),
+                //new KeywordParserTokenDefinition("interface", true),
+                //new KeywordParserTokenDefinition("abstract", true),
+                //new KeywordParserTokenDefinition("sealed", true),
 
-                        //Matches to the 'as' keyword
-                        new KeywordParserTokenDefinition("as", true),
-                        new KeywordParserTokenDefinition("is", true),
+                        ////Matches to the 'true' keyword
+                //new KeywordParserTokenDefinition("true", true),
+                //new KeywordParserTokenDefinition("false", true),
 
-                        //Matches to the 'if' keyword
-                        new KeywordParserTokenDefinition("if", true),
-                        new KeywordParserTokenDefinition("else", true),
-                        new KeywordParserTokenDefinition("do", true),
-                        new KeywordParserTokenDefinition("while", true),
-                        new KeywordParserTokenDefinition("break", true),
-                        new KeywordParserTokenDefinition("for", true),
-                        new KeywordParserTokenDefinition("foreach", true),
-                        new KeywordParserTokenDefinition("try", true),
-                        new KeywordParserTokenDefinition("catch", true),
-                        new KeywordParserTokenDefinition("finally", true),
-                        new KeywordParserTokenDefinition("switch", true),
-                        new KeywordParserTokenDefinition("case", true),
-                        new KeywordParserTokenDefinition("goto", true),
-                        new KeywordParserTokenDefinition("continue", true),
+                        ////Matches to the 'as' keyword
+                //new KeywordParserTokenDefinition("as", true),
+                //new KeywordParserTokenDefinition("is", true),
 
-                        //Matches to the 'return' keyword
-                        new KeywordParserTokenDefinition("return", true), 
+                        ////Matches to the 'if' keyword
+                //new KeywordParserTokenDefinition("if", true),
+                //new KeywordParserTokenDefinition("else", true),
+                //new KeywordParserTokenDefinition("do", true),
+                //new KeywordParserTokenDefinition("while", true),
+                //new KeywordParserTokenDefinition("break", true),
+                //new KeywordParserTokenDefinition("for", true),
+                //new KeywordParserTokenDefinition("foreach", true),
+                //new KeywordParserTokenDefinition("try", true),
+                //new KeywordParserTokenDefinition("catch", true),
+                //new KeywordParserTokenDefinition("finally", true),
+                //new KeywordParserTokenDefinition("switch", true),
+                //new KeywordParserTokenDefinition("case", true),
+                //new KeywordParserTokenDefinition("goto", true),
+                //new KeywordParserTokenDefinition("continue", true),
 
-                        //Matches to the 'delegate' keyword
-                        new KeywordParserTokenDefinition("delegate", true),
+                        ////Matches to the 'return' keyword
+                //new KeywordParserTokenDefinition("return", true), 
 
-                        //Matches to the 'static' keyword
-                        new KeywordParserTokenDefinition("static", true),
-                        //Matches to the 'const' keyword
-                        new KeywordParserTokenDefinition("const", true),
-	                    #endregion
+                        ////Matches to the 'delegate' keyword
+                //new KeywordParserTokenDefinition("delegate", true),
 
-                        //Matches to a word of arbitrary length as an identifier, we should keep this.
-                        new StringedParserTokenDefinition(@"\b\w+\b", "Id", true),
-                        //matches to an opening parenthese, we should discard this token.
-                        new StringedParserTokenDefinition(@"\(","(", false),
-                        //matches to an closing parenthese, we should discard this token.
-                        new StringedParserTokenDefinition(@"\)", ")", false),
-                        //matches to a semicolin, we should discard this token.
-                        new StringedParserTokenDefinition(@";", ";", false),
-                        //matches to an opening curly-brace, we should discard this token.
-                        new StringedParserTokenDefinition(@"\{", "{", false),
-                        //matches to a closing curly-brace, we should discard this token.
-                        new StringedParserTokenDefinition(@"\}", "}", false),
-                        //matches to a comma, we should discard this token
-                        new StringedParserTokenDefinition(@",", ",", false),
-                        //matches to the plus sign, we should keep this token
-                        new StringedParserTokenDefinition(@"\+", "+", true),
-                        //matches to the minus sign, we should keep this token
-                        new StringedParserTokenDefinition(@"\-", "-", true),
-                        //matches to the times sign, we should keep this token
-                        new StringedParserTokenDefinition(@"\*", "*", true),
-                        //matches to the division sign, we should keep this token
-                        new StringedParserTokenDefinition(@"/", "/", true),
-                        //matches to the assignment operator, we should keep this token
-                        new StringedParserTokenDefinition(@"=", "=", true),
-                    }
+                        ////Matches to the 'static' keyword
+                //new KeywordParserTokenDefinition("static", true),
+                ////Matches to the 'const' keyword
+                //new KeywordParserTokenDefinition("const", true),
+            #endregion
+
+                        GetKeywords(CSharpKeywords).Concat(
+
+                        new ParserTokenDefinition<string>[]
+                        {
+                            //Matches to a word of arbitrary length as an identifier, we should keep this.
+                            new StringedParserTokenDefinition(@"\b\w+\b", "Id", true),
+                            //matches to an opening parenthese, we should discard this token.
+                            new StringedParserTokenDefinition(@"\(","(", false),
+                            //matches to an closing parenthese, we should discard this token.
+                            new StringedParserTokenDefinition(@"\)", ")", false),
+                            //matches to a semicolin, we should discard this token.
+                            new StringedParserTokenDefinition(@";", ";", false),
+                            //matches to an opening curly-brace, we should discard this token.
+                            new StringedParserTokenDefinition(@"\{", "{", false),
+                            //matches to a closing curly-brace, we should discard this token.
+                            new StringedParserTokenDefinition(@"\}", "}", false),
+                            //matches to a comma, we should discard this token
+                            new StringedParserTokenDefinition(@",", ",", false),
+                            //matches to the plus sign, we should keep this token
+                            new StringedParserTokenDefinition(@"\+", "+", true),
+                            //matches to the minus sign, we should keep this token
+                            new StringedParserTokenDefinition(@"\-", "-", true),
+                            //matches to the times sign, we should keep this token
+                            new StringedParserTokenDefinition(@"\*", "*", true),
+                            //matches to the division sign, we should keep this token
+                            new StringedParserTokenDefinition(@"/", "/", true),
+                            //matches to the modulus operator, we should keep this token
+                            new StringedParserTokenDefinition(@"%", "%", true),
+                            //matches to the assignment operator, we should keep this token
+                            new StringedParserTokenDefinition(@"=", "=", true),
+                            new StringedParserTokenDefinition(@"<", "<", false),
+                            new StringedParserTokenDefinition(@">", ">", false),
+                            new StringedParserTokenDefinition(@":", ":", false),
+                        })
+                    )
                 ),
                 new List<Production<string>>
                 {
@@ -352,12 +446,21 @@ namespace ParserGUI
 
 
                     #region Program Definitions
-                    
-                    //TypeName -> Id GenericTemplate
-                    new Production<string>("TypeName".ToNonTerminal(), "Id".ToTerminal(), "GenericTemplate".ToNonTerminal()),
 
 		            //Class -> ClassAccessMod class Id GenericTemplate { MemberLst }
                     new Production<string>("Class".ToNonTerminal(), "ClassAccessMod".ToNonTerminal(), "class".ToTerminal(), "Id".ToTerminal(), "GenericTemplate".ToNonTerminal(), "{".ToTerminal(), "MemberLst".ToNonTerminal(), "}".ToTerminal()),
+                    
+                    //Class -> ClassAccessMod class Id { MemberLst }
+                    //new Production<string>("Class".ToNonTerminal(), "ClassAccessMod".ToNonTerminal(), "class".ToTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "MemberLst".ToNonTerminal(), "}".ToTerminal()),
+                    
+
+                    #region TypeName
+		            //TypeName -> Id GenericTemplate
+                    new Production<string>("TypeName".ToNonTerminal(), "Id".ToTerminal(), "GenericTemplate".ToNonTerminal()),
+                    
+                    //TypeName -> KeywordType
+                    new Production<string>("TypeName".ToNonTerminal(), "KeywordType".ToNonTerminal()), 
+	                #endregion
 
                     #region Generics Definitions
                     //Defines the productions that implement generics(i.e. type parameters)
@@ -399,11 +502,30 @@ namespace ParserGUI
                     new Production<string>("ClassAccessMod".ToNonTerminal()), 
 	                #endregion
 
+                    #region KeywordType
+		            //KeywordType -> int|bool|float|double|decimal|uint|ulong|long|short|ushort|byte|sbyte
+                    new Production<string>("KeywordType".ToNonTerminal(), "bool".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "int".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "float".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "double".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "decimal".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "long".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "uint".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "ulong".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "short".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "ushort".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "byte".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "sbyte".ToTerminal()),  
+	                #endregion
+
                     #region Member
                     //Defines productions for members of a class
 
 		            //MemberLst -> Member
                     new Production<string>("MemberLst".ToNonTerminal(), "Member".ToNonTerminal()),
+
+                    //MemberLst -> nothing
+                    new Production<string>("MemberLst".ToNonTerminal()),
 
                     //MemberLst -> MemberLst Member
                     new Production<string>("MemberLst".ToNonTerminal(), "MemberLst".ToNonTerminal(), "Member".ToNonTerminal()),
@@ -451,7 +573,7 @@ namespace ParserGUI
                     new Production<string>("MemberAccessMod".ToNonTerminal(), "internal".ToTerminal()),
 
                     //MemberAccessMod -> proctected internal
-                    new Production<string>("MemberAccessMod".ToNonTerminal(), "proctected".ToTerminal(), "internal".ToTerminal()),
+                    new Production<string>("MemberAccessMod".ToNonTerminal(), "protected".ToTerminal(), "internal".ToTerminal()),
 
                     //MemberAccessMod -> nothing
                     new Production<string>("MemberAccessMod".ToNonTerminal()), 
@@ -461,57 +583,58 @@ namespace ParserGUI
                     //Defines productions for a member field
 
                     //Matches "myField;", "myField = value", "public myField;", "public myField = value"
-		            //Field -> MemberAccessMod Id AsgnExpr ;
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "Id".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
-
-                    //Field -> MemberAccessMod bool|int|float|double|decimal|long|uint|ulong Expr ;
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "bool".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "int".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "float".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "double".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "decimal".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()), 
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "long".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()), 
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "uint".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()), 
-                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "ulong".ToTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()), 
+		            //Field -> MemberAccessMod TypeName AsgnExpr ;
+                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "TypeName".ToNonTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
 	                #endregion
 
                     #region Property
                     //Defines productions that match to properties
 
-		            //Property -> TypeName Id { PropGetExpr PropSetExpr }
-                    new Production<string>("Property".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "PropGetExpr".ToNonTerminal(), "PropSetExpr".ToNonTerminal()),
+		            //Property -> MemberAccessMod TypeName Id { PropGetExpr PropSetExpr }
+                    new Production<string>("Property".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "PropExpr".ToNonTerminal(), "PropExpr".ToNonTerminal(), "}".ToTerminal()),
 
                     //During semantic analysis 'Id' will be checked to make sure it is 'get'
-                    //PropGetExpr -> Id ;
-                    new Production<string>("PropGetExpr".ToNonTerminal(), "Id".ToTerminal(), ";".ToTerminal()),
+                    //PropExpr -> Id ;
+                    new Production<string>("PropExpr".ToNonTerminal(), "Id".ToTerminal(), ";".ToTerminal()),
 
                     //During semantic analysis 'Id' will be checked to make sure that it is 'get'
-                    //PropGetExpr -> Id { StmtLst }
-                    new Production<string>("PropGetExpr".ToNonTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
+                    //PropExpr -> Id { StmtLst }
+                    new Production<string>("PropExpr".ToNonTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
 
-                    //PropGetExpr -> nothing
-                    new Production<string>("PropSetExpr".ToNonTerminal()),
-
-                    //During semantic analysis 'Id' will be checked to make sure that it is 'set'
-                    //PropSetExpr -> Id ;
-                    new Production<string>("PropSetExpr".ToNonTerminal(), "Id".ToTerminal(), ";".ToTerminal()),
-
-                    //During semantic analysis 'Id' will be checked to make sure that it is 'set'
-                    //PropGetExpr -> Id { StmtLst }
-                    new Production<string>("PropSetExpr".ToNonTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
-
-                    //PropSetExpr -> nothing
-                    new Production<string>("PropSetExpr".ToNonTerminal()), 
+                    //PropExpr -> nothing
+                    new Production<string>("PropExpr".ToNonTerminal()), 
 	                #endregion
 
                     #region Field Assignment Expression
                     //Defines productions for field assignment(e.g. myField = stuff or just myField)
 
-		            //FieldAsgnExpr -> AsgnExpr
-                    new Production<string>("FieldAsgnExpr".ToNonTerminal(), "AsgnExpr".ToNonTerminal()),
+		            //FieldAsgnExpr -> Id EqlsExpr
+                    new Production<string>("FieldAsgnExpr".ToNonTerminal(), "Id".ToTerminal(), "EqlsExpr".ToNonTerminal()),
+
+                    //EqlsExpr -> = Term
+                    new Production<string>("EqlsExpr".ToNonTerminal(), "=".ToTerminal(), "Term".ToNonTerminal()),
+
+                    //EqlsExpr -> nothing
+                    new Production<string>("EqlsExpr".ToNonTerminal()),
 
                     //FieldAsgnExpr -> Id
-                    new Production<string>("FieldAsgnExpr".ToNonTerminal(), "Id".ToTerminal()),  
+                    //new Production<string>("FieldAsgnExpr".ToNonTerminal(), "Id".ToTerminal()),  
+	                #endregion
+
+                    #region Arguments
+                    //Defines an argument list(e.g. the signature of the method)
+
+                    //ArgLst -> ArgLst, Arg
+                    new Production<string>("ArgLst".ToNonTerminal(), "ArgLst".ToNonTerminal(), ",".ToTerminal(), "Arg".ToNonTerminal()),
+
+                    //ArgLst -> nothing
+                    //new Production<string>("ArgLst".ToNonTerminal()),
+
+                    //ArgLst -> Arg
+                    new Production<string>("ArgLst".ToNonTerminal(), "Arg".ToNonTerminal()),
+
+                    //Arg -> Id Id
+                    new Production<string>("Arg".ToNonTerminal(), "Id".ToTerminal(), "Id".ToTerminal()), 
 	                #endregion
 
 	                #endregion
@@ -519,14 +642,18 @@ namespace ParserGUI
                     //AsgnExpr -> Id = Term
                     new Production<string>("AsgnExpr".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Term".ToNonTerminal()),
                     
-                    //StmtLst -> Stmt
+                    #region Statements
+                    //Defines productions that match statements in a program
+
+		            //StmtLst -> Stmt
                     new Production<string>("StmtLst".ToNonTerminal(), "Stmt".ToNonTerminal()),
 
                     //StmtLst -> Stmt StmtLst
                     new Production<string>("StmtLst".ToNonTerminal(), "Stmt".ToNonTerminal(), "StmtLst".ToNonTerminal()),
 
                     //Stmt -> Expr ;
-                    new Production<string>("Stmt".ToNonTerminal(), "Expr".ToNonTerminal(), ";".ToTerminal()),
+                    new Production<string>("Stmt".ToNonTerminal(), "Expr".ToNonTerminal(), ";".ToTerminal()), 
+	                #endregion
 
                     #region Expression
 		            //Expr -> Term
@@ -538,13 +665,15 @@ namespace ParserGUI
                     //Expr -> Expr BiOp Term
                     new Production<string>("Expr".ToNonTerminal(), "Expr".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()), 
 	                #endregion
-                    
 
-                    //BiOp -> +|-|*|/
+                    #region Binary Operators
+		            //BiOp -> +|-|*|/|%
                     new Production<string>("BiOp".ToNonTerminal(), "+".ToTerminal()),
                     new Production<string>("BiOp".ToNonTerminal(), "-".ToTerminal()),
                     new Production<string>("BiOp".ToNonTerminal(), "*".ToTerminal()),
                     new Production<string>("BiOp".ToNonTerminal(), "/".ToTerminal()),
+                    new Production<string>("BiOp".ToNonTerminal(), "%".ToTerminal()), 
+	                #endregion
 
                     //UnaryOp -> -
                     new Production<string>("UnaryOp".ToNonTerminal(), "-".ToTerminal()),
@@ -569,28 +698,18 @@ namespace ParserGUI
                     new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal()), 
 	                #endregion
 
-                    //Defines an argument list(e.g. the signature of the method)
+                    #region Parameters
+                    //Defines productions that matches a parameter list(i.e. arguments that are provided to a called method)
 
-                    //ArgLst -> ArgLst, Arg
-                    new Production<string>("ArgLst".ToNonTerminal(), "ArgLst".ToNonTerminal(), ",".ToTerminal(), "Arg".ToNonTerminal()),
-
-                    //ArgLst -> nothing
-                    //new Production<string>("ArgLst".ToNonTerminal()),
-
-                    //ArgLst -> Arg
-                    new Production<string>("ArgLst".ToNonTerminal(), "Arg".ToNonTerminal()),
-
-                    //Arg -> Id Id
-                    new Production<string>("Arg".ToNonTerminal(), "Id".ToTerminal(), "Id".ToTerminal()),
-
-                    //ParamLst -> Param
+		            //ParamLst -> Param
                     new Production<string>("ParamLst".ToNonTerminal(), "Param".ToNonTerminal()),
 
                     //ParamLst -> ParamLst , Param
                     new Production<string>("ParamLst".ToNonTerminal(), "ParamLst".ToNonTerminal(), ",".ToTerminal(), "Param".ToNonTerminal()),
 
                     //Param -> Term
-                    new Production<string>("Param".ToNonTerminal(), "Expr".ToNonTerminal())
+                    new Production<string>("Param".ToNonTerminal(), "Expr".ToNonTerminal()) 
+	                #endregion
 
                     #endregion
                 }
@@ -719,7 +838,7 @@ namespace ParserGUI
             long totalLexTime = 0;
 
 
-            LRParser<Token<string>> parser = new LRParser<Token<string>>();
+            GLRParser<Token<string>> parser = new GLRParser<Token<string>>();
             parser.SetParseTable(def.GetGrammar());
 
 
@@ -737,7 +856,7 @@ namespace ParserGUI
 
             Stopwatch sw = Stopwatch.StartNew();
 
-            ParseResult<Token<string>> tree = parser.ParseAST(def.ConvertToTerminals(tokens));
+            /*ParseResult<Token<string>>*/ var tree = parser.ParseAbstractSyntaxTrees(def.ConvertToTerminals(tokens));
 
             sw.Stop();
 

@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Definitions\MissingTokenDefinition.cs" />
     <Compile Include="Grammar\IGrammarElement.cs" />
     <Compile Include="Grammar\INonTerminal.cs" />
     <Compile Include="Grammar\ITerminal.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Parsers\GLRParser.cs" />
     <Compile Include="Parsers\IGLRParser.cs" />
     <Compile Include="Parsers\ITree.cs" />
+    <Compile Include="Parsers\ParseTableConflict.cs" />
     <Compile Include="StateMachine\ParseTable.cs" />
     <Compile Include="Grammar\GrammarElement.cs" />
     <Compile Include="Grammar\GrammarExtensions.cs" />

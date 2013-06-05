@@ -9,6 +9,7 @@ namespace LexicalAnalysis
     /// Defines a keyword token.
     /// Equality of keywords are defined by their values, not by their token types(unlike normal tokens).
     /// </summary>
+    [Serializable]
     public class KeywordToken : Token<string>, IEquatable<KeywordToken>
     {
         public KeywordToken(int index, string keyword)

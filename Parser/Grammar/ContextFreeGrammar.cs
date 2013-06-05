@@ -43,7 +43,7 @@ namespace Parser.Grammar
             return (ContextFreeGrammar<T>)ser.ReadObject(stream);
         }
 
-        
+
 
         /// <summary>
         /// Gets or sets the list of productions used in this context free grammar.
@@ -529,25 +529,27 @@ namespace Parser.Grammar
 
             foreach (var production in productions)
             {
-                //add to first elements if the first element of production is a terminal
-                if (production.DerivedElements.Count > 0 && production.DerivedElements[0] is Terminal<T>)
+                if (production.DerivedElements.Count > 0)
                 {
-                    firstElements.Add((Terminal<T>)production.DerivedElements[0]);
-                }
-                //otherwise for all of the productions whose LHS == first element
-                else
-                {
-                    //make sure that we are not repeating ourselves
-                    if (!production.DerivedElements[0].Equals(nonTerminal))
+                    //add to first elements if the first element of production is a terminal
+                    if (production.DerivedElements[0] is Terminal<T>)
                     {
-                        //foreach (Production<T> p in this.Productions.Where(a => a.NonTerminal.Equals(production.DerivedElements[0])))
-                        //{
-                        //    //add First(p)
-                        //    firstElements.AddRange(First(p));
-                        //}
-                        firstElements.AddRange(First((NonTerminal<T>)production.DerivedElements[0]));
+                        firstElements.Add((Terminal<T>)production.DerivedElements[0]);
                     }
-
+                    //otherwise for all of the productions whose LHS == first element
+                    else
+                    {
+                        //make sure that we are not repeating ourselves
+                        if (!production.DerivedElements[0].Equals(nonTerminal))
+                        {
+                            //foreach (Production<T> p in this.Productions.Where(a => a.NonTerminal.Equals(production.DerivedElements[0])))
+                            //{
+                            //    //add First(p)
+                            //    firstElements.AddRange(First(p));
+                            //}
+                            firstElements.AddRange(First((NonTerminal<T>)production.DerivedElements[0]));
+                        }
+                    }
                 }
             }
             //return a distinct set of terminals

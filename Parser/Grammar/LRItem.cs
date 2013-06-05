@@ -280,6 +280,7 @@ namespace Parser.Grammar
                     b.Append('\u25CF');
                 }
                 b.Append(ProductionElements[i]);
+                b.Append(" ");
             }
 
             //if the dot is at the end
