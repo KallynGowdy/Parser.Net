@@ -90,7 +90,7 @@ namespace Parser.Definitions
                         ParserTokenDefinition<T> def = Definitions.FirstOrDefault(a => a.TerminalMatch((Terminal<T>)(object)e));
                         if (def != null)
                         {
-                            newP.DerivedElements.Add(new Terminal<Token<T>>(new Token<T>(0, e.InnerValue, default(T)), def.Keep));
+                            newP.DerivedElements.Add(new Terminal<Token<T>>(new Token<T>(0, e.InnerValue, default(T)/*def.GetToken(0, e.InnerValue, default(T)*/), def.Keep));
                         }
                         else
                         {

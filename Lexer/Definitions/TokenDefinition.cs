@@ -48,6 +48,8 @@ namespace LexicalAnalysis.Definitions
         /// <returns></returns>
         public abstract Token<T> GetToken(Capture match); 
 
+        public abstract Token<T> GetToken(int index, string tokenType, T value);
+
         protected TokenDefinition(Regex regex, string typeToMatch)
         {
             this.Regex = regex;

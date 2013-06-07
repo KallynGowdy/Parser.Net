@@ -12,10 +12,10 @@ namespace LexicalAnalysis
     [Serializable]
     public class KeywordToken : Token<string>, IEquatable<KeywordToken>
     {
-        public KeywordToken(int index, string keyword)
-            : base(index, TokenTypes.KEYWORD, keyword)
+        public KeywordToken(int index, string keyword, string tokenType = TokenTypes.KEYWORD)
+            : base(index, tokenType, keyword)
         {
-            
+
         }
 
 
@@ -26,7 +26,7 @@ namespace LexicalAnalysis
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if(obj is KeywordToken)
+            if (obj is KeywordToken)
             {
                 return Equals((KeywordToken)obj);
             }
@@ -43,7 +43,7 @@ namespace LexicalAnalysis
         /// <returns></returns>
         public bool Equals(KeywordToken other)
         {
-            if(other != null)
+            if (other != null)
             {
                 return this.Value.Equals(other.Value);
             }
@@ -59,7 +59,11 @@ namespace LexicalAnalysis
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            if (Value != null)
+            {
+                return Value.GetHashCode();
+            }
+            return 1249;
         }
     }
 }

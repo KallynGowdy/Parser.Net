@@ -41,12 +41,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Definitions\KeywordDefinitionBuilder.cs" />
+    <Compile Include="Definitions\KeywordIdentifierTokenDefinition.cs" />
     <Compile Include="Definitions\KeywordTokenDefinition.cs" />
     <Compile Include="Definitions\LexerTokenDefinition.cs" />
     <Compile Include="Definitions\StringedTokenDefinition.cs" />
     <Compile Include="Definitions\TokenDefinition.cs" />
     <Compile Include="Definitions\TokenDefinitionCollection.cs" />
     <Compile Include="ITokenElement.cs" />
+    <Compile Include="KeywordIdentifierToken.cs" />
     <Compile Include="KeywordToken.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="LexerExtensions.cs" />

@@ -32,6 +32,11 @@ namespace Parser.Definitions
             return new KeywordToken(match.Index, match.Value);
         }
 
+        public override Token<string> GetToken(int index, string tokenType, string value)
+        {
+            return new KeywordToken(index, value);
+        }
+
         /// <summary>
         /// Creates a new Keyword Definition object that defines a relationship between the given keyword and a ParserTokenDefinition.
         /// </summary>
@@ -39,6 +44,17 @@ namespace Parser.Definitions
         /// <param name="keep"></param>
         public KeywordParserTokenDefinition(string keyword, bool keep)
             : base(BuildKeywordRegex(keyword), TokenTypes.KEYWORD, keep)
+        {
+            this.Keyword = keyword;
+        }
+
+        /// <summary>
+        /// Creates a new Keyword Definition object that defines a relationship between the given keyword and a ParserTokenDefinition.
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <param name="keep"></param>
+        public KeywordParserTokenDefinition(string keyword, bool keep, string tokenTypeToMatch)
+            : base(BuildKeywordRegex(keyword), tokenTypeToMatch, keep)
         {
             this.Keyword = keyword;
         }

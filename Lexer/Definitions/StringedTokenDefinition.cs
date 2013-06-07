@@ -29,5 +29,10 @@ namespace LexicalAnalysis.Definitions
         {
 
         }
+
+        public override Token<string> GetToken(int index, string tokenType, string value)
+        {
+            return new Token<string>(index, this.TokenTypeToMatch, value);
+        }
     }
 }
