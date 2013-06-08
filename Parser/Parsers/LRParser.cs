@@ -77,8 +77,35 @@ namespace Parser.Parsers
             //}
         }
 
+        /// <summary>
+        /// Sets the parse table that the parser is to use. The given parse table is not checked for conflicts so a MultipleParseActions error might be returned during parse time.
+        /// </summary>
+        /// <param name="table"></param>
+        public virtual void SetParseTable(ParseTable<T> table)
+        {
+            if(table == null)
+            {
+                throw new ArgumentNullException("table");
+            }
+        }
+
+        /// <summary>
+        /// Sets the parse table that the parser uses with the given state graph used to help resolve parse table conflicts.
+        /// </summary>
+        /// <exception cref="Parser.Parsers.InvalidParseTableException">Thrown when the given parse table contains either a 'Shift Reduce' conflict or a 'Reduce Reduce' conflict.</exception>
+        /// <param name="value">The parse table to use for parsing</param>
+        /// <param name="graph">The graph to use to return informative exceptions regarding conflicts.</param>
         public virtual void SetParseTable(ParseTable<T> value, StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
         {
+            if(value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+            if(graph == null)
+            {
+                throw new ArgumentNullException("graph");
+            }
+            
             foreach (var colRow in value.ActionTable)
             {
                 //if we have a conflict
@@ -201,7 +228,7 @@ namespace Parser.Parsers
                                 //return a new ParseTree with the root as the current branch
                                 return new ParseResult<T>(true, new ParseTree<T>(currentBranches.First()), stateStack.ToList());
                             }
-                            //will never be called, but the compiler will be satisfied...
+                            //should never be called, but the compiler will be satisfied...
                             else
                             {
                                 return GetSyntaxErrorResult(input, i, currentBranches, stateStack, item);
@@ -245,18 +272,21 @@ namespace Parser.Parsers
 
 
         /// <summary>
-        /// Gets a result with a syntax error describing the problem.
+        /// Gets a result with a syntax error describing the problem based on the given input error index, current branches, state stack, and unexpected element.
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="index"></param>
-        /// <param name="currentBranches"></param>
-        /// <param name="stateStack"></param>
-        /// <param name="p"></param>
+        /// <param name="input">The input that contains the syntax error.</param>
+        /// <param name="index">The zero based index of the syntax error.</param>
+        /// <param name="currentBranches">The current branches that were created from the input.</param>
+        /// <param name="stateStack">The current stack representing the transitions that were taken through the state graph.</param>
+        /// <param name="p">The string representation of the unexpected element.</param>
         /// <returns></returns>
         protected ParseResult<T> GetSyntaxErrorResult(Terminal<T>[] input, int index, List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string p)
         {
+            //create a new root branch for the tree
             ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
             root.AddChildren(currentBranches);
+
+            //get the possible expected elements
             var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null).Select<Terminal<T>, object>(a =>
             {
                 if (a == EndOfInputElement)
@@ -265,8 +295,11 @@ namespace Parser.Parsers
                 }
                 return a;
             });
+
+            //get the error position
             Tuple<int, int> pos = new Tuple<int, int>(input.GetLineNumber(index, a => a == EndOfInputElement), input.GetColumnNumber(index, (a, i) => a == EndOfInputElement));
 
+            //return a new result with the new root branch as the root of a new tree, the state stack, a new syntax error with the current state, unexpected element, position, and expected elements
             ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, p, pos, rows.OfType<Terminal<T>>().ToArray()));
             return result;
         }

@@ -341,7 +341,7 @@ namespace Parser.Grammar
                 state.ForEach(a => a.DotIndex++);
 
                 //add the closure
-                IEnumerable<LRItem<T>> closure = state.Select(a => LR1Closure(a)).SelectMany(a => a).DistinctBy(a => a.ToString());
+                LRItem<T>[] closure = state.Select(a => LR1Closure(a)).SelectMany(a => a).DistinctBy(a => a.ToString()).ToArray();
 
                 state.AddRange(closure);
 

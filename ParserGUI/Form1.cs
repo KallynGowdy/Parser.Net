@@ -716,8 +716,14 @@ namespace ParserGUI
                     //Stmt -> Expr ;
                     new Production<string>("Stmt".ToNonTerminal(), "Expr".ToNonTerminal(), ";".ToTerminal()), 
 
-                    //Stmt -> AsgnExpr ;
-                    new Production<string>("Stmt".ToNonTerminal(), "AsngExpr".ToNonTerminal(), ";".ToTerminal()), 
+                    //Stmt -> Id = Term ;
+                    new Production<string>("Stmt".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Term".ToNonTerminal(), ";".ToTerminal()), 
+
+                    //Stmt -> Id = Expr ;
+                    new Production<string>("Stmt".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Expr".ToNonTerminal(), ";".ToTerminal()),
+
+                    //Stmt -> ReturnExpr ;
+                    new Production<string>("Stmt".ToNonTerminal(), "ReturnExpr".ToNonTerminal(), ";".ToTerminal()),
 
                     //Allow local variables to be defined.
                     //Stmt -> Field
@@ -736,6 +742,14 @@ namespace ParserGUI
                     //LocalField -> TypeName Id = Term;
                     new Production<string>("LocalField".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Term".ToNonTerminal(), ";".ToTerminal()),
 
+                    #region Return Expression
+		            //ReturnExpr -> return Expr
+                    new Production<string>("ReturnExpr".ToNonTerminal(), "return".ToTerminal(), "Expr".ToNonTerminal()),
+
+                    //ReturnExpr -> return Term
+                    new Production<string>("ReturnExpr".ToNonTerminal(), "return".ToTerminal(), "Term".ToNonTerminal()), 
+	                #endregion
+
                     #region Expression
                     //Expr -> Expr BiOp Term
                     new Production<string>("Expr".ToNonTerminal(), "Expr".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()), 
@@ -743,9 +757,23 @@ namespace ParserGUI
                     //Expr -> Term BiOp Term
                     new Production<string>("Expr".ToNonTerminal(), "Term".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()),
 
+                    //Expr -> Term BiOp Expr
+                    new Production<string>("Expr".ToNonTerminal(), "Term".ToNonTerminal(), "BiOp".ToNonTerminal(), "Expr".ToNonTerminal()),
+
                     //Expr -> ( Expr )
                     new Production<string>("Expr".ToNonTerminal(), "(".ToTerminal(), "Expr".ToNonTerminal(), ")".ToTerminal()),
+
+                    //Expr -> ( AsgnExpr )
+                    new Production<string>("Expr".ToNonTerminal(), "(".ToTerminal(), "AsgnExpr".ToNonTerminal(), ")".ToTerminal()),
 	                #endregion
+
+                    //Operation -> Expr BiOp Term
+                    new Production<string>("Operation".ToNonTerminal(), "Expr".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()),
+
+                    //Operation -> Term BiOp Expr
+                    new Production<string>("Operation".ToNonTerminal(), "Term".ToNonTerminal(), "BiOp".ToNonTerminal(), "Expr".ToNonTerminal()),
+
+                    //Operation -> Term BiOp Term
 
                     #region MethodCall
 	            	//MethodCall -> Id ( ParamLst )
@@ -946,15 +974,24 @@ namespace ParserGUI
             long totalParseTime = 0;
             long totalLexTime = 0;
 
-
             LRParser<Token<string>> parser = new LRParser<Token<string>>();
             parser.SetParseTable(def.GetGrammar());
+
+            //ParseTable<Token<string>> table = null;// = getParseTable();
+            //if(table == null)
+            //{
+            //    Stopwatch e = Stopwatch.StartNew();
+
+            //    table = createParseTable(def.GetGrammar(), parser);
+
+            //    e.Stop();
+            //}
 
 
             if (lexer == null)
             {
                 lexer = new Lexer();
-                lexer.SetDefintions(def.Definitions.GetNormalDefinitions());
+                lexer.SetDefintions(def.Definitions.GetLexerDefinitions());
             }
             Stopwatch w = Stopwatch.StartNew();
 
@@ -974,6 +1011,34 @@ namespace ParserGUI
             totalParseTime += sw.ElapsedMilliseconds;
 
             MessageBox.Show(string.Format("Totally done. Average time to lex {0} chars: {1}. Average time to parse {2} tokens: {3}", text.Length, totalLexTime, tokens.Count(), totalParseTime), "Done", MessageBoxButtons.OK);
+        }
+
+        private ParseTable<Token<string>> getParseTable()
+        {
+            if (File.Exists(string.Format("{0}/ParseTable.ptbl", AppDomain.CurrentDomain.BaseDirectory)))
+            {
+                using (Stream s = File.OpenRead(string.Format("{0}/ParseTable.ptbl", AppDomain.CurrentDomain.BaseDirectory)))
+                {
+                    return ParseTable<Token<string>>.ReadFromStream(s);
+                }
+            }
+            return null;
+        }
+
+        private ParseTable<Token<string>> createParseTable(ContextFreeGrammar<Token<string>> cfg, LRParser<Token<string>> parser)
+        {
+            var w = Stopwatch.StartNew();
+            parser.SetParseTable(cfg);
+            var table = parser.ParseTable;
+            w.Stop();
+
+            var sw = Stopwatch.StartNew();
+            using(Stream s = File.Create(string.Format("{0}/ParseTable.ptbl", AppDomain.CurrentDomain.BaseDirectory)))
+            {
+                table.WriteToStream(s);
+            }
+            sw.Stop();
+            return table;
         }
 
         private void OnParseDone(dynamic param)

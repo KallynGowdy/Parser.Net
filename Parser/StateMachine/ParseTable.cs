@@ -8,6 +8,7 @@ using System.Xml;
 using Parser.Collections;
 using Parser.Grammar;
 using Parser.Parsers;
+using System.IO.Compression;
 
 namespace Parser.StateMachine
 {
@@ -67,6 +68,7 @@ namespace Parser.StateMachine
             //{
             //    typeof(DelegateSerializationHolder
             //});
+
             using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings
             {
                 Indent = true
@@ -74,6 +76,7 @@ namespace Parser.StateMachine
             {
                 ser.WriteObject(writer, this);
             }
+
         }
 
         /// <summary>
@@ -93,6 +96,7 @@ namespace Parser.StateMachine
                 typeof(Terminal<T>),
                 typeof(NonTerminal<T>)
             });
+
             return (ParseTable<T>)ser.ReadObject(stream);
         }
 
@@ -330,7 +334,7 @@ namespace Parser.StateMachine
             }
         }
 
-        
+
         /// <summary>
         /// Creates a new parse table with the given states as rows, and possibleTerminals with possibleNonTerminals as columns for the Action and Goto tables respectively.
         /// </summary>

@@ -55,7 +55,7 @@ namespace Parser.Definitions
         /// <returns></returns>
         public TokenDefinitionCollection<T> GetLexerDefinitions()
         {
-            return Definitions.GetNormalDefinitions();
+            return Definitions.GetLexerDefinitions();
         }
 
         /// <summary>
