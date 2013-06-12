@@ -329,7 +329,7 @@ namespace ParserGUI
                 (
                     new List<ParserTokenDefinition<string>>
                     (
-            #region Keywords
+                        #region Keywords
                 ////Matches to the 'public' keyword, we should keep this keyword.
                 //new KeywordParserTokenDefinition("public", true),
                 ////Matches to the 'private' keyword, we should keep this keyword.
@@ -407,8 +407,45 @@ namespace ParserGUI
                         {
                             new KeywordIdentifierParserTokenDefinition("get", true, "Id"),
                             new KeywordIdentifierParserTokenDefinition("set", true, "Id"),
+
+                            //Matches to a comment
+                            //new StringedParserTokenDefinition(@"//[^\n]*(?:\n|$)", "SingleLineComment", true),
+                            //new StringedParserTokenDefinition(@"/\*(?:(?!\*/)[\S\s]|)+\*/", "MultiLineComment", true),
+                            
+
+                            //Matches to a character literal
+                            new StringedParserTokenDefinition(@"'(?:[^\\]|\\x[\dabcdefABCDEF]{1,4}|\\[nr\'\""0abftv\\]|)'", "CharLiteral", true),
+
+                            //Matches to a string literal
+                            new StringedParserTokenDefinition(@"[@]""(?:[^""]|"""")*""|""(?:[^\\""\n]|\\[Uux][\dabcdefABCDEF]{1,4}|\\[nr\'\""0abftv\\])*""", "StringLiteral", true),
+
                             //Matches to a word of arbitrary length as an identifier, we should keep this.
-                            new StringedParserTokenDefinition(@"\b\w+\b", "Id", true),
+                            new StringedParserTokenDefinition(@"[@a-zA-Z_]\w*\b|\\u\d{4,4}\d{4,4}?", "Id", true),
+
+                            //matches to a double-precision floating point literal
+                            new StringedParserTokenDefinition(@"[+-]?\d*(?:\.\d+)[dD]?", "Double", true),
+
+                            //matches to a double-precision floating point literal
+                            new StringedParserTokenDefinition(@"[+-]?\d*(?:\.\d+)[fF]", "Float", true),
+
+                            //matches to a double-precision floating point literal
+                            new StringedParserTokenDefinition(@"[+-]?\d*(?:\.\d+)[mM]", "Decimal", true),
+
+                            //Matches to a interger literal
+                            new StringedParserTokenDefinition(@"[-]?\d+", "Int", true),
+
+                            //Matches to a long interger literal
+                            new StringedParserTokenDefinition(@"[-]?\d+[lL]", "LongInt", true),
+
+                            //Matches to an unsigned long interger literal
+                            new StringedParserTokenDefinition(@"[-]?\d+(?:[uU][lL]|[lL][uU])", "ULong", true),
+
+                            //Matches to an unsigned interger literal
+                            new StringedParserTokenDefinition(@"[-]?\d+[uU]", "UInt", true),
+
+                            //Matches to a long interger literal
+                            new StringedParserTokenDefinition(@"[-]?\d+[lL]", "Long", true),
+
                             //matches to an opening parenthese, we should discard this token.
                             new StringedParserTokenDefinition(@"\(","(", false),
                             //matches to an closing parenthese, we should discard this token.
@@ -429,6 +466,25 @@ namespace ParserGUI
                             new StringedParserTokenDefinition(@"\*", "*", true),
                             //matches to the division sign, we should keep this token
                             new StringedParserTokenDefinition(@"/", "/", true),
+
+                            //matches to the carriage return character
+                            //new StringedParserTokenDefinition(@"\r", @"\r", false),
+
+                            //matches to the line feed character
+                            //new StringedParserTokenDefinition(@"\n", @"\n", false),
+
+                            //matches the newline character
+                            new StringedParserTokenDefinition("\u0085", @"\n", false),
+
+                            //matches the line separator character
+                            new StringedParserTokenDefinition("\u2028", @"\n", false),
+
+                            //matches the paragraph separator character
+                            new StringedParserTokenDefinition("\u2029", @"\n", false),
+
+                            //matches to the backslash character
+                            new StringedParserTokenDefinition(@"\\", @"\", false),
+
                             //matches to the modulus operator, we should keep this token
                             new StringedParserTokenDefinition(@"%", "%", true),
                             //matches to the assignment operator, we should keep this token
@@ -436,6 +492,11 @@ namespace ParserGUI
                             new StringedParserTokenDefinition(@"<", "<", false),
                             new StringedParserTokenDefinition(@">", ">", false),
                             new StringedParserTokenDefinition(@":", ":", false),
+                            new StringedParserTokenDefinition(@",", ",", false),
+
+                            //matches to whitespace
+                            //new StringedParserTokenDefinition(@"\s+", "Whitespace", false),
+                            
                         })
                     )
                 ),
@@ -757,8 +818,8 @@ namespace ParserGUI
                     //Expr -> Term BiOp Term
                     new Production<string>("Expr".ToNonTerminal(), "Term".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()),
 
-                    //Expr -> Term BiOp Expr
-                    new Production<string>("Expr".ToNonTerminal(), "Term".ToNonTerminal(), "BiOp".ToNonTerminal(), "Expr".ToNonTerminal()),
+                    //Expr -> Expr BiOp Expr
+                    //new Production<string>("Expr".ToNonTerminal(), "Expr".ToNonTerminal(), "BiOp".ToNonTerminal(), "Expr".ToNonTerminal()),
 
                     //Expr -> ( Expr )
                     new Production<string>("Expr".ToNonTerminal(), "(".ToTerminal(), "Expr".ToNonTerminal(), ")".ToTerminal()),
@@ -831,9 +892,23 @@ namespace ParserGUI
                     //Term -> Id
                     new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal()), 
 
+                    //Term -> Number
+                    new Production<string>("Term".ToNonTerminal(), "Number".ToNonTerminal()),
+
                     //Term -> new ConstructorCall
                     new Production<string>("Term".ToNonTerminal(), "new".ToTerminal(), "ConstructorCall".ToNonTerminal()),
 	                #endregion
+
+                    #region Number
+		            //Number -> Double|Float|Int|UInt|ULong|Long
+                    new Production<string>("Number".ToNonTerminal(), "Double".ToTerminal()),
+                    new Production<string>("Number".ToNonTerminal(), "Float".ToTerminal()),
+                    new Production<string>("Number".ToNonTerminal(), "Int".ToTerminal()),
+                    new Production<string>("Number".ToNonTerminal(), "Long".ToTerminal()),
+                    new Production<string>("Number".ToNonTerminal(), "UInt".ToTerminal()),
+                    new Production<string>("Number".ToNonTerminal(), "ULong".ToTerminal()), 
+	                #endregion
+
 
                     #region Parameters
                     //Defines productions that matches a parameter list(i.e. arguments that are provided to a called method)

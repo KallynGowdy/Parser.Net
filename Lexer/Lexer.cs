@@ -152,7 +152,7 @@ using Definitions;
                     if (g.Success)
                     {
                         //if we have not reached the last group. if we have then a Syntax error has occured.
-                        if (currentIndex != int.MaxValue - Definitions.Count)
+                        if (currentIndex > int.MaxValue - Definitions.Count)
                         {
                             tokens.Add(Definitions[i].GetToken(g));
                         }
