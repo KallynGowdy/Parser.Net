@@ -94,6 +94,10 @@ using Definitions;
             ThrowSyntaxErrors = true;
         }
 
+        /// <summary>
+        /// Sets the definitions to the given definitions and builds the regular expression that encapsulates all of the definitions in one.
+        /// </summary>
+        /// <param name="definitions"></param>
         public void SetDefintions(TokenDefinitionCollection<string> definitions)
         {
             this.Definitions = definitions;

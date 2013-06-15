@@ -370,6 +370,8 @@ namespace Parser.Parsers
                 //create a new branch with the value as the LHS of the reduction item.
                 ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
 
+                
+
                 //Determine whether to add each element to the new branch based on whether it should be kept.
                 foreach (GrammarElement<T> element in e)
                 {
@@ -378,14 +380,14 @@ namespace Parser.Parsers
                         if (element.Keep || syntax)
                         {
                             //find the first branch that matches the reduce element
-                            var b = currentBranches.First(a => a.Value.Equals(element));
+                            var b = currentBranches.Last(a => a.Value.Equals(element));
                             newBranch.AddChild(b);
                             currentBranches.Remove(b);
                         }
                         else
                         {
                             //find the first branch that matches the reduce element
-                            var b = currentBranches.First(a => a.Value.Equals(element));
+                            var b = currentBranches.Last(a => a.Value.Equals(element));
                             //get the children of the branch since we dont want the current value
                             IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.GetChildren();
                             //add the children

@@ -82,7 +82,22 @@ namespace Parser.Collections
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return Row.GetHashCode() ^ Column.GetHashCode();
+            if(Row != null && Column != null)
+            {
+                return Row.GetHashCode() ^ Column.GetHashCode();
+            }
+            else if(Column != null)
+            {
+                return unchecked(Column.GetHashCode() * 23);
+            }
+            else if(Row != null)
+            {
+                return unchecked(Row.GetHashCode() * 23);
+            }
+            else
+            {
+                return base.GetHashCode();
+            }
         }
     }
 }

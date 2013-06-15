@@ -234,7 +234,14 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return ProductionElements.GetHashCode() ^ DotIndex ^ LookaheadElement.GetHashCode();
+            if (LookaheadElement != null)
+            {
+                return ProductionElements.GetHashCode() ^ DotIndex ^ LookaheadElement.GetHashCode();
+            }
+            else
+            {
+                return ProductionElements.GetHashCode() ^ DotIndex;
+            }
         }
 
         /// <summary>

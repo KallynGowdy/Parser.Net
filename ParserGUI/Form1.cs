@@ -19,6 +19,7 @@ using System.IO;
 using System.IO.Compression;
 using Parser.Parsers.AllInOne;
 using Parser;
+using Parser.RegularExpressions;
 
 namespace ParserGUI
 {
@@ -29,98 +30,14 @@ namespace ParserGUI
             InitializeComponent();
         }
 
+        RegularExpression r;
+
         private void button1_Click(object sender, EventArgs e)
         {
-            (new Thread(aio)).Start(txtCFG.Text);
+            r = new RegularExpression(txtCFG.Text);
 
-            #region Parse Table Builder
-            //List<dynamic> gridCollection = new List<dynamic>();
+            //(new Thread(aio)).Start(txtCFG.Text);
 
-            //foreach (var item in table.ActionTable.Select(a => new
-            //{
-            //    State = a.Key.Row,
-            //    Input = a.Key.Column,
-            //    Value = a.Value
-            //}))
-            //{
-            //    gridCollection.Add(item);
-            //}
-
-            //foreach (var item in table.GotoTable.Select(a => new
-            //{
-            //    State = a.Key.Row,
-            //    Input = a.Key.Column,
-            //    Value = a.Value
-            //}))
-            //{
-            //    gridCollection.Add(item);
-            //}
-            ////grdTable.AutoGenerateColumns = true;
-
-            //grdTable.Columns.Clear();
-
-            //grdTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
-            //foreach (dynamic column in gridCollection.OrderBy(a => a is Terminal<string>).Select(a => a.Input).DistinctBy(a => a.ToString()))
-            //{
-            //    DataGridViewColumn col = new DataGridViewTextBoxColumn();
-            //    col.HeaderText = column.ToString();
-            //    col.SortMode = DataGridViewColumnSortMode.NotSortable;
-            //    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            //    grdTable.Columns.Add(col);
-            //}
-
-
-            //grdTable.Columns[grdTable.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-            //grdTable.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-
-            //var rows = gridCollection.GroupBy(a => a.State).Select(a => new List<dynamic>(a)).ToArray();
-            //for (int i = 0; i < rows.Length; i++)
-            //{
-            //    List<dynamic> row = new List<dynamic>();
-            //    for (int r = 0; r < grdTable.Columns.Count; r++)
-            //    {
-
-            //        if (r < rows[i].Count())
-            //        {
-            //            if (rows[i].Any(a =>
-            //            {
-            //                if (a != null)
-            //                {
-            //                    return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
-            //                }
-            //                return false;
-            //            }))
-            //            {
-            //                row.Add(concatArray(rows[i].First(a =>
-            //                {
-            //                    if (a != null)
-            //                    {
-            //                        return a.Input.ToString().Equals(grdTable.Columns[r].HeaderText);
-            //                    }
-            //                    return false;
-            //                }).Value, "\n"));
-            //            }
-            //            else
-            //            {
-            //                row.Add(null);
-            //                rows[i].Insert(r, null);
-            //            }
-            //        }
-            //    }
-            //    grdTable.Rows.Add(row.ToArray());
-            //    grdTable.Rows[i].HeaderCell.Value = i.ToString();
-
-            //}
-
-            //foreach(DataGridViewColumn column in grdTable.Columns)
-            //{
-            //    int colw = column.Width;
-            //    column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            //    column.Width = colw;
-            //} 
-            #endregion
         }
 
         IEnumerable<Token<string>> tokens;
@@ -252,10 +169,10 @@ namespace ParserGUI
 
 
             ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-(
-    new ParserTokenDefinitionCollection<string>
-    (
-        new[]
+            (
+                new ParserTokenDefinitionCollection<string>
+                (
+                    new[]
                     {
                         ////defines'\w'. In regex it is matched as a word.
                         //new StringedParserTokenDefinition(@"\\w", "Word", false),
@@ -326,8 +243,8 @@ namespace ParserGUI
                         //defines a literal as anything single character that is not a space
                         new StringedParserTokenDefinition(@"[^\s]", "Literal", true),
                     }
-    ),
-    new[]
+                ),
+                new[]
                 {
                     //Regex -> TermLst '|' Regex
                     new Production<string>("Regex".ToNonTerminal(), "TermLst".ToNonTerminal(), "|".ToTerminal(), "Regex".ToNonTerminal()),
@@ -428,7 +345,7 @@ namespace ParserGUI
                     //new Production<string>("Anything".ToNonTerminal(), 
 
                 }
-); 
+            ); 
 
 
             long totalParseTime = 0;
@@ -504,6 +421,11 @@ namespace ParserGUI
         private void OnParseDone(dynamic param)
         {
             MessageBox.Show(string.Format("Parsing is done. {0} string chars were lexed in {1} milliseconds. {2} tokens were parsed in {3} milliseconds", param.l, param.w.ElapsedMilliseconds, param.p, param.sw.ElapsedMilliseconds), "Done", MessageBoxButtons.OK);
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            MessageBox.Show(r.IsMatch(txtCFG.Text).ToString());
         }
     }
 }

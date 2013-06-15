@@ -551,6 +551,10 @@ namespace Parser.Grammar
                         }
                     }
                 }
+                else
+                {
+                    firstElements.Add(EndOfInputElement);
+                }
             }
             //return a distinct set of terminals
             return firstElements.Distinct();
@@ -629,11 +633,13 @@ namespace Parser.Grammar
         public ContextFreeGrammar(NonTerminal<T> startingElement, IEnumerable<Production<T>> productions)
         {
             //add the production S -> startingElement
-            this.startElement = new NonTerminal<T>("S'");
+            this.startElement = new NonTerminal<T>("S'" + (new Random()).Next(int.MaxValue).ToString("X"));
             this.Productions = new List<Production<T>>();
             this.Productions.Add(new Production<T>(startElement, startingElement));
 
             this.Productions.AddRange(productions);
+
+            this.EndOfInputElement = new Terminal<T>(default(T), false);
         }
 
         /// <summary>
@@ -644,7 +650,7 @@ namespace Parser.Grammar
         /// <param name="productions"></param>
         public ContextFreeGrammar(NonTerminal<T> startingElement, Terminal<T> endOfInput, IEnumerable<Production<T>> productions)
         {
-            this.startElement = new NonTerminal<T>("S'");
+            this.startElement = new NonTerminal<T>("S'" + (new Random()).Next(int.MaxValue).ToString("X"));
             this.Productions = new List<Production<T>>();
             this.Productions.Add(new Production<T>(startElement, startingElement));
             this.Productions.AddRange(productions);
