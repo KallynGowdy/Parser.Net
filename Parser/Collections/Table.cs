@@ -13,22 +13,24 @@ namespace Parser.Collections
     /// <typeparam name="TColumn">The type of the column objects</typeparam>
     /// <typeparam name="TValue">The type of the values to store in the table</typeparam>
     [Serializable]
-    public class Table<TRow, TColumn, TValue> : IDictionary<ColumnRowPair<TRow, TColumn>, TValue>
+    public class Table<TRow, TColumn, TValue> : IDictionary<TRow, Dictionary<TColumn, TValue>>
         where TRow : IEquatable<TRow>
         where TColumn : IEquatable<TColumn>
     {
-        Dictionary<ColumnRowPair<TRow, TColumn>, TValue> lookup;
+        Dictionary<TRow, Dictionary<TColumn, TValue>> lookup;
+
+        //Dictionary<ColumnRowPair<TRow, TColumn>, TValue> lookup;
 
         /// <summary>
         /// Gets or sets(if it is null) the internal dictionary used by the table.
         /// </summary>
-        public Dictionary<ColumnRowPair<TRow, TColumn>, TValue> InternalDictionary
+        public Dictionary<TRow, Dictionary<TColumn, TValue>> InternalDictionary
         {
             get
             {
-                return lookup;
+                return lookup.DeepCopy();
             }
-            set
+            internal set
             {
                 if (value != null && lookup == null)
                 {
@@ -42,16 +44,16 @@ namespace Parser.Collections
         /// </summary>
         public Table()
         {
-            lookup = new Dictionary<ColumnRowPair<TRow, TColumn>, TValue>();
+            lookup = new Dictionary<TRow, Dictionary<TColumn, TValue>>();
         }
 
         /// <summary>
         /// Creates a new table from the given dictionary.
         /// </summary>
         /// <param name="items"></param>
-        public Table(IDictionary<ColumnRowPair<TRow, TColumn>, TValue> items)
+        public Table(IDictionary<TRow, Dictionary<TColumn, TValue>> items)
         {
-            lookup = new Dictionary<ColumnRowPair<TRow, TColumn>, TValue>(items);
+            lookup = new Dictionary<TRow, Dictionary<TColumn, TValue>>(items);
         }
 
         /// <summary>
@@ -61,7 +63,11 @@ namespace Parser.Collections
         /// <param name="value"></param>
         public void Add(ColumnRowPair<TRow, TColumn> key, TValue value)
         {
-            lookup.Add(key, value);
+            lookup.Add(key.Row,
+            new Dictionary<TColumn, TValue>
+            {
+                {key.Column, value}
+            });
         }
 
         /// <summary>
@@ -72,7 +78,17 @@ namespace Parser.Collections
         /// <param name="value"></param>
         public void Add(TRow row, TColumn column, TValue value)
         {
-            lookup.Add(new ColumnRowPair<TRow, TColumn>(row, column), value);
+            if (lookup.ContainsKey(row))
+            {
+                lookup[row].Add(column, value);
+            }
+            else
+            {
+                lookup.Add(row, new Dictionary<TColumn, TValue>
+                {
+                    {column, value}
+                });
+            }
         }
 
         /// <summary>
@@ -82,13 +98,24 @@ namespace Parser.Collections
         /// <returns></returns>
         public bool ContainsKey(ColumnRowPair<TRow, TColumn> key)
         {
-            return lookup.ContainsKey(key);
+            return lookup.ContainsKey(key.Row) && lookup[key.Row].ContainsKey(key.Column);
+        }
+
+        /// <summary>
+        /// Determines if the given column and row are contained in this table.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public bool ContainsKey(TRow row, TColumn column)
+        {
+            return lookup.ContainsKey(row) && lookup[row].ContainsKey(column);
         }
 
         /// <summary>
         /// Gets the Columns and Rows from the table as a pair.
         /// </summary>
-        public ICollection<ColumnRowPair<TRow, TColumn>> Keys
+        public ICollection<TRow> Rows
         {
             get
             {
@@ -104,12 +131,12 @@ namespace Parser.Collections
         /// <returns></returns>
         public bool Remove(ColumnRowPair<TRow, TColumn> key)
         {
-            return lookup.Remove(key);
+            return lookup[key.Row].Remove(key.Column);
         }
 
         /// <summary>
         /// Tries to get a value based on the given key,
-        /// Returns ture if the operation was successful, otherwise false.
+        /// Returns true if the operation was successful, otherwise false.
         /// value is set to the found value or default(T).
         /// </summary>
         /// <param name="key"></param>
@@ -117,7 +144,39 @@ namespace Parser.Collections
         /// <returns></returns>
         public bool TryGetValue(ColumnRowPair<TRow, TColumn> key, out TValue value)
         {
-            return lookup.TryGetValue(key, out value);
+            Dictionary<TColumn, TValue> v;
+            if (!lookup.TryGetValue(key.Row, out v))
+            {
+                return v.TryGetValue(key.Column, out value);
+            }
+            else
+            {
+                value = default(TValue);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Tries to get a value based on the given key,
+        /// Returns true if the operation was successful, otherwise false.
+        /// value is set to the found value of default(T).
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private bool TryGetValue(TRow row, TColumn column, out TValue value)
+        {
+            Dictionary<TColumn, TValue> v;
+            if (lookup.TryGetValue(row, out v))
+            {
+                return v.TryGetValue(column, out value);
+            }
+            else
+            {
+                value = default(TValue);
+                return false;
+            }
         }
 
         /// <summary>
@@ -127,7 +186,7 @@ namespace Parser.Collections
         {
             get
             {
-                return lookup.Values.ToArray();
+                return lookup.Values.SelectMany(a => a.Values).ToArray();
             }
         }
 
@@ -144,12 +203,12 @@ namespace Parser.Collections
             get
             {
                 TValue result;
-                lookup.TryGetValue(new ColumnRowPair<TRow, TColumn>(row, column), out result);
+                this.TryGetValue(row, column, out result);
                 return result;
             }
             set
             {
-                lookup[new ColumnRowPair<TRow,TColumn>(row, column)] = value;                
+                lookup[row][column] = value;
             }
         }
 
@@ -164,12 +223,12 @@ namespace Parser.Collections
             get
             {
                 TValue result;
-                lookup.TryGetValue(key, out result);
+                TryGetValue(key, out result);
                 return result;
             }
             set
             {
-                lookup[key] = value;
+                lookup[key.Row][key.Column] = value;
             }
         }
 
@@ -183,7 +242,7 @@ namespace Parser.Collections
         {
             get
             {
-                return lookup.ElementAt(index).Value;
+                return lookup.SelectMany(a => a.Value).ElementAt(index).Value;
             }
         }
 
@@ -194,7 +253,7 @@ namespace Parser.Collections
         /// <returns></returns>
         public TRow[] GetRows(TColumn column)
         {
-            return lookup.Where(r => r.Key.Column.Equals(column)).Select(r => r.Key.Row).ToArray();
+            return lookup.Where(a => a.Value.ContainsKey(column)).Select(a => a.Key).ToArray();
         }
 
         /// <summary>
@@ -204,7 +263,7 @@ namespace Parser.Collections
         /// <returns></returns>
         public TColumn[] GetColumns(TRow row)
         {
-            return lookup.Where(c => c.Key.Row.Equals(row)).Select(c => c.Key.Column).ToArray();
+            return lookup[row].Select(a => a.Key).ToArray();
         }
 
         /// <summary>
@@ -213,7 +272,18 @@ namespace Parser.Collections
         /// <param name="item"></param>
         public void Add(KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> item)
         {
-            lookup.Add(item.Key, item.Value);
+            if (lookup.ContainsKey(item.Key.Row))
+            {
+                lookup[item.Key.Row].Add(item.Key.Column, item.Value);
+            }
+            else
+            {
+                lookup.Add(item.Key.Row,
+                new Dictionary<TColumn, TValue>
+                {
+                    {item.Key.Column, item.Value}
+                });
+            }
         }
 
         /// <summary>
@@ -231,7 +301,7 @@ namespace Parser.Collections
         /// <returns></returns>
         public bool Contains(KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> item)
         {
-            return lookup.Contains(item);
+            return lookup.ContainsKey(item.Key.Row) && lookup[item.Key.Row].ContainsKey(item.Key.Column) && lookup[item.Key.Row][item.Key.Column].Equals(item.Value);
         }
 
         /// <summary>
@@ -239,14 +309,14 @@ namespace Parser.Collections
         /// </summary>
         /// <param name="array"></param>
         /// <param name="arrayIndex"></param>
-        public void CopyTo(KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue>[] array, int arrayIndex)
+        public void CopyTo(KeyValuePair<TRow, Dictionary<TColumn, TValue>>[] array, int arrayIndex)
         {
-            KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue>[] a = lookup.ToArray();
-            a.CopyTo(array, arrayIndex);
+            var temp = lookup.ToArray();
+            temp.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
-        /// Gets the number of columns in the table. Since the table is always square, the number of
+        /// Gets the number of rows in the table. Since the table is always square, the number of
         /// rows equals the number of columns.
         /// </summary>
         public int Count
@@ -276,7 +346,8 @@ namespace Parser.Collections
         /// <returns></returns>
         public bool Remove(KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> item)
         {
-            return lookup.Remove(item.Key);
+            
+            return lookup[item.Key.Row].Remove(item.Key.Column);
         }
 
         /// <summary>
@@ -284,7 +355,7 @@ namespace Parser.Collections
         /// enumerates columns and rows simultaneously.
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue>> GetEnumerator()
+        public Dictionary<TRow, Dictionary<TColumn, TValue>>.Enumerator GetEnumerator()
         {
             return lookup.GetEnumerator();
         }
@@ -299,13 +370,72 @@ namespace Parser.Collections
             return lookup.GetEnumerator();
         }
 
+        public void Add(TRow key, Dictionary<TColumn, TValue> value)
+        {
+            lookup.Add(key, value);
+        }
 
-        ICollection<TValue> IDictionary<ColumnRowPair<TRow, TColumn>, TValue>.Values
+        public bool ContainsKey(TRow key)
+        {
+            return lookup.ContainsKey(key);
+        }
+
+        public ICollection<TRow> Keys
+        {
+            get
+            {
+                return lookup.Keys;
+            }
+        }
+
+        public bool Remove(TRow key)
+        {
+            return lookup.Remove(key);
+        }
+
+        public bool TryGetValue(TRow key, out Dictionary<TColumn, TValue> value)
+        {
+            return lookup.TryGetValue(key, out value);
+        }
+
+        ICollection<Dictionary<TColumn, TValue>> IDictionary<TRow, Dictionary<TColumn, TValue>>.Values
         {
             get
             {
                 return lookup.Values;
             }
+        }
+
+        public Dictionary<TColumn, TValue> this[TRow key]
+        {
+            get
+            {
+                return lookup[key];
+            }
+            set
+            {
+                lookup[key] = value;
+            }
+        }
+
+        public void Add(KeyValuePair<TRow, Dictionary<TColumn, TValue>> item)
+        {
+            lookup.Add(item.Key, item.Value);
+        }
+
+        public bool Contains(KeyValuePair<TRow, Dictionary<TColumn, TValue>> item)
+        {
+            return lookup.Contains(item);
+        }
+
+        public bool Remove(KeyValuePair<TRow, Dictionary<TColumn, TValue>> item)
+        {
+            return lookup.Remove(item.Key);
+        }
+
+        IEnumerator<KeyValuePair<TRow, Dictionary<TColumn, TValue>>> IEnumerable<KeyValuePair<TRow, Dictionary<TColumn, TValue>>>.GetEnumerator()
+        {
+            return lookup.GetEnumerator();
         }
     }
 }

@@ -119,7 +119,7 @@ namespace Parser.StateMachine
                 if (nextInput is Terminal<T>)
                 {
                     //if the given state and next input are in the table
-                    if (ActionTable.Any(a => a.Key.Row == currentState && a.Key.Column.Equals(nextInput)))
+                    if (ActionTable.Any(a => a.Key == currentState && a.Value.Any(b => b.Equals(nextInput))))
                     {
                         //return the action
                         return ActionTable[currentState, (Terminal<T>)nextInput].ToArray();
@@ -128,7 +128,7 @@ namespace Parser.StateMachine
                 else
                 {
                     //if the given state and next input are in the table
-                    if (GotoTable.Any(a => a.Key.Row == currentState && a.Key.Column.Equals(nextInput)))
+                    if (GotoTable.Any(a => a.Key == currentState && a.Value.Any(b => b.Equals(nextInput))))
                     {
                         //return a new shift action representing the goto movement.
                         return new[] { new ShiftAction<T>(this, GotoTable[currentState, (NonTerminal<T>)nextInput].Value) };
@@ -148,7 +148,7 @@ namespace Parser.StateMachine
         private void addAction(Terminal<T> element, int currentState, params ParserAction<T>[] actions)
         {
             //if the column already exists
-            if (ActionTable.Keys.Any(a => a.Column == element && a.Row == currentState))
+            if (ActionTable.ContainsKey(currentState, element))
             {
                 //add the actions
                 ActionTable[currentState, element].AddRange(actions);
@@ -169,7 +169,7 @@ namespace Parser.StateMachine
         private void addGoto(NonTerminal<T> element, int currentState, int @goto)
         {
             //if the column already exists
-            if (GotoTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
+            if (GotoTable.ContainsKey(currentState, element))
             {
                 //add the goto state
                 GotoTable[currentState, element] = @goto;

@@ -83,7 +83,7 @@ namespace Parser.Parsers
         /// <param name="table"></param>
         public virtual void SetParseTable(ParseTable<T> table)
         {
-            if(table == null)
+            if (table == null)
             {
                 throw new ArgumentNullException("table");
             }
@@ -106,14 +106,21 @@ namespace Parser.Parsers
                 throw new ArgumentNullException("graph");
             }
             
-            foreach (var colRow in value.ActionTable)
+            foreach (var colRow in value.ActionTable.Select(a =>
+                {
+                    foreach(var b in a.Value.Keys)
+                    {
+                        return new {Row = a, Column = b, Value = a.Value[b]};
+                    }
+                    return null;
+                }))
             {
                 //if we have a conflict
                 if (colRow.Value.Count > 1)
                 {
                     List<ParseTableConflict<T>> conflicts = new List<ParseTableConflict<T>>();
 
-                    StateNode<GrammarElement<T>, LRItem<T>[]> node = graph.GetBreadthFirstTraversal().ElementAt(colRow.Key.Row);
+                    StateNode<GrammarElement<T>, LRItem<T>[]> node = graph.GetBreadthFirstTraversal().ElementAt(colRow.Row.Key);
 
 
                     //ParseTableExceptionType exType;
@@ -125,18 +132,18 @@ namespace Parser.Parsers
                             GrammarElement<T> e = a.GetNextElement();
                             if(e != null)
                             {
-                                return e.Equals(colRow.Key.Column);
+                                return e.Equals(colRow.Column);
                             }
                             return false;
                         }).Concat(colRow.Value.OfType<ReduceAction<T>>().Select(a => ((ReduceAction<T>)a).ReduceItem)).ToArray();
 
-                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.SHIFT_REDUCE, colRow.Key, node, items));
+                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.SHIFT_REDUCE, new Collections.ColumnRowPair<int,Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
 
                         //then check for a reduce-reduce conflict
                         if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
                         {
                             items = colRow.Value.OfType<ReduceAction<T>>().Select(a => a.ReduceItem).ToArray();
-                            conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key, node, items));
+                            conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, new Collections.ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
                         }
                     }
                     //otherwise we have a reduce-reduce conflict
@@ -145,7 +152,7 @@ namespace Parser.Parsers
                         //get all of the reduce items
                         LRItem<T>[] items = colRow.Value.OfType<ReduceAction<T>>().Select(a => a.ReduceItem).ToArray();
 
-                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key, node, items));
+                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, new Collections.ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
                     }
 
                     //throw invalid parse table exception
@@ -370,7 +377,7 @@ namespace Parser.Parsers
                 //create a new branch with the value as the LHS of the reduction item.
                 ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
 
-                
+
 
                 //Determine whether to add each element to the new branch based on whether it should be kept.
                 foreach (GrammarElement<T> element in e)
