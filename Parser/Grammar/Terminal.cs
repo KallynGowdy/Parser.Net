@@ -61,7 +61,7 @@ namespace Parser.Grammar
         /// </summary>
         /// <param name="terminal"></param>
         /// <returns></returns>
-        public bool Equals(ITerminal<T> terminal)
+        public virtual bool Equals(ITerminal<T> terminal)
         {
             if (terminal != null)
             {
@@ -113,7 +113,7 @@ namespace Parser.Grammar
             }
         }
 
-        public bool Equals(Terminal<T> other)
+        public virtual bool Equals(Terminal<T> other)
         {
             return Equals((ITerminal<T>)other);
         }

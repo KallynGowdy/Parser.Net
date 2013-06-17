@@ -175,7 +175,7 @@ namespace Parser.Parsers
 
             b.AppendFormat("Syntax Error at state {0}.", state >= 0 ? State.ToString() : "Unkown");
             
-            b.AppendFormat(" Expected {0}{{{1}}}, but found '{2}'.", expectedInput.Length > 0 ? "one of: " : " ", expectedInput.Select(a => string.Format("\'{0}\'", a)).ConcatArray(","), unexpectedInput);
+            b.AppendFormat(" Expected {0}{{{1}}}, but found '{2}'.", expectedInput.Length > 0 ? "one of: " : " ", expectedInput.Select(a => string.Format("\'{0}\'", a)).ConcatStringArray(","), unexpectedInput);
             b.Append(errorPos.ToString(" Line Number: {0}, Column Number {1}"));
 
             return b.ToString();

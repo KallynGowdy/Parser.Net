@@ -61,7 +61,7 @@ namespace Parser.Grammar
             {
                 return InnerValue.GetHashCode();
             }
-            return base.GetHashCode();
+            return unchecked(521 * typeof(T).GetHashCode()); 
         }
     }
 }

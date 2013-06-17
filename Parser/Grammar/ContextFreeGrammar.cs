@@ -136,7 +136,7 @@ namespace Parser.Grammar
                 var productions = this.Productions.Where(a => a.NonTerminal.Equals(nextElement));
 
                 //for each of the possible following elements of item
-                foreach (Terminal<T> l in Follow(item))
+                foreach (Terminal<T> l in follow(item, items))
                 {
                     foreach (Production<T> p in productions)
                     {
@@ -399,6 +399,79 @@ namespace Parser.Grammar
             return set.Select(a => Closure(a)).SelectMany(a => a).Distinct();
         }
 
+
+        /// <summary>
+        /// Gets a collection of Terminal elements that can appear after the element that is after the dot of the item.
+        /// </summary>
+        /// <example>
+        /// With Grammar:
+        /// S -> E
+        /// E -> T
+        /// E -> (E)
+        /// T -> n
+        /// T -> + T
+        /// T ->  T + n
+        /// 
+        /// Follow(S -> •E) : {$}
+        /// Follow(T -> •+ T) : {'+', 'n'}
+        /// Follow(T -> •n, ')') : {')'}
+        /// </example>
+        /// <param name="nonTerminal"></param>
+        /// <returns></returns>
+        private IEnumerable<Terminal<T>> follow(LRItem<T> item, IEnumerable<LRItem<T>> totalItems)
+        {
+
+            //Follow(item) is First(b) where item is:
+            //A -> a•Eb
+
+            GrammarElement<T> element = item.GetNextElement(1);
+
+            if (element != null)
+            {
+                if (element is NonTerminal<T>)
+                {
+                    List<Terminal<T>> firstSet = new List<Terminal<T>>();
+
+                    //if the element has a production with no derived elements and the element is at the end of the current item's production, then
+                    //add the lookahead of the given item.
+
+                    //if there is any production of the current element that has no derived elements
+                    if(Productions.Any(a => a.NonTerminal.Equals(element) && a.DerivedElements.Count == 0))
+                    {
+                        //if the current element is the end of the current item's production
+                        if(item.GetNextElement(2) == null)
+                        {
+                            firstSet.Add(item.LookaheadElement == null ? EndOfInputElement : item.LookaheadElement);
+                        }
+                    }
+
+                    //select the lookahead element or end of input element for each item in the previous set
+                    //List<Terminal<T>> firstSet = new List<Terminal<T>>(items.Select(a => a.LookaheadElement == null ? EndOfInputElement : a.LookaheadElement));
+
+                    //add the rest of the first set.
+                    firstSet.AddRange(First(element));
+                    return firstSet;
+                }
+                else
+                {
+                    return First(element);
+                }
+                
+            }
+            else
+            {
+                if (item.LookaheadElement == null)
+                {
+                    return new[] { EndOfInputElement };
+                }
+                else
+                {
+                    return new[] { item.LookaheadElement };
+                }
+            }
+
+        }
+
         /// <summary>
         /// Gets a collection of Terminal elements that can appear after the element that is after the dot of the item.
         /// </summary>
@@ -427,7 +500,16 @@ namespace Parser.Grammar
 
             if (element != null)
             {
+                //if(item.LookaheadElement != null && item.GetNextElement(2) == null)
+                //{
+                //    //if it is, then include the lookahead of item in the follow set.
+                //    return First(element).Concat(new[] { item.LookaheadElement });
+                //}
+                ////If the element is not the last element in the production.
+                //else
+                //{
                 return First(element);
+                //}
             }
             else
             {
@@ -551,10 +633,10 @@ namespace Parser.Grammar
                         }
                     }
                 }
-                else
-                {
-                    firstElements.Add(EndOfInputElement);
-                }
+                //else
+                //{
+                //    firstElements.Add(EndOfInputElement);
+                //}
             }
             //return a distinct set of terminals
             return firstElements.Distinct();

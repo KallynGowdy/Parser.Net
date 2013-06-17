@@ -7,7 +7,7 @@
     <ProjectGuid>{7D3A9DE2-E08D-4CF4-8BC1-81A8121B1912}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RegularExpressions</RootNamespace>
+    <RootNamespace>Parser.RegularExpressions</RootNamespace>
     <AssemblyName>RegularExpressions</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,6 +41,9 @@
   <ItemGroup>
     <Compile Include="RegularExpression.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tokens\AnyButTerminal.cs" />
+    <Compile Include="Tokens\AnyOfTerminal.cs" />
+    <Compile Include="Tokens\AnyTerminal.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lexer\LexicalAnalysis.csproj">
@@ -52,6 +55,7 @@
       <Name>Parser</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
