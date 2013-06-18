@@ -78,6 +78,7 @@ namespace Parser.Grammar
             {
                 return (object)this.InnerValue == (object)terminal;
             }
+
         }
 
         /// <summary>
@@ -113,6 +114,11 @@ namespace Parser.Grammar
             }
         }
 
+        /// <summary>
+        /// Determines if this terminal element equals the given other element.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public virtual bool Equals(Terminal<T> other)
         {
             return Equals((ITerminal<T>)other);

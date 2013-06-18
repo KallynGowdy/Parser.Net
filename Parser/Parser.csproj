@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\IMultiHashedObject.cs" />
+    <Compile Include="Collections\MultiHashedDictionary.cs" />
     <Compile Include="Definitions\KeywordIdentifierParserTokenDefinition.cs" />
     <Compile Include="Definitions\MissingTokenDefinition.cs" />
     <Compile Include="Definitions\StringedIdentifierParserTokenDefinition.cs" />

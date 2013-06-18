@@ -116,24 +116,44 @@ namespace Parser.StateMachine
                 {
                     throw new ArgumentNullException("nextInput");
                 }
+
                 if (nextInput is Terminal<T>)
                 {
-                    //if the given state and next input are in the table
-                    if (ActionTable.Any(a => a.Key == currentState && a.Value.Any(b => b.Equals(nextInput))))
+                    //if the given state is in the table
+                    if (ActionTable.ContainsKey(currentState))
                     {
-                        //return the action
-                        return ActionTable[currentState, (Terminal<T>)nextInput].ToArray();
+                        //if the next input is in the table
+                        if (ActionTable[currentState].ContainsKey((Terminal<T>)nextInput))
+                        {
+                            //if the stored column is not negated
+                            if (!ActionTable[currentState].First(a => a.Equals(nextInput)).Key.Negated)
+                            {
+                                //return the action
+                                return ActionTable[currentState, (Terminal<T>)nextInput].ToArray();
+                            }
+                        }
+                        //otherwise
+                        //if the state is contained in the table, and if there is a negated input element that does not match the given input
+                        else
+                        {
+                            KeyValuePair<Terminal<T>, List<ParserAction<T>>> result = ActionTable[currentState].FirstOrDefault(a => a.Key.Negated && !a.Key.Equals(nextInput));
+                            if (!result.Equals(default(KeyValuePair<Terminal<T>, List<ParserAction<T>>>)))
+                            {
+                                return result.Value.ToArray();
+                            }
+                        }
                     }
                 }
                 else
                 {
                     //if the given state and next input are in the table
-                    if (GotoTable.Any(a => a.Key == currentState && a.Value.Any(b => b.Equals(nextInput))))
+                    if (GotoTable.ContainsKey(currentState) && GotoTable[currentState].ContainsKey((NonTerminal<T>)nextInput))
                     {
                         //return a new shift action representing the goto movement.
                         return new[] { new ShiftAction<T>(this, GotoTable[currentState, (NonTerminal<T>)nextInput].Value) };
                     }
                 }
+
                 //the item does not exist in the table, return null.
                 return null;
             }

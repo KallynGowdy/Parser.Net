@@ -40,20 +40,52 @@ namespace Parser.Collections
         }
 
         /// <summary>
+        /// Gets the IEqualityComparer for the Rows of the table.
+        /// </summary>
+        public IEqualityComparer<TRow> RowComparer
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the IEqualityComparer for the Columns of the table.
+        /// </summary>
+        public IEqualityComparer<TColumn> ColumnComparer
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Creates a new Empty table.
         /// </summary>
         public Table()
         {
             lookup = new Dictionary<TRow, Dictionary<TColumn, TValue>>();
+            this.RowComparer = EqualityComparer<TRow>.Default;
+            this.ColumnComparer = EqualityComparer<TColumn>.Default;
         }
 
         /// <summary>
         /// Creates a new table from the given dictionary.
         /// </summary>
         /// <param name="items"></param>
-        public Table(IDictionary<TRow, Dictionary<TColumn, TValue>> items)
+        public Table(IDictionary<TRow, Dictionary<TColumn, TValue>> items) : this()
         {
             lookup = new Dictionary<TRow, Dictionary<TColumn, TValue>>(items);
+        }
+
+        /// <summary>
+        /// Creates a new Table with the given IEqualityComparer objects used to compare keys.
+        /// </summary>
+        /// <param name="rowComparer"></param>
+        /// <param name="columnComparer"></param>
+        public Table(IEqualityComparer<TRow> rowComparer, IEqualityComparer<TColumn> columnComparer)
+        {
+            this.RowComparer = rowComparer;
+            this.ColumnComparer = columnComparer;
+            lookup = new Dictionary<TRow,Dictionary<TColumn,TValue>>(RowComparer);
         }
 
         /// <summary>
@@ -229,20 +261,6 @@ namespace Parser.Collections
             set
             {
                 lookup[key.Row][key.Column] = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets the value at the given index.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <exception cref="System.ArgumentOutOfRangeException"/>
-        /// <returns></returns>
-        public TValue this[int index]
-        {
-            get
-            {
-                return lookup.SelectMany(a => a.Value).ElementAt(index).Value;
             }
         }
 
