@@ -106,7 +106,7 @@ namespace Parser.Grammar
         /// <returns></returns>
         public IEnumerable<LRItem<T>> LR1Closure(LRItem<T> item)
         {
-            return lr1Closure(item, null);
+            return lr1Closure(item, new HashSet<LRItem<T>>());
         }
 
         /// <summary>
@@ -115,17 +115,17 @@ namespace Parser.Grammar
         /// <param name="item"></param>
         /// <param name="currentItems"></param>
         /// <returns></returns>
-        private IEnumerable<LRItem<T>> lr1Closure(LRItem<T> item, IEnumerable<LRItem<T>> currentItems)
+        private IEnumerable<LRItem<T>> lr1Closure(LRItem<T> item, HashSet<LRItem<T>> currentItems)
         {
-            List<LRItem<T>> items;
+            //<LRItem<T>> items;
 
-            items = new List<LRItem<T>>();
+            //items = new List<LRItem<T>>();
 
             //add the current items
-            if (currentItems != null)
-            {
-                items.AddRange(currentItems);
-            }
+            //if (currentItems != null)
+            //{
+            //    items.AddRange(currentItems);
+            //}
 
             GrammarElement<T> nextElement;
 
@@ -136,7 +136,7 @@ namespace Parser.Grammar
                 var productions = this.Productions.Where(a => a.NonTerminal.Equals(nextElement));
 
                 //for each of the possible following elements of item
-                foreach (Terminal<T> l in follow(item, items))
+                foreach (Terminal<T> l in follow(item, currentItems))
                 {
                     foreach (Production<T> p in productions)
                     {
@@ -147,18 +147,17 @@ namespace Parser.Grammar
                         newItem.LookaheadElement = l;
 
                         //if the item is not already contained
-                        if (!items.Contains(newItem))
+                        if (currentItems.Add(newItem))
                         {
                             //add the new item(but make sure it is not a duplicate
-                            items.Add(newItem);
+                            //items.Add(newItem);
                             //add the LR1 closure of the new item
-                            items = items.Union(lr1Closure(newItem, items)).ToList();
+                            lr1Closure(newItem, currentItems);
                         }
                     }
                 }
             }
-
-            return items.Distinct();
+            return currentItems.Distinct();
         }
 
         /// <summary>
@@ -385,7 +384,7 @@ namespace Parser.Grammar
             firstState.Add(startingItem);
 
             //get the rest of the first state
-            firstState.AddRange(lr1Closure(startingItem, null));
+            firstState.AddRange(lr1Closure(startingItem, new HashSet<LRItem<T>>()));
             return firstState;
         }
 
@@ -436,10 +435,10 @@ namespace Parser.Grammar
                     //add the lookahead of the given item.
 
                     //if there is any production of the current element that has no derived elements
-                    if(Productions.Any(a => a.NonTerminal.Equals(element) && a.DerivedElements.Count == 0))
+                    if (Productions.Any(a => a.NonTerminal.Equals(element) && a.DerivedElements.Count == 0))
                     {
                         //if the current element is the end of the current item's production
-                        if(item.GetNextElement(2) == null)
+                        if (item.GetNextElement(2) == null)
                         {
                             firstSet.Add(item.LookaheadElement == null ? EndOfInputElement : item.LookaheadElement);
                         }
@@ -456,7 +455,7 @@ namespace Parser.Grammar
                 {
                     return First(element);
                 }
-                
+
             }
             else
             {

@@ -20,6 +20,7 @@ using System.IO.Compression;
 using Parser.Parsers.AllInOne;
 using Parser;
 using Parser.RegularExpressions;
+using System.Xml;
 
 namespace ParserGUI
 {
@@ -37,7 +38,6 @@ namespace ParserGUI
             r = new RegularExpression(txtCFG.Text);
 
             //(new Thread(aio)).Start(txtCFG.Text);
-
         }
 
         IEnumerable<Token<string>> tokens;

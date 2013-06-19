@@ -18,6 +18,16 @@ namespace Parser.Grammar
             this.Keep = keep;
         }
 
+        /// <summary>
+        /// Gets whether this terminal element is an end of input element.
+        /// </summary>
+        public bool EndOfInput
+        {
+            get
+            {
+                return InnerValue == null && !Negated;
+            }
+        }
 
         /// <summary>
         /// Gets a unique interger value that describes this object that is garenteed not to change.
@@ -25,7 +35,14 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            if (InnerValue != null)
+            {
+                return base.GetHashCode();
+            }
+            else
+            {
+                return Negated.GetHashCode();
+            }
         }
 
 
@@ -106,11 +123,25 @@ namespace Parser.Grammar
         {
             if (this.InnerValue != null)
             {
-                return InnerValue.ToString();
+                if (this.Negated)
+                {
+                    return string.Format("Not {0}", InnerValue.ToString());
+                }
+                else
+                {
+                    return InnerValue.ToString();
+                }
             }
             else
             {
-                return "END_OF_INPUT";
+                if (!this.Negated)
+                {
+                    return "END_OF_INPUT";
+                }
+                else
+                {
+                    return "Anything";
+                }
             }
         }
 

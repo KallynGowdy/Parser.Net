@@ -93,7 +93,7 @@ namespace Parser.Parsers
                                 int progression = e.Progression;
 
                                 //get the item
-                                Terminal<T> item = input.ElementAt(progression);
+                                Terminal<T> item = input.ElementAt(progression >= input.Count() ? input.Count() - 1 : progression);
 
                                 //get a new list of current branches
                                 List<ParseTree<T>.ParseTreebranch> branches = new List<ParseTree<T>.ParseTreebranch>(result.GetParseTree().Root.Children);
@@ -225,23 +225,33 @@ namespace Parser.Parsers
         }
 
         /// <summary>
-        /// Parses the given input as an LR(1) parser.
+        /// Parses the given input and returns the first successful or unsuccessful result.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public override ParseResult<T> ParseAST(IEnumerable<Terminal<T>> input)
         {
-            return base.ParseAST(input);
+            var results = ParseAbstractSyntaxTrees(input);
+            if(results.Any(a => a.Success))
+            {
+                return results.First(a => a.Success);
+            }
+            return results.FirstOrDefault();
         }
 
         /// <summary>
-        /// Parses the given input as an LR(1) parser.
+        /// Parses the given input and returns the first successful or unsuccessful result.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public override ParseResult<T> ParseSyntaxTree(IEnumerable<Terminal<T>> input)
         {
-            return base.ParseSyntaxTree(input);
+            var results = ParseSyntaxTrees(input);
+            if (results.Any(a => a.Success))
+            {
+                return results.First(a => a.Success);
+            }
+            return results.FirstOrDefault();
         }
     }
 }

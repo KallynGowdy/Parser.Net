@@ -67,6 +67,12 @@ namespace Parser.RegularExpressions
                             //defines '^'
                             new StringedParserTokenDefinition(@"\^", "^", true),
 
+                            //defines '\-'
+                            new StringedParserTokenDefinition(@"\\\-", "Literal", true),
+
+                            //defines '-'
+                            new StringedParserTokenDefinition(@"\-", "-", false),
+
                             //defines a literal as anything single character that is not a space
                             new StringedParserTokenDefinition(@"[^\s]", "Literal", true),
                         }
@@ -183,11 +189,18 @@ namespace Parser.RegularExpressions
 	                    #endregion
 
                         #region LiteralLst
-		                //LiteralLst -> AnyLiteral
-                        new Production<string>("LiteralLst".ToNonTerminal(), "AnyLiteral".ToNonTerminal()),
 
-                        //LiteralLst -> LiteralLst AnyLiteral
-                        new Production<string>("LiteralLst".ToNonTerminal(), "LiteralLst".ToNonTerminal(), "AnyLiteral".ToNonTerminal()), 
+		                //LiteralRange -> AnyLiteral
+                        new Production<string>("LiteralRange".ToNonTerminal(), "AnyLiteral".ToNonTerminal()),
+
+                        //LiteralRange -> AnyLiteral - AnyLiteral
+                        new Production<string>("LiteralRange".ToNonTerminal(), "AnyLiteral".ToNonTerminal(), "-".ToTerminal(), "AnyLiteral".ToNonTerminal()),
+
+                        //LiteralLst -> LiteralRange
+                        new Production<string>("LiteralLst".ToNonTerminal(), "LiteralRange".ToNonTerminal()),
+
+                        //LiteralLst -> LiteralLst LiteralRange
+                        new Production<string>("LiteralLst".ToNonTerminal(), "LiteralLst".ToNonTerminal(), "LiteralRange".ToNonTerminal()), 
 	                    #endregion
 
                         #region AnyLiteral
@@ -277,7 +290,7 @@ namespace Parser.RegularExpressions
         /// <summary>
         /// The parser used to parse input that should match regular expressions.
         /// </summary>
-        LRParser<string> parser;
+        GLRParser<string> parser;
 
         /// <summary>
         /// Gets the regular expression pattern used by this Regex matcher.
@@ -309,7 +322,7 @@ namespace Parser.RegularExpressions
             if (result.Success)
             {
                 grammar = buildGrammar(result.GetParseTree());
-                parser = new LRParser<string>();
+                parser = new GLRParser<string>();
                 parser.SetParseTable(grammar);
             }
             else
@@ -317,6 +330,7 @@ namespace Parser.RegularExpressions
                 throw new ArgumentException("Please provide a valid regular expression pattern.", "pattern");
             }
         }
+
 
         /// <summary>
         /// Determines if the given input string matches the regular expression.
@@ -327,8 +341,9 @@ namespace Parser.RegularExpressions
         {
             //List<Terminal<string>> terminals = new List<Terminal<string>>();
 
-            var result = parser.ParseAST(input.Select(a => new Terminal<string>(a.ToString())));
-            return result.Success;
+            var result = parser.ParseAbstractSyntaxTrees(input.Select(a => new Terminal<string>(a.ToString())));
+
+            return result.Any(a => a.Success);
         }
 
         /// <summary>
@@ -521,7 +536,17 @@ namespace Parser.RegularExpressions
                         }
                         else
                         {
-                            return new Terminal<string>(a.Value.InnerValue.Value);
+                            //Base -> .
+                            if (a.Value.InnerValue.Value.Equals("."))
+                            {
+                                Terminal<string> t = new Terminal<string>(null);
+                                t.Negated = true;
+                                return t;
+                            }
+                            else
+                            {
+                                return new Terminal<string>(a.Value.InnerValue.Value);
+                            }
                         }
                     }).ToArray();
                 }
@@ -569,17 +594,79 @@ namespace Parser.RegularExpressions
                         List<Terminal<string>> elements = new List<Terminal<string>>(buildLiteralLstBranch(currentBranch.Children[2], productions));
 
                         NonTerminal<string> condition = new NonTerminal<string>(name);
+                        condition.Negated = true;
 
-                        AnyButTerminal<string> t = new AnyButTerminal<string>(elements, true);
+                        //AnyButTerminal<string> t = new AnyButTerminal<string>(elements, true);
 
-                        //Condition -> AnyBut(elements)
-                        productions.Push(new Production<string>(condition, t));
+                        foreach (var e in elements)
+                        {
+                            e.Negated = true;
+                            productions.Push(new Production<string>(condition, e));
+                        }
 
                         return new[] { condition };
                     }
                 }
             }
             return new GrammarElement<string>[0];
+        }
+
+        private Terminal<string>[] buildLiteralRangeBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions)
+        {
+            //LiteralRange -> AnyLiteral
+            if (currentBranch.Children.Count == 1)
+            {
+                return buildAnyLiteralBranch(currentBranch.Children[0], productions);
+            }
+            //LiteralRange -> AnyLiteral - AnyLiteral
+            else
+            {
+                //if (((NonTerminal<Token<string>>)currentBranch.Children[0].Value).Name.Equals("LiteralLst"))
+                //{
+                //    List<Terminal<string>> elements = new List<Terminal<string>>();
+                //    elements.AddRange(buildLiteralLstBranch(currentBranch.Children[0], productions));
+                //    elements.AddRange(buildAnyLiteralBranch(currentBranch.Children[1], productions));
+
+                //    return elements.ToArray();
+                //}
+                //LiteralLst -> AnyLiteral - AnyLiteral
+                //else
+                //{
+                List<Terminal<string>> elements = new List<Terminal<string>>();
+                var first = buildAnyLiteralBranch(currentBranch.Children[0], productions).First();
+                var last = buildAnyLiteralBranch(currentBranch.Children[1], productions).First();
+
+                int dir = first.InnerValue[0] - last.InnerValue[0];
+
+
+                //if the last's character is greater than the first's
+                if (dir > 0)
+                {
+                    //count from the first to the last
+                    for (int i = last.InnerValue[0]; i <= first.InnerValue[0]; i++)
+                    {
+                        //add each character between the first and last character in the group.
+                        elements.Add(new Terminal<string>(((char)i).ToString()));
+                    }
+                }
+                else if (dir < 0)
+                {
+                    //count from the last to the first.
+                    for (int i = first.InnerValue[0]; i <= last.InnerValue[0]; i++)
+                    {
+                        //add each character between the last and first character in the group.
+                        elements.Add(new Terminal<string>(((char)i).ToString()));
+                    }
+                }
+                else
+                {
+                    //add the first/last element because they are the same
+                    elements.Add(new Terminal<string>(first.InnerValue));
+                }
+
+                return elements.ToArray();
+                //}
+            }
         }
 
         /// <summary>
@@ -590,19 +677,59 @@ namespace Parser.RegularExpressions
         /// <returns>A list of grammar elements that represent the grammar elemetns contained in this LiteralLst</returns>
         private Terminal<string>[] buildLiteralLstBranch(ParseTree<Token<string>>.ParseTreebranch parseTreebranch, Stack<Production<string>> productions)
         {
-            //LiteralLst -> AnyLiteral
+            //LiteralLst -> LiteralRange
             if (parseTreebranch.Children.Count == 1)
             {
-                return buildAnyLiteralBranch(parseTreebranch.Children[0], productions);
+                return buildLiteralRangeBranch(parseTreebranch.Children[0], productions);
             }
-            //LiteralLst -> LiteralLst AnyLiteral
+            //LiteralLst -> LiteralLst LiteralRange
             else
             {
-                List<Terminal<string>> elements = new List<Terminal<string>>();
-                elements.AddRange(buildLiteralLstBranch(parseTreebranch.Children[0], productions));
-                elements.AddRange(buildAnyLiteralBranch(parseTreebranch.Children[1], productions));
+                //if (((NonTerminal<Token<string>>)parseTreebranch.Children[0].Value).Name.Equals("LiteralLst"))
+                //{
+                    List<Terminal<string>> elements = new List<Terminal<string>>();
+                    elements.AddRange(buildLiteralLstBranch(parseTreebranch.Children[0], productions));
+                    elements.AddRange(buildLiteralRangeBranch(parseTreebranch.Children[1], productions));
 
-                return elements.ToArray();
+                    return elements.ToArray();
+                //}
+                ////LiteralLst -> AnyLiteral - AnyLiteral
+                //else
+                //{
+                //    List<Terminal<string>> elements = new List<Terminal<string>>();
+                //    var first = buildAnyLiteralBranch(parseTreebranch.Children[0], productions).First();
+                //    var last = buildAnyLiteralBranch(parseTreebranch.Children[1], productions).First();
+
+                //    int dir = first.InnerValue[0] - last.InnerValue[0];
+
+
+                //    //if the last's character is greater than the first's
+                //    if (dir > 0)
+                //    {
+                //        //count from the first to the last
+                //        for (int i = last.InnerValue[0]; i <= first.InnerValue[0]; i++)
+                //        {
+                //            //add each character between the first and last character in the group.
+                //            elements.Add(new Terminal<string>(((char)i).ToString()));
+                //        }
+                //    }
+                //    else if (dir < 0)
+                //    {
+                //        //count from the last to the first.
+                //        for (int i = first.InnerValue[0]; i <= last.InnerValue[0]; i++)
+                //        {
+                //            //add each character between the last and first character in the group.
+                //            elements.Add(new Terminal<string>(((char)i).ToString()));
+                //        }
+                //    }
+                //    else
+                //    {
+                //        //add the first/last element because they are the same
+                //        elements.Add(new Terminal<string>(first.InnerValue));
+                //    }
+
+                //    return elements.ToArray();
+                //}
             }
         }
 

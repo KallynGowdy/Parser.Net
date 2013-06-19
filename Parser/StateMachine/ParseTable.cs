@@ -122,26 +122,39 @@ namespace Parser.StateMachine
                     //if the given state is in the table
                     if (ActionTable.ContainsKey(currentState))
                     {
+                        List<ParserAction<T>> actions = new List<ParserAction<T>>();
                         //if the next input is in the table
                         if (ActionTable[currentState].ContainsKey((Terminal<T>)nextInput))
                         {
+                            Terminal<T> key = ActionTable[currentState].GetKey((Terminal<T>)nextInput);
+
                             //if the stored column is not negated
-                            if (!ActionTable[currentState].First(a => a.Equals(nextInput)).Key.Negated)
+                            if (!key.Negated)
                             {
                                 //return the action
-                                return ActionTable[currentState, (Terminal<T>)nextInput].ToArray();
+                                actions.AddRange(ActionTable[currentState][key].ToArray());
                             }
                         }
-                        //otherwise
-                        //if the state is contained in the table, and if there is a negated input element that does not match the given input
-                        else
+                        //Negated values will never match the end of input element
+                        if (!((Terminal<T>)nextInput).EndOfInput)
                         {
-                            KeyValuePair<Terminal<T>, List<ParserAction<T>>> result = ActionTable[currentState].FirstOrDefault(a => a.Key.Negated && !a.Key.Equals(nextInput));
-                            if (!result.Equals(default(KeyValuePair<Terminal<T>, List<ParserAction<T>>>)))
+                            //Negated values act as an 'and' clause instead of an 'or' clause
+                            //input is not 'a' and input is not 'b', instead of input is not 'a' or input is not 'b'
+
+                            //If all of the negated keys do not equal the next input.
+                            if (ActionTable[currentState].All(a => (a.Key.Negated && !a.Key.Equals(nextInput)) || !a.Key.Negated))
                             {
-                                return result.Value.ToArray();
+
+                                //if the state is contained in the table, and if there is a negated input element that does not match the given input
+                                //A Terminal with a null value that is negated will match anything except END_OF_INPUT.
+                                var result = ActionTable[currentState].FirstOrDefault(a => a.Key.Negated && !a.Key.Equals(nextInput));
+                                if (!result.Equals(default(KeyValuePair<Terminal<T>, List<ParserAction<T>>>)))
+                                {
+                                    actions.AddRange(result.Value.ToArray());
+                                }
                             }
                         }
+                        return actions.ToArray();
                     }
                 }
                 else

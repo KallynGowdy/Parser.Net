@@ -69,25 +69,13 @@
   </Binaries>
   <Reports>
     <Report>
-      <Path>ParserGUI130524.vsp</Path>
+      <Path>ParserGUI130618(1).vsp</Path>
     </Report>
     <Report>
-      <Path>ParserGUI130524(1).vsp</Path>
+      <Path>ParserGUI130618(2).vsp</Path>
     </Report>
     <Report>
-      <Path>ParserGUI130524(2).vsp</Path>
-    </Report>
-    <Report>
-      <Path>ParserGUI130524(3).vsp</Path>
-    </Report>
-    <Report>
-      <Path>ParserGUI130524(10).vsp</Path>
-    </Report>
-    <Report>
-      <Path>ParserGUI130607.vsp</Path>
-    </Report>
-    <Report>
-      <Path>ParserGUI130607(1).vsp</Path>
+      <Path>ParserGUI130618(3).vsp</Path>
     </Report>
   </Reports>
   <Launches>

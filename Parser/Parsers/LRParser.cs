@@ -204,12 +204,12 @@ namespace Parser.Parsers
                     int s = stateStack.Peek().Key;
 
                     //Get the possible actions for the current state and item from the table
-                    var actions = ParseTable.ActionTable[s, item];
+                    var actions = ParseTable[s, item];
 
                     if (actions != null)
                     {
                         //SHIFT_REDUCE or REDUCE_REDUCE
-                        if (actions.Count > 1)
+                        if (actions.Length > 1)
                         {
                             KeyValuePair<int, GrammarElement<T>> currentState = stateStack.Peek();
                             return new ParseResult<T>(false, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(currentBranches)), stateStack.ToList(), new MultipleActionsParseError<T>("", currentState.Key, item, i, actions.ToArray()));
@@ -262,7 +262,7 @@ namespace Parser.Parsers
             else
             {
                 //check for Start -> epsilon
-                IEnumerable<ParserAction<T>> actions = ParseTable.ActionTable[0, null];
+                IEnumerable<ParserAction<T>> actions = ParseTable.ActionTable[0, new Terminal<T>(default(T))];
                 if (actions != null && actions.Count() > 0)
                 {
                     var action = (ReduceAction<T>)actions.First();
