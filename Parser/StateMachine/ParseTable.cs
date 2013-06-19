@@ -394,5 +394,23 @@ namespace Parser.StateMachine
                 }
             }
         }
+
+        /// <summary>
+        /// Creates a new Parse Table from the given State Graph.
+        /// </summary>
+        /// <param name="graph"></param>
+        public ParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        {
+            if (graph.Root != null && graph.Root.Value.Length > 0)
+            {
+                this.ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
+                this.GotoTable = new Table<int, NonTerminal<T>, int?>();
+                buildParseTable(graph, graph.Root.Value.First().LeftHandSide);
+            }
+            else
+            {
+                throw new ArgumentException("The given graph must have at least one item in the root node.", "graph");
+            }
+        }
     }
 }

@@ -39,42 +39,14 @@ namespace Parser.Parsers
             {
                 return parseTable;
             }
-            //set
-            //{
-            //    foreach (var colRow in value.ActionTable)
-            //    {
-            //        //if we have a conflict
-            //        if (colRow.Value.Count > 1)
-            //        {
-            //            List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>> conflicts = new List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>>();
+        }
 
-            //            //ParseTableExceptionType exType;
-            //            ////if we have a shift-reduce conflict
-            //            if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
-            //            {
-            //                conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.SHIFT_REDUCE, colRow.Key.Row, colRow.Key.Column));
-
-            //                //then check for a reduce-reduce conflict
-            //                if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
-            //                {
-            //                    conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
-            //                }
-            //            }
-            //            //otherwise we have a reduce-reduce conflict
-            //            else
-            //            {
-            //                conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
-            //            }
-
-
-
-            //            //throw invalid parse table exception
-            //            throw new InvalidParseTableException<T>(value, conflicts.ToArray());
-            //        }
-
-            //    }
-            //    this.parseTable = value;
-            //}
+        /// <summary>
+        /// Sets the end of input element from the table by finding the first terminal that identifies itself as the end of input element.
+        /// </summary>
+        protected void SetEndOfInputFromTable()
+        {
+            this.EndOfInputElement = this.parseTable.ActionTable.Select(a => a.Value.FirstOrDefault(b => b.Key.EndOfInput).Key).Where(a => a != null).First();
         }
 
         /// <summary>
@@ -87,6 +59,8 @@ namespace Parser.Parsers
             {
                 throw new ArgumentNullException("table");
             }
+            this.parseTable = table;
+            SetEndOfInputFromTable();
         }
 
         /// <summary>
@@ -161,6 +135,7 @@ namespace Parser.Parsers
 
             }
             this.parseTable = value;
+            SetEndOfInputFromTable();
         }
 
         /// <summary>
@@ -526,7 +501,7 @@ namespace Parser.Parsers
         /// </summary>
         /// <param name="graph"></param>
         /// <exception cref="Parser.InvalidParseTableException"/>
-        public void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement)
+        public virtual void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement)
         {
             if (graph == null)
             {
@@ -554,7 +529,7 @@ namespace Parser.Parsers
         /// </summary>
         /// <param name="grammar"></param>
         /// <exception cref="Parser.InvalidParseTableException"/>
-        public void SetParseTable(ContextFreeGrammar<T> grammar)
+        public virtual void SetParseTable(ContextFreeGrammar<T> grammar)
         {
             if (grammar == null)
             {

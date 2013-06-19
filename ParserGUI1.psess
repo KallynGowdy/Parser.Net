@@ -77,6 +77,9 @@
     <Report>
       <Path>ParserGUI130618(3).vsp</Path>
     </Report>
+    <Report>
+      <Path>ParserGUI130618(4).vsp</Path>
+    </Report>
   </Reports>
   <Launches>
     <ProjBinary>

@@ -12,11 +12,14 @@ namespace Parser.Grammar
     public class Terminal<T> : GrammarElement<T>, ITerminal<T>, IEquatable<Terminal<T>> where T : IEquatable<T>
     {
 
-        public Terminal(T value, bool keep = true)
+        public Terminal(T value, bool keep = true, bool negated = false)
             : base(value)
         {
             this.Keep = keep;
+            this.Negated = negated;
         }
+
+        
 
         /// <summary>
         /// Gets whether this terminal element is an end of input element.

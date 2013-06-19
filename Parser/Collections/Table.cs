@@ -13,11 +13,14 @@ namespace Parser.Collections
     /// <typeparam name="TColumn">The type of the column objects</typeparam>
     /// <typeparam name="TValue">The type of the values to store in the table</typeparam>
     [Serializable]
+    [DataContract(Name = "Table")]
     public class Table<TRow, TColumn, TValue> : IDictionary<TRow, KeyedDictionary<TColumn, TValue>>
         where TRow : IEquatable<TRow>
         where TColumn : IEquatable<TColumn>
     {
+        [DataMember(Name="LookupDictionary")]
         KeyedDictionary<TRow, KeyedDictionary<TColumn, TValue>> lookup;
+
 
         //Dictionary<ColumnRowPair<TRow, TColumn>, TValue> lookup;
 
@@ -365,7 +368,7 @@ namespace Parser.Collections
         /// <returns></returns>
         public bool Remove(KeyValuePair<ColumnRowPair<TRow, TColumn>, TValue> item)
         {
-            
+
             return lookup[item.Key.Row].Remove(item.Key.Column);
         }
 

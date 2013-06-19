@@ -99,6 +99,8 @@ namespace Parser.Grammar
             set;
         }
 
+        Dictionary<LRItem<T>, IEnumerable<LRItem<T>>> closures = new Dictionary<LRItem<T>, IEnumerable<LRItem<T>>>();
+
         /// <summary>
         /// Gets the LR(1) closure of the given item.
         /// </summary>
@@ -106,7 +108,16 @@ namespace Parser.Grammar
         /// <returns></returns>
         public IEnumerable<LRItem<T>> LR1Closure(LRItem<T> item)
         {
-            return lr1Closure(item, new HashSet<LRItem<T>>());
+            if (closures.ContainsKey(item))
+            {
+                return closures[item];
+            }
+            else
+            {
+                IEnumerable<LRItem<T>> closure = lr1Closure(item, new HashSet<LRItem<T>>());
+                closures.Add(item, closure);
+                return closure;
+            }
         }
 
         /// <summary>

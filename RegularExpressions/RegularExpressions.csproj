@@ -39,11 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RegexBuilder.cs" />
     <Compile Include="RegularExpression.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tokens\AnyButTerminal.cs" />
-    <Compile Include="Tokens\AnyOfTerminal.cs" />
-    <Compile Include="Tokens\AnyTerminal.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lexer\LexicalAnalysis.csproj">

@@ -18,7 +18,7 @@ namespace Parser.Parsers
     {
 
         /// <summary>
-        /// Gets or sets the parse table to use.
+        /// Gets the parse table used by this parser.
         /// </summary>
         public override ParseTable<T> ParseTable
         {
@@ -26,15 +26,66 @@ namespace Parser.Parsers
             {
                 return parseTable;
             }
-            //set
-            //{
-            //    parseTable = value;
-            //}
         }
 
-        public override void SetParseTable(ParseTable<T> value, StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        /// <summary>
+        /// Creates a new GLRParser with a null parse table.
+        /// </summary>
+        public GLRParser()
         {
-            this.parseTable = value;
+
+        }
+
+        /// <summary>
+        /// Creates a new GLRParse with the given parse table.
+        /// </summary>
+        /// <param name="table"></param>
+        public GLRParser(ParseTable<T> table)
+        {
+            this.parseTable = table;
+            SetEndOfInputFromTable();
+        }
+
+        /// <summary>
+        /// Sets the parse table of this GLRParser.
+        /// </summary>
+        /// <param name="table"></param>
+        public override void SetParseTable(ParseTable<T> table)
+        {
+            this.parseTable = table;
+            SetEndOfInputFromTable();
+        }
+
+        /// <summary>
+        /// Sets the parse table of this GLRParser. The graph is ignored.
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="graph"></param>
+        public override void SetParseTable(ParseTable<T> table, StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        {
+            this.parseTable = table;
+            SetEndOfInputFromTable();
+        }
+
+        /// <summary>
+        /// Sets the parse table of this GLRParse based on the given grammar.
+        /// </summary>
+        /// <param name="grammar"></param>
+        public override void SetParseTable(ContextFreeGrammar<T> grammar)
+        {
+            this.parseTable = new ParseTable<T>(grammar);
+            SetEndOfInputFromTable();
+        }
+
+        /// <summary>
+        /// Sets the parse table of this GLRParser based on the given graph and end of input element.
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="endOfInputElement"></param>
+        public override void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement)
+        {
+            this.parseTable = new ParseTable<T>(graph);
+            SetEndOfInputFromTable();
         }
 
         /// <summary>
