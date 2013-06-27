@@ -70,6 +70,15 @@ namespace Parser.RegularExpressions
                             //defines '-'
                             new StringedParserTokenDefinition(@"\-", "-", false),
 
+                            //defines '<' or '>'
+                            new StringedIdentifierParserTokenDefinition(@"\<|\>", "Literal", true),
+
+                            //defines '='
+                            new StringedIdentifierParserTokenDefinition(@"\=", "Literal", true),
+
+                            //defines '!'
+                            new StringedIdentifierParserTokenDefinition(@"\!", "Literal", true),
+
                             //defines a literal as anything single character that is not a space
                             new StringedParserTokenDefinition(@"[^\s]", "Literal", true),
                         }
@@ -183,7 +192,15 @@ namespace Parser.RegularExpressions
 
                         //Base -> '(' Regex ')'
                         new Production<string>("Base".ToNonTerminal(), "(".ToTerminal(), "Regex".ToNonTerminal(), ")".ToTerminal()),
-	                    #endregion
+
+                        //Negative zero-width assertion
+                        //Base -> '(' '? '!' Regex ')'
+                        new Production<string>("Base".ToNonTerminal(), "(".ToTerminal(), "?".ToTerminal(), "!".ToTerminal(), "Regex".ToNonTerminal(), ")".ToTerminal()),
+
+                        //Positive zero-width assertion
+                        //Base -> '(' '? '=' Regex ')'
+                        new Production<string>("Base".ToNonTerminal(), "(".ToTerminal(), "?".ToTerminal(), "=".ToTerminal(), "Regex".ToNonTerminal(), ")".ToTerminal()),
+                        #endregion
 
                         #region LiteralLst
 
@@ -265,6 +282,8 @@ namespace Parser.RegularExpressions
 
         private int currentAlternationNameIndex = 0;
 
+        private int currentZeroWidthNameIndex = 0;
+
         private ContextFreeGrammar<Token<string>> patternGrammar;
 
         public RegexBuilder()
@@ -300,6 +319,16 @@ namespace Parser.RegularExpressions
         private string getCurrentAlternationName()
         {
             return string.Format("Alternation:{0}", currentAlternationNameIndex);
+        }
+
+        private string getNewZeroWidthName()
+        {
+            return string.Format("Zero-Width:{0}", ++currentZeroWidthNameIndex);
+        }
+
+        private string getCurrentZeroWidthName()
+        {
+            return string.Format("Zero-Width:{0}", currentZeroWidthNameIndex);
         }
 
         /// <summary>
@@ -358,11 +387,11 @@ namespace Parser.RegularExpressions
                 string name = ((NonTerminal<Token<string>>)currentBranch.Value).Name;
                 if (name.Equals("Regex"))
                 {
-                    buildRegexBranch(currentBranch, productions);
+                    buildRegexBranch(currentBranch, productions, false, true);
                 }
                 else if (name.Equals("Term"))
                 {
-                    buildTermBranch(currentBranch, productions);
+                    buildTermBranch(currentBranch, productions, false, true);
                 }
             }
         }
@@ -374,7 +403,7 @@ namespace Parser.RegularExpressions
         /// <param name="productions"></param>
         /// <param name="currentNameIndex"></param>
         /// <returns></returns>
-        private GrammarElement<string>[] buildRegexBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions, string name = null)
+        private GrammarElement<string>[] buildRegexBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions, bool negated, bool keep, string name = null)
         {
             if (name == null)
             {
@@ -391,17 +420,17 @@ namespace Parser.RegularExpressions
                 //Regex -> TermLst
                 //Regex -> RegexChild
 
-                productions.Push(new Production<string>(nt, buildTermLstBranch(currentBranch.Children[0], productions)));
+                productions.Push(new Production<string>(nt, buildTermLstBranch(currentBranch.Children[0], productions, negated, keep)));
 
                 //Regex -> RegexChild
-                buildRegexBranch(currentBranch.Children[2], productions, name);
+                buildRegexBranch(currentBranch.Children[2], productions, negated, keep, name);
                 return new[] { nt };
             }
             //Regex -> TermLst
             else
             {
                 NonTerminal<string> nt = new NonTerminal<string>(name);
-                productions.Push(new Production<string>(nt, buildTermLstBranch(currentBranch.Children[0], productions)));
+                productions.Push(new Production<string>(nt, buildTermLstBranch(currentBranch.Children[0], productions, negated, keep)));
                 return new[] { nt };
             }
         }
@@ -412,7 +441,7 @@ namespace Parser.RegularExpressions
         /// <param name="currentBranch"></param>
         /// <param name="productions"></param>
         /// <returns></returns>
-        private GrammarElement<string>[] buildTermBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions)
+        private GrammarElement<string>[] buildTermBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions, bool negated, bool keep)
         {
             string name = getNewRepetitionName();
             NonTerminal<string> nt = new NonTerminal<string>(name);
@@ -426,7 +455,7 @@ namespace Parser.RegularExpressions
                     //Create a set of productions that match the behaviour of the '*' sign in a regular expression
 
                     //R -> elements R
-                    productions.Push(new Production<string>(nt, buildBaseBranch(currentBranch.Children[0].Children[0], productions).Concat(new[] { nt }).ToArray()));
+                    productions.Push(new Production<string>(nt, buildBaseBranch(currentBranch.Children[0].Children[0], productions, negated, keep).Concat(new[] { nt }).ToArray()));
 
                     //R -> nothing
                     productions.Push(new Production<string>(nt));
@@ -439,7 +468,7 @@ namespace Parser.RegularExpressions
                     //R1
                     NonTerminal<string> x1 = new NonTerminal<string>(getNewRepetitionName());
 
-                    GrammarElement<string>[] elements = buildBaseBranch(currentBranch.Children[0].Children[0], productions).Concat(new[] { x1 }).ToArray();
+                    GrammarElement<string>[] elements = buildBaseBranch(currentBranch.Children[0].Children[0], productions, negated, keep).Concat(new[] { x1 }).ToArray();
 
                     //R -> elements R1
                     //R1 -> elements
@@ -454,7 +483,7 @@ namespace Parser.RegularExpressions
                     //create a set of productions that match either one or none
 
                     //R -> elements
-                    productions.Push(new Production<string>(nt, buildBaseBranch(currentBranch.Children[0].Children[0], productions)));
+                    productions.Push(new Production<string>(nt, buildBaseBranch(currentBranch.Children[0].Children[0], productions, negated, keep)));
 
                     //R -> nothing
                     productions.Push(new Production<string>(nt));
@@ -464,7 +493,7 @@ namespace Parser.RegularExpressions
             //Otherwise the production is of the form Factor -> Base
             else
             {
-                return buildBaseBranch(currentBranch.Children[0].Children[0], productions);
+                return buildBaseBranch(currentBranch.Children[0].Children[0], productions, negated, keep);
             }
 
             //Return the created non terminal that represents the entry point into the productions we created.
@@ -477,10 +506,10 @@ namespace Parser.RegularExpressions
         /// <param name="currentBranch"></param>
         /// <param name="productions"></param>
         /// <returns></returns>
-        private GrammarElement<string>[] buildBaseBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions)
+        private GrammarElement<string>[] buildBaseBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions, bool negated, bool keep)
         {
             //If the production is not of the form: Base -> ( Regex )
-            if (currentBranch.Children.Count != 3 && currentBranch.Children.Count != 4)
+            if (currentBranch.Children.Count == 1)
             {
                 //Then there are only two possible forms:
                 //
@@ -490,12 +519,12 @@ namespace Parser.RegularExpressions
                 //Base -> AnyLiteral
                 if (currentBranch.Children[0].Value is NonTerminal<Token<string>>)
                 {
-                    return buildAnyLiteralBranch(currentBranch.Children[0], productions);
+                    return buildAnyLiteralBranch(currentBranch.Children[0], productions, negated, keep);
                 }
                 //Base -> '.'
                 else
                 {
-                    return new[] { new Terminal<string>(null, true, true) };
+                    return new[] { new Terminal<string>(null, true, negated) };
                 }
             }
             //If the production is of the above form(Base -> '(' Regex ')' or Base -> [ LiteralLst ] or Base -> [ ^ LiteralLst ])
@@ -511,13 +540,13 @@ namespace Parser.RegularExpressions
                     if (nt.Name.Equals("Regex"))
                     {
                         //build the productions for the branch
-                        return buildRegexBranch(currentBranch.Children[1], productions);
+                        return buildRegexBranch(currentBranch.Children[1], productions, negated, keep);
                     }
                     //Base -> [ LiteralLst ]
                     else if (nt.Name.Equals("LiteralLst"))
                     {
                         //Get all of the possible elements for the alternation
-                        List<Terminal<string>> elements = new List<Terminal<string>>(buildLiteralLstBranch(currentBranch.Children[1], productions));
+                        List<Terminal<string>> elements = new List<Terminal<string>>(buildLiteralLstBranch(currentBranch.Children[1], productions, negated, keep));
 
                         //build the non-terminal to represent it
                         NonTerminal<string> alternation = new NonTerminal<string>(getNewAlternationName());
@@ -531,48 +560,74 @@ namespace Parser.RegularExpressions
                         return new[] { alternation };
                     }
                 }
-                //Base -> [ ^ LiteralLst ]
                 else
                 {
-
-                    NonTerminal<Token<string>> nt = currentBranch.Children[2].Value as NonTerminal<Token<string>>;
-
-                    if (nt.Name.Equals("LiteralLst"))
+                    //Base -> [ ^ LiteralLst ]
+                    if (currentBranch.Children[2].Value is NonTerminal<Token<string>>)
                     {
-                        string name = string.Format(getNewAlternationName());
-                        List<Terminal<string>> elements = new List<Terminal<string>>(buildLiteralLstBranch(currentBranch.Children[2], productions));
+                        NonTerminal<Token<string>> nt = currentBranch.Children[2].Value as NonTerminal<Token<string>>;
 
-                        NonTerminal<string> condition = new NonTerminal<string>(name);
-                        condition.Negated = true;
-
-                        //AnyButTerminal<string> t = new AnyButTerminal<string>(elements, true);
-
-                        foreach (var e in elements)
+                        if (nt.Name.Equals("LiteralLst"))
                         {
-                            e.Negated = true;
-                            productions.Push(new Production<string>(condition, e));
-                        }
+                            string name = string.Format(getNewAlternationName());
+                            List<Terminal<string>> elements = new List<Terminal<string>>(buildLiteralLstBranch(currentBranch.Children[2], productions, negated, keep));
 
-                        return new[] { condition };
+                            NonTerminal<string> condition = new NonTerminal<string>(name);
+                            condition.Negated = true;
+
+
+                            foreach (var e in elements)
+                            {
+                                e.Negated = true;
+                                productions.Push(new Production<string>(condition, e));
+                            }
+
+                            return new[] { condition };
+                        }
+                    }
+                    //Base -> ( ? either then either '!' or '=' then Regex )
+                    else
+                    {
+                        Terminal<Token<string>> negationTerm = currentBranch.Children[2].Value as Terminal<Token<string>>;
+                        NonTerminal<Token<string>> regex = currentBranch.Children[3].Value as NonTerminal<Token<string>>;
+                        NonTerminal<string> nt = new NonTerminal<string>(getNewZeroWidthName());
+                        if (negationTerm.InnerValue.Value.Equals("!"))
+                        {
+                            GrammarElement<string>[] elements = buildRegexBranch(currentBranch.Children[3], productions, !negated, false);
+                            productions.Push(new Production<string>(nt, elements));
+                        }
+                        //Not negated
+                        else
+                        {
+                            GrammarElement<string>[] elements = buildRegexBranch(currentBranch.Children[3], productions, negated, false);
+
+                            productions.Push(new Production<string>(nt, elements));
+
+                            
+                        }
+                        return new[] { nt };
                     }
                 }
+
             }
             return new GrammarElement<string>[0];
         }
 
-        private Terminal<string>[] buildLiteralRangeBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions)
+
+
+        private Terminal<string>[] buildLiteralRangeBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions, bool negated, bool keep)
         {
             //LiteralRange -> AnyLiteral
             if (currentBranch.Children.Count == 1)
             {
-                return buildAnyLiteralBranch(currentBranch.Children[0], productions);
+                return buildAnyLiteralBranch(currentBranch.Children[0], productions, negated, keep);
             }
             //LiteralRange -> AnyLiteral - AnyLiteral
             else
             {
                 List<Terminal<string>> elements = new List<Terminal<string>>();
-                var first = buildAnyLiteralBranch(currentBranch.Children[0], productions).First();
-                var last = buildAnyLiteralBranch(currentBranch.Children[1], productions).First();
+                var first = buildAnyLiteralBranch(currentBranch.Children[0], productions, negated, keep).First();
+                var last = buildAnyLiteralBranch(currentBranch.Children[1], productions, negated, keep).First();
 
                 int dir = first.InnerValue[0] - last.InnerValue[0];
 
@@ -584,7 +639,7 @@ namespace Parser.RegularExpressions
                     for (int i = last.InnerValue[0]; i <= first.InnerValue[0]; i++)
                     {
                         //add each character between the first and last character in the group.
-                        elements.Add(new Terminal<string>(((char)i).ToString()));
+                        elements.Add(new Terminal<string>(((char)i).ToString(), keep, negated));
                     }
                 }
                 else if (dir < 0)
@@ -593,13 +648,13 @@ namespace Parser.RegularExpressions
                     for (int i = first.InnerValue[0]; i <= last.InnerValue[0]; i++)
                     {
                         //add each character between the last and first character in the group.
-                        elements.Add(new Terminal<string>(((char)i).ToString()));
+                        elements.Add(new Terminal<string>(((char)i).ToString(), keep, negated));
                     }
                 }
                 else
                 {
                     //add the first/last element because they are the same
-                    elements.Add(new Terminal<string>(first.InnerValue));
+                    elements.Add(new Terminal<string>(first.InnerValue, keep, negated));
                 }
 
                 return elements.Distinct().ToArray();
@@ -612,12 +667,12 @@ namespace Parser.RegularExpressions
         /// <param name="parseTreebranch"></param>
         /// <param name="productions"></param>
         /// <returns>A list of grammar elements that represent the grammar elemetns contained in this LiteralLst</returns>
-        private Terminal<string>[] buildLiteralLstBranch(ParseTree<Token<string>>.ParseTreebranch parseTreebranch, Stack<Production<string>> productions)
+        private Terminal<string>[] buildLiteralLstBranch(ParseTree<Token<string>>.ParseTreebranch parseTreebranch, Stack<Production<string>> productions, bool negated, bool keep)
         {
             //LiteralLst -> LiteralRange
             if (parseTreebranch.Children.Count == 1)
             {
-                return buildLiteralRangeBranch(parseTreebranch.Children[0], productions);
+                return buildLiteralRangeBranch(parseTreebranch.Children[0], productions, negated, keep);
             }
             //LiteralLst -> LiteralLst LiteralRange
             else
@@ -625,8 +680,8 @@ namespace Parser.RegularExpressions
                 //if (((NonTerminal<Token<string>>)parseTreebranch.Children[0].Value).Name.Equals("LiteralLst"))
                 //{
                 List<Terminal<string>> elements = new List<Terminal<string>>();
-                elements.AddRange(buildLiteralLstBranch(parseTreebranch.Children[0], productions));
-                elements.AddRange(buildLiteralRangeBranch(parseTreebranch.Children[1], productions));
+                elements.AddRange(buildLiteralLstBranch(parseTreebranch.Children[0], productions, negated, keep));
+                elements.AddRange(buildLiteralRangeBranch(parseTreebranch.Children[1], productions, negated, keep));
 
                 return elements.Distinct().ToArray();
                 //}
@@ -670,7 +725,7 @@ namespace Parser.RegularExpressions
             }
         }
 
-        private Terminal<string>[] buildAnyLiteralBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions)
+        private Terminal<string>[] buildAnyLiteralBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions, bool negated, bool keep)
         {
             //The index at witch to start taking elements, either 0 or 1(to prevent including '\')
             int startIndex = 0;
@@ -679,7 +734,7 @@ namespace Parser.RegularExpressions
                 startIndex = currentBranch.Children[0].Value.InnerValue.Value == @"\" ? 1 : 0;
             }
 
-            return currentBranch.Children.Skip(startIndex).Select<ParseTree<Token<string>>.ParseTreebranch, Terminal<string>>(a => new Terminal<string>(a.Value.InnerValue.Value)).ToArray();
+            return currentBranch.Children.Skip(startIndex).Select<ParseTree<Token<string>>.ParseTreebranch, Terminal<string>>(a => new Terminal<string>(a.Value.InnerValue.Value, keep, negated)).ToArray();
         }
 
         /// <summary>
@@ -688,7 +743,7 @@ namespace Parser.RegularExpressions
         /// <param name="currentBranch"></param>
         /// <param name="productions"></param>
         /// <returns></returns>
-        private GrammarElement<string>[] buildTermLstBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions)
+        private GrammarElement<string>[] buildTermLstBranch(ParseTree<Token<string>>.ParseTreebranch currentBranch, Stack<Production<string>> productions, bool negated, bool keep)
         {
             //if the current branch is of the form: TermLst -> TermLst Term
             if (currentBranch.Children.Count == 2)
@@ -696,10 +751,10 @@ namespace Parser.RegularExpressions
                 List<GrammarElement<string>> elements = new List<GrammarElement<string>>();
 
                 //Build the TermLst branch
-                elements.AddRange(buildTermLstBranch(currentBranch.Children[0], productions));
+                elements.AddRange(buildTermLstBranch(currentBranch.Children[0], productions, negated, keep));
 
                 //and then the Term branch
-                elements.AddRange(buildTermBranch(currentBranch.Children[1], productions));
+                elements.AddRange(buildTermBranch(currentBranch.Children[1], productions, negated, keep));
 
                 //return the total elements generated.
                 return elements.ToArray();
@@ -707,7 +762,7 @@ namespace Parser.RegularExpressions
             //Otherwise the branch is of the form: TermLst -> Term
             else
             {
-                return buildTermBranch(currentBranch.Children[0], productions);
+                return buildTermBranch(currentBranch.Children[0], productions, negated, keep);
             }
         }
 

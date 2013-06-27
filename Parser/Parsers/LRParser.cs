@@ -16,6 +16,15 @@ namespace Parser.Parsers
     public class LRParser<T> : IGrammarParser<T>, IGraphParser<T> where T : IEquatable<T>
     {
         /// <summary>
+        /// Determines whether to take the first action (of the possible actions) through the parse table or to error.
+        /// </summary>
+        public bool TakeFirstRoute
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the end of input element.
         /// </summary>
         public Terminal<T> EndOfInputElement
@@ -71,20 +80,25 @@ namespace Parser.Parsers
         /// <param name="graph">The graph to use to return informative exceptions regarding conflicts.</param>
         public virtual void SetParseTable(ParseTable<T> value, StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
         {
-            if(value == null)
+            if (value == null)
             {
                 throw new ArgumentNullException("value");
             }
-            if(graph == null)
+            if (graph == null)
             {
                 throw new ArgumentNullException("graph");
             }
-            
+
             foreach (var colRow in value.ActionTable.Select(a =>
                 {
-                    foreach(var b in a.Value.Keys)
+                    foreach (var b in a.Value.Keys)
                     {
-                        return new {Row = a, Column = b, Value = a.Value[b]};
+                        return new
+                        {
+                            Row = a,
+                            Column = b,
+                            Value = a.Value[b]
+                        };
                     }
                     return null;
                 }))
@@ -101,17 +115,17 @@ namespace Parser.Parsers
                     ////if we have a shift-reduce conflict
                     if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
                     {
-                        LRItem<T>[] items = node.Value.Where(a => 
+                        LRItem<T>[] items = node.Value.Where(a =>
                         {
                             GrammarElement<T> e = a.GetNextElement();
-                            if(e != null)
+                            if (e != null)
                             {
                                 return e.Equals(colRow.Column);
                             }
                             return false;
                         }).Concat(colRow.Value.OfType<ReduceAction<T>>().Select(a => ((ReduceAction<T>)a).ReduceItem)).ToArray();
 
-                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.SHIFT_REDUCE, new Collections.ColumnRowPair<int,Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
+                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.SHIFT_REDUCE, new Collections.ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
 
                         //then check for a reduce-reduce conflict
                         if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
@@ -183,14 +197,24 @@ namespace Parser.Parsers
 
                     if (actions != null)
                     {
+                        ParserAction<T> action;
                         //SHIFT_REDUCE or REDUCE_REDUCE
                         if (actions.Length > 1)
                         {
-                            KeyValuePair<int, GrammarElement<T>> currentState = stateStack.Peek();
-                            return new ParseResult<T>(false, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(currentBranches)), stateStack.ToList(), new MultipleActionsParseError<T>("", currentState.Key, item, i, actions.ToArray()));
+                            if (!TakeFirstRoute)
+                            {
+                                KeyValuePair<int, GrammarElement<T>> currentState = stateStack.Peek();
+                                return new ParseResult<T>(false, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(currentBranches)), stateStack.ToList(), new MultipleActionsParseError<T>("", currentState.Key, item, i, actions.ToArray()));
+                            }
+                            else
+                            {
+                                action = actions.First();
+                            }
                         }
-
-                        ParserAction<T> action = actions.SingleOrDefault();
+                        else
+                        {
+                            action = actions.SingleOrDefault();
+                        }
                         //if there is an action
                         if (action != null)
                         {

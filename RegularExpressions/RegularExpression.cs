@@ -8,6 +8,7 @@ using LexicalAnalysis;
 using Parser.Parsers;
 using LexicalAnalysis.Definitions;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Parser.RegularExpressions
 {
@@ -50,7 +51,7 @@ namespace Parser.RegularExpressions
         /// <summary>
         /// The parser used to parse input that should match regular expressions.
         /// </summary>
-        GLRParser<string> parser;
+        LRParser<string> parser;
 
         /// <summary>
         /// Gets the regular expression pattern used by this Regex matcher.
@@ -71,8 +72,8 @@ namespace Parser.RegularExpressions
 
             this.grammar = (new RegexBuilder()).BuildGrammar(pattern);
 
-            this.parser = new GLRParser<string>();
-            parser.SetParseTable(grammar);
+            this.parser = new LRParser<string>();
+            parser.SetParseTable(grammar.Reverse());
         }
 
         /// <summary>
@@ -83,10 +84,15 @@ namespace Parser.RegularExpressions
         public bool IsMatch(string input)
         {
             //List<Terminal<string>> terminals = new List<Terminal<string>>();
+            Stopwatch w = Stopwatch.StartNew();
+            var result = parser.ParseAST(input.Select(a => new Terminal<string>(a.ToString())).Reverse());
+            w.Stop();
+            Stopwatch sw = Stopwatch.StartNew();
+            Regex r = new Regex(@"\w+er");
+            r.IsMatch(input);
+            sw.Stop();
 
-            var result = parser.ParseAbstractSyntaxTrees(input.Select(a => new Terminal<string>(a.ToString())));
-
-            return result.Any(a => a.Success);
+            return result.Success;
         }
     }
 }

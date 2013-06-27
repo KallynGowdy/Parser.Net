@@ -8,6 +8,7 @@ namespace Parser.Grammar
     /// <summary>
     /// Defines a relation between a non terminal element and several terminal/non-terminal elements.
     /// </summary>
+    [Serializable]
     public class Production<T>
     {
         /// <summary>

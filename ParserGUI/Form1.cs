@@ -21,6 +21,7 @@ using Parser.Parsers.AllInOne;
 using Parser;
 using Parser.RegularExpressions;
 using System.Xml;
+using GrammarBuilder;
 
 namespace ParserGUI
 {
@@ -35,7 +36,30 @@ namespace ParserGUI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            r = new RegularExpression(txtCFG.Text);
+            GrammarBuilder<string> builder = new GrammarBuilder<string>();
+            ContextFreeGrammar<string> cfg = builder.Build(a =>
+            {
+                a.Form(b =>
+                {
+                    return new[]
+                    {
+                        "{".ToTerminal(),
+                        b.Form(c => 
+                        {
+                            return new []
+                            { 
+                                "b".ToTerminal(),
+                                c.Not.OneOf(() =>  "1".ToTerminal(), () => "2".ToTerminal(), () => "3".ToTerminal()),
+                                "b".ToTerminal()
+                            };
+                        }),
+                        "}".ToTerminal()  
+                        
+                    };
+                });
+            });
+            LRParser<string> parser = new LRParser<string>();
+            parser.SetParseTable(cfg);
 
             //(new Thread(aio)).Start(txtCFG.Text);
         }
@@ -345,7 +369,7 @@ namespace ParserGUI
                     //new Production<string>("Anything".ToNonTerminal(), 
 
                 }
-            ); 
+            );
 
 
             long totalParseTime = 0;
@@ -410,7 +434,7 @@ namespace ParserGUI
             w.Stop();
 
             var sw = Stopwatch.StartNew();
-            using(Stream s = File.Create(string.Format("{0}/ParseTable.ptbl", AppDomain.CurrentDomain.BaseDirectory)))
+            using (Stream s = File.Create(string.Format("{0}/ParseTable.ptbl", AppDomain.CurrentDomain.BaseDirectory)))
             {
                 table.WriteToStream(s);
             }

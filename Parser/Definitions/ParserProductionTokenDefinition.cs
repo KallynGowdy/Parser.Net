@@ -25,7 +25,7 @@ namespace Parser.Definitions
             Definitions = parserTokenDefinitionCollection;
         }
 
-        public List<Production<string>> productions;
+        List<Production<string>> productions;
 
         /// <summary>
         /// Gets or sets the productions matching TokenTypes as terminals.

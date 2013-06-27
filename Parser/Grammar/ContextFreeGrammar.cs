@@ -102,6 +102,21 @@ namespace Parser.Grammar
         Dictionary<LRItem<T>, IEnumerable<LRItem<T>>> closures = new Dictionary<LRItem<T>, IEnumerable<LRItem<T>>>();
 
         /// <summary>
+        /// Reverses the grammar such that, when created into a parse table, can parse input backwards.
+        /// </summary>
+        /// <returns>A new context free grammar object that represents the reversed form of this grammar.</returns>
+        public ContextFreeGrammar<T> Reverse()
+        {
+            //Copy the grammar.
+            ContextFreeGrammar<T> grammar = this.DeepCopy();
+            foreach(Production<T> production in grammar.Productions)
+            {
+                production.DerivedElements.Reverse();
+            }
+            return grammar;
+        }
+
+        /// <summary>
         /// Gets the LR(1) closure of the given item.
         /// </summary>
         /// <param name="item"></param>
