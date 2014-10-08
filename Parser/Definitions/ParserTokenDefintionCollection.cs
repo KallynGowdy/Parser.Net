@@ -45,10 +45,10 @@ namespace Parser.Definitions
         }
 
         /// <summary>
-        /// Gets the regular TokenDefinition objects from this collection.
+        /// Gets the regular TokenDefinition objects from this collection that are used in a lexer.
         /// </summary>
         /// <returns></returns>
-        public TokenDefinitionCollection<T> GetNormalDefinitions()
+        public TokenDefinitionCollection<T> GetLexerDefinitions()
         {
             return new TokenDefinitionCollection<T>(Definitions.Cast<TokenDefinition<T>>());
         }

@@ -91,6 +91,10 @@ namespace LexicalAnalysis
             ThrowSyntaxErrors = true;
         }
 
+        /// <summary>
+        /// Sets the definitions to the given definitions and builds the regular expression that encapsulates all of the definitions in one.
+        /// </summary>
+        /// <param name="definitions"></param>
         public void SetDefintions(TokenDefinitionCollection<string> definitions)
         {
             this.Definitions = definitions;
@@ -149,7 +153,7 @@ namespace LexicalAnalysis
                     if (g.Success)
                     {
                         //if we have not reached the last group. if we have then a Syntax error has occured.
-                        if (currentIndex != int.MaxValue - Definitions.Count)
+                        if (currentIndex > int.MaxValue - Definitions.Count)
                         {
                             tokens.Add(Definitions[i].GetToken(g));
                         }

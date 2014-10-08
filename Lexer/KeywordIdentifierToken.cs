@@ -9,6 +9,7 @@ namespace LexicalAnalysis
     /// Defines a keyword whose token type is the configured token type.
     /// Equality is first determined by keyword, and then by token type.
     /// </summary>
+    [Serializable]
     public class KeywordIdentifierToken : KeywordToken, IEquatable<KeywordIdentifierToken>
     {
 

@@ -8,6 +8,7 @@ using System.Xml;
 using Parser.Collections;
 using Parser.Grammar;
 using Parser.Parsers;
+using System.IO.Compression;
 
 namespace Parser.StateMachine
 {
@@ -67,6 +68,7 @@ namespace Parser.StateMachine
             //{
             //    typeof(DelegateSerializationHolder
             //});
+
             using (XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings
             {
                 Indent = true
@@ -74,6 +76,7 @@ namespace Parser.StateMachine
             {
                 ser.WriteObject(writer, this);
             }
+
         }
 
         /// <summary>
@@ -93,6 +96,7 @@ namespace Parser.StateMachine
                 typeof(Terminal<T>),
                 typeof(NonTerminal<T>)
             });
+
             return (ParseTable<T>)ser.ReadObject(stream);
         }
 
@@ -112,24 +116,57 @@ namespace Parser.StateMachine
                 {
                     throw new ArgumentNullException("nextInput");
                 }
+
                 if (nextInput is Terminal<T>)
                 {
-                    //if the given state and next input are in the table
-                    if (ActionTable.Any(a => a.Key.Row == currentState && a.Key.Column.Equals(nextInput)))
+                    //if the given state is in the table
+                    if (ActionTable.ContainsKey(currentState))
                     {
-                        //return the action
-                        return ActionTable[currentState, (Terminal<T>)nextInput].ToArray();
+                        List<ParserAction<T>> actions = new List<ParserAction<T>>();
+                        //if the next input is in the table
+                        if (ActionTable[currentState].ContainsKey((Terminal<T>)nextInput))
+                        {
+                            Terminal<T> key = ActionTable[currentState].GetKey((Terminal<T>)nextInput);
+
+                            //if the stored column is not negated
+                            if (!key.Negated)
+                            {
+                                //return the action
+                                actions.AddRange(ActionTable[currentState][key].ToArray());
+                            }
+                        }
+                        //Negated values will never match the end of input element
+                        if (!((Terminal<T>)nextInput).EndOfInput)
+                        {
+                            //Negated values act as an 'and' clause instead of an 'or' clause
+                            //input is not 'a' and input is not 'b', instead of input is not 'a' or input is not 'b'
+
+                            //If all of the negated keys do not equal the next input.
+                            if (ActionTable[currentState].All(a => (a.Key.Negated && !a.Key.Equals(nextInput)) || !a.Key.Negated))
+                            {
+
+                                //if the state is contained in the table, and if there is a negated input element that does not match the given input
+                                //A Terminal with a null value that is negated will match anything except END_OF_INPUT.
+                                var result = ActionTable[currentState].FirstOrDefault(a => a.Key.Negated && !a.Key.Equals(nextInput));
+                                if (!result.Equals(default(KeyValuePair<Terminal<T>, List<ParserAction<T>>>)))
+                                {
+                                    actions.AddRange(result.Value.ToArray());
+                                }
+                            }
+                        }
+                        return actions.ToArray();
                     }
                 }
                 else
                 {
                     //if the given state and next input are in the table
-                    if (GotoTable.Any(a => a.Key.Row == currentState && a.Key.Column.Equals(nextInput)))
+                    if (GotoTable.ContainsKey(currentState) && GotoTable[currentState].ContainsKey((NonTerminal<T>)nextInput))
                     {
                         //return a new shift action representing the goto movement.
                         return new[] { new ShiftAction<T>(this, GotoTable[currentState, (NonTerminal<T>)nextInput].Value) };
                     }
                 }
+
                 //the item does not exist in the table, return null.
                 return null;
             }
@@ -144,7 +181,7 @@ namespace Parser.StateMachine
         private void addAction(Terminal<T> element, int currentState, params ParserAction<T>[] actions)
         {
             //if the column already exists
-            if (ActionTable.Keys.Any(a => a.Column == element && a.Row == currentState))
+            if (ActionTable.ContainsKey(currentState, element))
             {
                 //add the actions
                 ActionTable[currentState, element].AddRange(actions);
@@ -165,7 +202,7 @@ namespace Parser.StateMachine
         private void addGoto(NonTerminal<T> element, int currentState, int @goto)
         {
             //if the column already exists
-            if (GotoTable.Keys.Any(a => a.Column.Equals(element) && a.Row == currentState))
+            if (GotoTable.ContainsKey(currentState, element))
             {
                 //add the goto state
                 GotoTable[currentState, element] = @goto;
@@ -330,7 +367,7 @@ namespace Parser.StateMachine
             }
         }
 
-        
+
         /// <summary>
         /// Creates a new parse table with the given states as rows, and possibleTerminals with possibleNonTerminals as columns for the Action and Goto tables respectively.
         /// </summary>
@@ -355,6 +392,24 @@ namespace Parser.StateMachine
                 {
                     GotoTable.Add(s, nt, null);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Creates a new Parse Table from the given State Graph.
+        /// </summary>
+        /// <param name="graph"></param>
+        public ParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        {
+            if (graph.Root != null && graph.Root.Value.Length > 0)
+            {
+                this.ActionTable = new Table<int, Terminal<T>, List<ParserAction<T>>>();
+                this.GotoTable = new Table<int, NonTerminal<T>, int?>();
+                buildParseTable(graph, graph.Root.Value.First().LeftHandSide);
+            }
+            else
+            {
+                throw new ArgumentException("The given graph must have at least one item in the root node.", "graph");
             }
         }
     }

@@ -10,14 +10,14 @@ namespace Parser.Grammar
     /// Defines an element that has one or more terminal elements that represent it.
     /// Equality is determined by the name of the Non-Terminal.
     /// </summary>
-    [DataContract(Name="NonTerminal")]
+    [DataContract(Name = "NonTerminal")]
     [Serializable]
     public class NonTerminal<T> : GrammarElement<T>, IEquatable<NonTerminal<T>>
     {
         /// <summary>
         /// Gets the name of this Non-Terminal.
         /// </summary>
-        [DataMember(Name="Name")]
+        [DataMember(Name = "Name")]
         public string Name
         {
             get;
@@ -41,7 +41,8 @@ namespace Parser.Grammar
             this.Name = name;
         }
 
-        public NonTerminal(string name, bool keep) : base(keep)
+        public NonTerminal(string name, bool keep)
+            : base(keep)
         {
             this.Name = name;
         }
@@ -71,7 +72,7 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return Name.GetHashCode();
+            return Name.GetHashCode() ^ Negated.GetHashCode();
         }
 
         /// <summary>
@@ -98,7 +99,7 @@ namespace Parser.Grammar
         /// <returns></returns>
         public bool Equals(NonTerminal<T> obj)
         {
-            return ((NonTerminal<T>)obj).Name.Equals(this.Name);
+            return obj.Name.Equals(this.Name);
         }
 
         /// <summary>

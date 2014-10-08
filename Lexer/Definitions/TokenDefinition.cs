@@ -62,7 +62,6 @@ namespace LexicalAnalysis.Definitions
         /// </summary>
         /// <param name="pattern"></param>
         /// <param name="typeToMatch"></param>
-        public TokenDefinition(string pattern, string typeToMatch)
         protected TokenDefinition(string pattern, string typeToMatch)
         {
             //build a new regex object from the given pattern, define 

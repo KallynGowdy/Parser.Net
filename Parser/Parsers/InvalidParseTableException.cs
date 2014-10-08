@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Parser.Grammar;
 using Parser.StateMachine;
+using System.Security.Permissions;
 
 namespace Parser.Parsers
 {

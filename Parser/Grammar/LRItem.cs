@@ -229,12 +229,33 @@ namespace Parser.Grammar
         }
 
         /// <summary>
+        /// Gets the hash code for the production elements.
+        /// </summary>
+        /// <returns></returns>
+        private int getProductionHash()
+        {
+            int hash = unchecked(521 * ProductionElements.Length + 48976213);
+            for(int i = 0; i < ProductionElements.Length; i++)
+            {
+                hash = unchecked((ProductionElements[i].GetHashCode() ^ hash) * (i + 1));
+            }
+            return hash;
+        }
+
+        /// <summary>
         /// Gets the hash code for this object.
         /// </summary>
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return ProductionElements.GetHashCode() ^ DotIndex ^ LookaheadElement.GetHashCode();
+            if (LookaheadElement != null)
+            {
+                return getProductionHash() ^ DotIndex ^ LookaheadElement.GetHashCode();
+            }
+            else
+            {
+                return getProductionHash() ^ DotIndex;
+            }
         }
 
         /// <summary>

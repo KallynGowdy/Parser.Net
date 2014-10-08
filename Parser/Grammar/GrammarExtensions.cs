@@ -34,7 +34,7 @@ namespace Parser.Grammar
         /// <typeparam name="T"></typeparam>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static Table<T1, T2, T> ToTable<T1, T2, T>(this IDictionary<ColumnRowPair<T1, T2>, T> collection) where T1 : IEquatable<T1> where T2 : IEquatable<T2>
+        public static Table<T1, T2, T> ToTable<T1, T2, T>(this IDictionary<T1, KeyedDictionary<T2, T>> collection) where T1 : IEquatable<T1> where T2 : IEquatable<T2>
         {
             return new Table<T1,T2,T>(collection);
         }

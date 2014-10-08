@@ -12,12 +12,25 @@ namespace Parser.Grammar
     public class Terminal<T> : GrammarElement<T>, ITerminal<T>, IEquatable<Terminal<T>> where T : IEquatable<T>
     {
 
-        public Terminal(T value, bool keep = true)
+        public Terminal(T value, bool keep = true, bool negated = false)
             : base(value)
         {
             this.Keep = keep;
+            this.Negated = negated;
         }
 
+        
+
+        /// <summary>
+        /// Gets whether this terminal element is an end of input element.
+        /// </summary>
+        public bool EndOfInput
+        {
+            get
+            {
+                return InnerValue == null && !Negated;
+            }
+        }
 
         /// <summary>
         /// Gets a unique interger value that describes this object that is garenteed not to change.
@@ -25,7 +38,14 @@ namespace Parser.Grammar
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            if (InnerValue != null)
+            {
+                return base.GetHashCode();
+            }
+            else
+            {
+                return Negated.GetHashCode();
+            }
         }
 
 
@@ -61,7 +81,7 @@ namespace Parser.Grammar
         /// </summary>
         /// <param name="terminal"></param>
         /// <returns></returns>
-        public bool Equals(ITerminal<T> terminal)
+        public virtual bool Equals(ITerminal<T> terminal)
         {
             if (terminal != null)
             {
@@ -78,6 +98,7 @@ namespace Parser.Grammar
             {
                 return (object)this.InnerValue == (object)terminal;
             }
+
         }
 
         /// <summary>
@@ -105,15 +126,34 @@ namespace Parser.Grammar
         {
             if (this.InnerValue != null)
             {
-                return InnerValue.ToString();
+                if (this.Negated)
+                {
+                    return string.Format("Not {0}", InnerValue.ToString());
+                }
+                else
+                {
+                    return InnerValue.ToString();
+                }
             }
             else
             {
-                return "END_OF_INPUT";
+                if (!this.Negated)
+                {
+                    return "END_OF_INPUT";
+                }
+                else
+                {
+                    return "Anything";
+                }
             }
         }
 
-        public bool Equals(Terminal<T> other)
+        /// <summary>
+        /// Determines if this terminal element equals the given other element.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public virtual bool Equals(Terminal<T> other)
         {
             return Equals((ITerminal<T>)other);
         }
