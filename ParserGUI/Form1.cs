@@ -18,6 +18,7 @@ using System.Threading;
 using System.IO;
 using System.IO.Compression;
 using Parser.Parsers.AllInOne;
+using Parser;
 
 namespace ParserGUI
 {
@@ -31,8 +32,6 @@ namespace ParserGUI
         private void button1_Click(object sender, EventArgs e)
         {
             (new Thread(aio)).Start(txtCFG.Text);
-
-
 
             #region Parse Table Builder
             //List<dynamic> gridCollection = new List<dynamic>();
@@ -124,7 +123,35 @@ namespace ParserGUI
             #endregion
         }
 
-        #region Keywords
+        IEnumerable<Token<string>> tokens;
+
+        Lexer lexer;
+
+        /// <summary>
+        /// Concats each individual element in the given dynamic object to produce a single string representing all elements.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        private string concatArray(dynamic a, string seperator = " ")
+        {
+            if (a is IEnumerable<dynamic>)
+            {
+                StringBuilder b = new StringBuilder();
+                foreach (dynamic e in a)
+                {
+                    b.Append(e.ToString());
+                    b.Append(seperator);
+                }
+                return b.ToString();
+            }
+            else
+            {
+                return a.ToString();
+            }
+        }
+
+        AIOLRParser<string> aioParser;
+
         static readonly string[] CSharpKeywords = new string[] 
         {
             "new",
@@ -208,83 +235,16 @@ namespace ParserGUI
             "while",
             "string"
         };
-        #endregion
 
-        private void NewMethod()
+        private static IEnumerable<ParserTokenDefinition<string>> GetKeywords(IEnumerable<string> keywords)
         {
-            //productions.ToArray());
-
-            //    var closure = grammar.Closure(grammar.Productions[0]);
-
-            //string text = File.ReadAllText("../../Program.cs");
-
-
-
-            #region Definitions
-            TokenDefinitionCollection<string> collection = new TokenDefinitionCollection<string>
+            List<ParserTokenDefinition<string>> words = new List<ParserTokenDefinition<string>>(keywords.Count());
+            foreach (string keyword in keywords)
             {
-                Definitions = new List<TokenDefinition<string>>
-                {
-                    //precedence is based on the order that they are defined
-                    new StringedTokenDefinition(String.Format(@"//.*(?={0})|/\*.*\*/", Environment.NewLine), "COMMENT"),
-                    new StringedTokenDefinition(@"#\w+", "PREPROCESSOR_Directive"),
-                    new StringedTokenDefinition(@"(\b|^)-?[\d]+(\b|$)", "NUMBER"),
-                    new StringedTokenDefinition(@"[\s\n]+", "WHITESPACE"),
-                    new StringedTokenDefinition(KeywordDefinitionBuilder.GetPattern(CSharpKeywords), "KEYWORD"),
-                    new StringedTokenDefinition(@"(@""([^""]|"""")*""|""(\\.|[^\\""])*"")", "STRING"),
-                    new StringedTokenDefinition(@"'.'|'\\['""\\0abfnrtuUxv]'", "CHARACTER_STRING"),
-                    new StringedTokenDefinition(@"\.", "DOT"),
-                    new StringedTokenDefinition(@"{|\(", "OPEN_BRACE"),
-                    new StringedTokenDefinition(@"}|\)", "CLOSE_BRACE"),
-                    new StringedTokenDefinition(@";", "SEMICOLIN"),
-                    new StringedTokenDefinition(@",", "COMMA"),
-                    new StringedTokenDefinition(@"=", "SET_OPERATOR"),
-                    new StringedTokenDefinition(@"==", "EQUALS_OPERATOR"),
-                    new StringedTokenDefinition(@"!=", "NOT_EQUALS_OPERATOR"),
-                    new StringedTokenDefinition(@"<=", "LESS_THAN_OR_EQUAL"),
-                    new StringedTokenDefinition(@">=", "GREATER_THAN_OR_EQUAL"),
-                    new StringedTokenDefinition(@"<", "LEFT_CARROT"),
-                    new StringedTokenDefinition(@">", "RIGHT_CARROT"),
-                    new StringedTokenDefinition(@"\+", "PLUS_OPERATOR"),
-                    new StringedTokenDefinition(@"-", "MINUS_OPERATOR"),
-                    new StringedTokenDefinition(@"\*", "TIMES_OPERATOR"),
-                    new StringedTokenDefinition(@"/", "DIVIDE_OPERATOR"),
-                    new StringedTokenDefinition(@"\[", "LEFT_BRACKET"),
-                    new StringedTokenDefinition(@"\]", "RIGHT_BRACKET"), 
-                    new StringedTokenDefinition(@"\b[a-zA-Z@_][\w_]*\b", "IDENTIFIER")
-                }
-            };
-            #endregion
-        }
-
-        IEnumerable<Token<string>> tokens;
-
-        Lexer lexer;
-
-        /// <summary>
-        /// Concats each individual element in the given dynamic object to produce a single string representing all elements.
-        /// </summary>
-        /// <param name="a"></param>
-        /// <returns></returns>
-        private string concatArray(dynamic a, string seperator = " ")
-        {
-            if (a is IEnumerable<dynamic>)
-            {
-                StringBuilder b = new StringBuilder();
-                foreach (dynamic e in a)
-                {
-                    b.Append(e.ToString());
-                    b.Append(seperator);
-                }
-                return b.ToString();
+                words.Add(new KeywordParserTokenDefinition(keyword, true));
             }
-            else
-            {
-                return a.ToString();
-            }
+            return words;
         }
-
-        AIOLRParser<string> aioParser;
 
         private void aio(object p)
         {
@@ -364,85 +324,505 @@ namespace ParserGUI
             #region Def
             //C# Definition
             ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-            {
+            (
+                new ParserTokenDefinitionCollection<string>
+                (
+                    new List<ParserTokenDefinition<string>>
+                    (
+            #region Keywords
+                ////Matches to the 'public' keyword, we should keep this keyword.
+                //new KeywordParserTokenDefinition("public", true),
+                ////Matches to the 'private' keyword, we should keep this keyword.
+                //new KeywordParserTokenDefinition("private", true),
+                ////Matches to the 'protected' keyword, we should keep this keyword.
+                //new KeywordParserTokenDefinition("protected", true),
+                //new KeywordParserTokenDefinition("internal", true),
 
-                Definitions = new ParserTokenDefinitionCollection<string>
+                        ////Matches to the 'void' keyword
+                //new KeywordParserTokenDefinition("void", true),
+
+                        ////Matches to the 'null' keyword
+                //new KeywordParserTokenDefinition("null", true),
+                //new KeywordParserTokenDefinition("bool", true),
+                //new KeywordParserTokenDefinition("int", true),
+                //new KeywordParserTokenDefinition("short", true),
+                //new KeywordParserTokenDefinition("float", true),
+                //new KeywordParserTokenDefinition("double", true),
+                //new KeywordParserTokenDefinition("decimal", true),
+                //new KeywordParserTokenDefinition("uint", true),
+                //new KeywordParserTokenDefinition("ulong", true),
+                //new KeywordParserTokenDefinition("long", true),
+                //new KeywordParserTokenDefinition("byte", true),
+                //new KeywordParserTokenDefinition("sbyte", true),
+                //new KeywordParserTokenDefinition("char", true),
+                //new KeywordParserTokenDefinition("string", true),
+
+                        ////Matches to the 'class' keyword
+                //new KeywordParserTokenDefinition("class", true),
+                //new KeywordParserTokenDefinition("struct", true),
+                //new KeywordParserTokenDefinition("enum", true),
+                //new KeywordParserTokenDefinition("interface", true),
+                //new KeywordParserTokenDefinition("abstract", true),
+                //new KeywordParserTokenDefinition("sealed", true),
+
+                        ////Matches to the 'true' keyword
+                //new KeywordParserTokenDefinition("true", true),
+                //new KeywordParserTokenDefinition("false", true),
+
+                        ////Matches to the 'as' keyword
+                //new KeywordParserTokenDefinition("as", true),
+                //new KeywordParserTokenDefinition("is", true),
+
+                        ////Matches to the 'if' keyword
+                //new KeywordParserTokenDefinition("if", true),
+                //new KeywordParserTokenDefinition("else", true),
+                //new KeywordParserTokenDefinition("do", true),
+                //new KeywordParserTokenDefinition("while", true),
+                //new KeywordParserTokenDefinition("break", true),
+                //new KeywordParserTokenDefinition("for", true),
+                //new KeywordParserTokenDefinition("foreach", true),
+                //new KeywordParserTokenDefinition("try", true),
+                //new KeywordParserTokenDefinition("catch", true),
+                //new KeywordParserTokenDefinition("finally", true),
+                //new KeywordParserTokenDefinition("switch", true),
+                //new KeywordParserTokenDefinition("case", true),
+                //new KeywordParserTokenDefinition("goto", true),
+                //new KeywordParserTokenDefinition("continue", true),
+
+                        ////Matches to the 'return' keyword
+                //new KeywordParserTokenDefinition("return", true), 
+
+                        ////Matches to the 'delegate' keyword
+                //new KeywordParserTokenDefinition("delegate", true),
+
+                        ////Matches to the 'static' keyword
+                //new KeywordParserTokenDefinition("static", true),
+                ////Matches to the 'const' keyword
+                //new KeywordParserTokenDefinition("const", true),
+            #endregion
+
+                        GetKeywords(CSharpKeywords).Concat(
+
+                        new ParserTokenDefinition<string>[]
+                        {
+                            new KeywordIdentifierParserTokenDefinition("get", true, "Id"),
+                            new KeywordIdentifierParserTokenDefinition("set", true, "Id"),
+                            //Matches to a word of arbitrary length as an identifier, we should keep this.
+                            new StringedParserTokenDefinition(@"\b\w+\b", "Id", true),
+                            //matches to an opening parenthese, we should discard this token.
+                            new StringedParserTokenDefinition(@"\(","(", false),
+                            //matches to an closing parenthese, we should discard this token.
+                            new StringedParserTokenDefinition(@"\)", ")", false),
+                            //matches to a semicolin, we should discard this token.
+                            new StringedParserTokenDefinition(@";", ";", false),
+                            //matches to an opening curly-brace, we should discard this token.
+                            new StringedParserTokenDefinition(@"\{", "{", false),
+                            //matches to a closing curly-brace, we should discard this token.
+                            new StringedParserTokenDefinition(@"\}", "}", false),
+                            //matches to a comma, we should discard this token
+                            new StringedParserTokenDefinition(@",", ",", false),
+                            //matches to the plus sign, we should keep this token
+                            new StringedParserTokenDefinition(@"\+", "+", true),
+                            //matches to the minus sign, we should keep this token
+                            new StringedParserTokenDefinition(@"\-", "-", true),
+                            //matches to the times sign, we should keep this token
+                            new StringedParserTokenDefinition(@"\*", "*", true),
+                            //matches to the division sign, we should keep this token
+                            new StringedParserTokenDefinition(@"/", "/", true),
+                            //matches to the modulus operator, we should keep this token
+                            new StringedParserTokenDefinition(@"%", "%", true),
+                            //matches to the assignment operator, we should keep this token
+                            new StringedParserTokenDefinition(@"=", "=", true),
+                            new StringedParserTokenDefinition(@"<", "<", false),
+                            new StringedParserTokenDefinition(@">", ">", false),
+                            new StringedParserTokenDefinition(@":", ":", false),
+                        })
+                    )
+                ),
+                new List<Production<string>>
                 {
-                    Definitions = new List<ParserTokenDefinition<string>>
-                    {
-                        //Matches to the 'public' keyword, we should keep this keyword.
-                        new KeywordParserTokenDefinition("public", true),
-                        //Matches to the 'private' keyword, we should keep this keyword.
-                        new KeywordParserTokenDefinition("private", true),
-                        //Matches to the 'protected' keyword, we should keep this keyword.
-                        new KeywordParserTokenDefinition("protected", true),
-                        //Matches to a word of arbitrary length as an identifier, we should keep this.
-                        new StringedParserTokenDefinition(@"\b\w+\b", "Id", true),
-                        //matches to an opening parenthese, we should discard this token.
-                        new StringedParserTokenDefinition(@"\(","(", false),
-                        //matches to an closing parenthese, we should discard this token.
-                        new StringedParserTokenDefinition(@"\)", ")", false),
-                        //matches to a semicolin, we should discard this token.
-                        new StringedParserTokenDefinition(@";", ";", false),
-                        //matches to an opening curly-brace, we should discard this token.
-                        new StringedParserTokenDefinition(@"\{", "{", false),
-                        //matches to a closing curly-brace, we should discard this token.
-                        new StringedParserTokenDefinition(@"\}", "}", false),
-                        //matches to a comma, we should discard this token
-                        new StringedParserTokenDefinition(@",", ",", false)
-                    }
-                },
-                Productions = new List<Production<string>>
-                {
-                    //Method -> AccessMod Id ( ) { StmtLst }
-                    //new Production<string>("Method".ToNonTerminal(), "AccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
+                    //The C# language structure is split into two parts:
+                    //1. The program definitions (class definitions, method defintions, field definitions, i.e. compile-time constants)
+                    //2. The program runtime (statements that manipulate variables, fuction calls, i.e. the things that are evaluated at runtime)
+                    #region C# Context-Free-Grammar
 
-                    //Method -> AccessMod Id ( ArgLst ) { StmtLst }
-                    new Production<string>("Method".ToNonTerminal(), "AccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "ArgLst".ToNonTerminal(), ")".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
 
-                    //AccessMod -> public | private | protected
-                    new Production<string>("AccessMod".ToNonTerminal(), "public".ToTerminal()),
-                    new Production<string>("AccessMod".ToNonTerminal(), "private".ToTerminal()),
-                    new Production<string>("AccessMod".ToNonTerminal(), "protected".ToTerminal()),
+                    #region Program Definitions
 
-                    //AccessMod -> nothing
-                    new Production<string>("AccessMod".ToNonTerminal()),
+		            //Class -> ClassAccessMod class Id GenericTemplate { MemberLst }
+                    new Production<string>("Class".ToNonTerminal(), "ClassAccessMod".ToNonTerminal(), "class".ToTerminal(false), "Id".ToTerminal(), "GenericTemplate".ToNonTerminal(), "{".ToTerminal(), "MemberLst".ToNonTerminal(), "}".ToTerminal()),
+                    
+                    //Class -> ClassAccessMod class Id { MemberLst }
+                    //new Production<string>("Class".ToNonTerminal(), "ClassAccessMod".ToNonTerminal(), "class".ToTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "MemberLst".ToNonTerminal(), "}".ToTerminal()),
+                    
+                    //Constructor -> MemberAccessMod Id ( MethodArgLst ) { MethodBody }
+                    new Production<string>("Constructor".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "MethodArgLst".ToNonTerminal(), ")".ToTerminal(), "{".ToTerminal(), "MethodBody".ToNonTerminal(), "}".ToTerminal()),
 
-                    //StmtLst -> Stmt
-                    new Production<string>("StmtLst".ToNonTerminal(), "Stmt".ToNonTerminal()),
-
-                    //StmtLst -> Stmt StmtLst
-                    new Production<string>("StmtLst".ToNonTerminal(), "Stmt".ToNonTerminal(), "StmtLst".ToNonTerminal()),
-
-                    //Stmt -> Expr ;
-                    new Production<string>("Stmt".ToNonTerminal(), "Expr".ToNonTerminal(), ";".ToTerminal()),
-
-                    //Expr -> Term
-                    new Production<string>("Expr".ToNonTerminal(), "Term".ToNonTerminal()),
-
-                    //Term -> Id ( Expr )
-                    new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "Expr".ToNonTerminal(), ")".ToTerminal()),
-
-                    //Term -> Id ( )
-                    new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal()),
                     
 
+                    #region TypeName
+		            //TypeName -> Id GenericDefinition
+                    new Production<string>("TypeName".ToNonTerminal(), "Id".ToTerminal(), "GenericDefinition".ToNonTerminal()),
+                    
+                    //TypeName -> KeywordType
+                    new Production<string>("TypeName".ToNonTerminal(), "KeywordType".ToNonTerminal()), 
+	                #endregion
+
+                    #region Generics Definitions
+                    //GenericDefinition -> < GenericDefLst >
+                    new Production<string>("GenericDefinition".ToNonTerminal(), "<".ToTerminal(), "GenericDefLst".ToNonTerminal(), ">".ToTerminal()),
+
+                    //GenericDefinition -> nothing
+                    new Production<string>("GenericDefinition".ToNonTerminal()),
+
+                    //GenericDefLst -> GenericDefLst , GenericDef
+                    new Production<string>("GenericDefLst".ToNonTerminal(), "GenericDefLst".ToNonTerminal(), ",".ToTerminal(), "GenericDef".ToNonTerminal()),
+
+                    //GenericDefLst -> GenericDef
+                    new Production<string>("GenericDefLst".ToNonTerminal(), "GenericDef".ToNonTerminal()),
+
+                    //GenericDef -> TypeName
+                    new Production<string>("GenericDef".ToNonTerminal(), "TypeName".ToNonTerminal()),
+
+
+                    //Defines the productions that implement generics(i.e. type parameters)
+
+		            //GenericTemplate -> < GenericLst >
+                    new Production<string>("GenericTemplate".ToNonTerminal(), "<".ToTerminal(), "GenericLst".ToNonTerminal(), ">".ToTerminal()),
+
+                    //GenericTemplate -> nothing
+                    new Production<string>("GenericTemplate".ToNonTerminal()),
+
+                    //GenericLst -> Id
+                    new Production<string>("GenericLst".ToNonTerminal(), "Id".ToTerminal()),
+
+                    //GenericLst -> GenericLst , Id
+                    new Production<string>("GenericLst".ToNonTerminal(), "GenericLst".ToNonTerminal(), ",".ToTerminal(), "Id".ToTerminal()), 
+	                #endregion
+
+                    #region Inheritance Definitions
+                    //Defines the productions for a list of types to inherit from(e.g. className : IEnumerable)
+
+		            //InheritanceDef -> : InheritanceLst
+                    new Production<string>("InheritanceDef".ToNonTerminal(), ":".ToTerminal(), "InheritanceLst".ToNonTerminal()),
+
+                    //InheritanceLst -> TypeName
+                    new Production<string>("InheritanceLst".ToNonTerminal(), "TypeName".ToNonTerminal()),
+
+                    //InheritanceLst -> InheritanceLst , TypeName
+                    new Production<string>("InheritanceLst".ToNonTerminal(), "InheritanceLst".ToNonTerminal(), ",".ToTerminal(), "TypeName".ToNonTerminal()), 
+	                #endregion
+
+                    #region Class Access Modifers
+                    //Defines the access modifiers that can be used on a class(i.e. public and internal)
+
+		            //ClassAccessMod -> public | internal
+                    new Production<string>("ClassAccessMod".ToNonTerminal(), "public".ToTerminal()),
+                    new Production<string>("ClassAccessMod".ToNonTerminal(), "internal".ToTerminal()),
+
+                    //ClassAccessMod -> nothing
+                    new Production<string>("ClassAccessMod".ToNonTerminal()), 
+	                #endregion
+
+                    #region KeywordType
+		            //KeywordType -> int|bool|float|double|decimal|uint|ulong|long|short|ushort|byte|sbyte|string
+                    new Production<string>("KeywordType".ToNonTerminal(), "bool".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "int".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "float".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "double".ToTerminal()),
+                    new Production<string>("KeywordType".ToNonTerminal(), "decimal".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "long".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "uint".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "ulong".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "short".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "ushort".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "byte".ToTerminal()), 
+                    new Production<string>("KeywordType".ToNonTerminal(), "sbyte".ToTerminal()),  
+                    new Production<string>("KeywordType".ToNonTerminal(), "string".ToTerminal()),  
+	                #endregion
+
+                    #region Member
+                    //Defines productions for members of a class
+
+		            //MemberLst -> Member
+                    new Production<string>("MemberLst".ToNonTerminal(), "Member".ToNonTerminal()),
+
+                    //MemberLst -> nothing
+                    //new Production<string>("MemberLst".ToNonTerminal()),
+
+                    //MemberLst -> MemberLst Member
+                    new Production<string>("MemberLst".ToNonTerminal(), "MemberLst".ToNonTerminal(), "Member".ToNonTerminal()),
+
+                    //Member -> Constructor
+                    new Production<string>("Member".ToNonTerminal(), "Constructor".ToNonTerminal()),
+
+                    //Member -> Method
+                    new Production<string>("Member".ToNonTerminal(), "Method".ToNonTerminal()),
+
+                    //Member -> Field
+                    new Production<string>("Member".ToNonTerminal(), "Field".ToNonTerminal()), 
+
+                    //Member -> Property
+                    new Production<string>("Member".ToNonTerminal(), "Property".ToNonTerminal()),
+	                #endregion
+
+                    #region Method
+                    //Defines productions for method declarations
+
+		            //MethodLst -> Method
+                    new Production<string>("MethodLst".ToNonTerminal(), "Method".ToNonTerminal()),
+
+                    //MethodLst -> MethodLst Method
+                    new Production<string>("MethodLst".ToNonTerminal(), "MethodLst".ToNonTerminal(), "Method".ToNonTerminal()),
+
+                    //Method -> MemberAccessMod TypeName Id ( ) { StmtLst }
+                    //new Production<string>("Method".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
+
+                    //Method -> MemberAccessMod TypeName Id ( MethodArgLst ) { MethodBody }
+                    new Production<string>("Method".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "MethodArgLst".ToNonTerminal(), ")".ToTerminal(), "{".ToTerminal(), "MethodBody".ToNonTerminal(), "}".ToTerminal()),
+
+                    //Method -> MemberAccessMod void Id ( MethodArgLst ) { MethodBody }
+                    new Production<string>("Method".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "void".ToTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "MethodArgLst".ToNonTerminal(), ")".ToTerminal(), "{".ToTerminal(), "MethodBody".ToNonTerminal(), "}".ToTerminal()),
+
+
+	                #endregion
+
+                    #region Method Body
+		            //MethodBody -> StmtLst
+                    new Production<string>("MethodBody".ToNonTerminal(), "StmtLst".ToNonTerminal()),
+
+                    //MethodBody -> nothing
+                    new Production<string>("MethodBody".ToNonTerminal()), 
+	                #endregion
+
+                    #region Method Arg List
+		            //MethodArgLst -> ArgLst
+                    new Production<string>("MethodArgLst".ToNonTerminal(), "ArgLst".ToNonTerminal()),
+
+                    //MethodArgLst -> nothing
+                    new Production<string>("MethodArgLst".ToNonTerminal()), 
+	                #endregion
+
+                    #region Return Type
+                    //Defines productions for a method return type.
+
+		            //ReturnType -> TypeName | void
+                    new Production<string>("ReturnType".ToNonTerminal(), "TypeName".ToNonTerminal()),
+                    new Production<string>("ReturnType".ToNonTerminal(), "void".ToTerminal()), 
+	                #endregion
+
+                    #region Member Access Modifiers
+		            //MemberAccessMod -> public | private | protected | internal
+                    new Production<string>("MemberAccessMod".ToNonTerminal(), "public".ToTerminal()),
+                    new Production<string>("MemberAccessMod".ToNonTerminal(), "private".ToTerminal()),
+                    new Production<string>("MemberAccessMod".ToNonTerminal(), "protected".ToTerminal()),
+                    new Production<string>("MemberAccessMod".ToNonTerminal(), "internal".ToTerminal()),
+
+                    //MemberAccessMod -> proctected internal
+                    new Production<string>("MemberAccessMod".ToNonTerminal(), "protected".ToTerminal(), "internal".ToTerminal()),
+
+                    //MemberAccessMod -> nothing
+                    new Production<string>("MemberAccessMod".ToNonTerminal()), 
+	                #endregion
+
+                    #region Field
+                    //Defines productions for a member field
+
+                    //Matches "myField;", "myField = value", "public myField;", "public myField = value"
+		            //Field -> MemberAccessMod TypeName AsgnExpr ;
+                    new Production<string>("Field".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "TypeName".ToNonTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
+                    //Field -> MemberAccessMod TypeName AsgnExpr ;
+                    //new Production<string>("Field".ToNonTerminal(), "TypeName".ToNonTerminal(), "FieldAsgnExpr".ToNonTerminal(), ";".ToTerminal()),
+	                #endregion
+
+                    #region Property
+                    //Defines productions that match to properties
+
+		            //Property -> MemberAccessMod TypeName Id { PropExpr PropExpr }
+                    new Production<string>("Property".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "PropExpr".ToNonTerminal(), "PropExpr".ToNonTerminal(), "}".ToTerminal()),
+                    
+                    //Property -> MemberAccessMod TypeName Id { PropExpr }
+                    new Production<string>("Property".ToNonTerminal(), "MemberAccessMod".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "{".ToTerminal(), "PropExpr".ToNonTerminal(), "}".ToTerminal()),
+
+                    //During semantic analysis 'Id' will be checked to make sure it is 'get'
+                    //PropExpr -> get|set ;
+                    new Production<string>("PropExpr".ToNonTerminal(), "get".ToTerminal(), ";".ToTerminal()),
+                    new Production<string>("PropExpr".ToNonTerminal(), "set".ToTerminal(), ";".ToTerminal()),
+
+
+                    //During semantic analysis 'Id' will be checked to make sure that it is 'get'
+                    //PropExpr -> get|set { StmtLst }
+                    new Production<string>("PropExpr".ToNonTerminal(), "get".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
+                    new Production<string>("PropExpr".ToNonTerminal(), "set".ToTerminal(), "{".ToTerminal(), "StmtLst".ToNonTerminal(), "}".ToTerminal()),
+
+                    //PropExpr -> nothing
+                    //new Production<string>("PropExpr".ToNonTerminal()), 
+	                #endregion
+
+                    #region Field Assignment Expression
+                    //Defines productions for field assignment(e.g. myField = stuff or just myField)
+
+		            //FieldAsgnExpr -> Id EqlsExpr
+                    new Production<string>("FieldAsgnExpr".ToNonTerminal(), "Id".ToTerminal(), "EqlsExpr".ToNonTerminal()),
+
+                    //EqlsExpr -> = Term
+                    new Production<string>("EqlsExpr".ToNonTerminal(), "=".ToTerminal(), "Term".ToNonTerminal()),
+
+                    //EqlsExpr -> = Expr
+                    new Production<string>("EqlsExpr".ToNonTerminal(), "=".ToTerminal(), "Expr".ToNonTerminal()),
+
+                    //EqlsExpr -> nothing
+                    new Production<string>("EqlsExpr".ToNonTerminal()),
+
+                    //FieldAsgnExpr -> Id
+                    //new Production<string>("FieldAsgnExpr".ToNonTerminal(), "Id".ToTerminal()),  
+	                #endregion
+
+                    #region Arguments
                     //Defines an argument list(e.g. the signature of the method)
 
                     //ArgLst -> ArgLst, Arg
                     new Production<string>("ArgLst".ToNonTerminal(), "ArgLst".ToNonTerminal(), ",".ToTerminal(), "Arg".ToNonTerminal()),
 
                     //ArgLst -> nothing
-                    new Production<string>("ArgLst".ToNonTerminal()),
+                    //new Production<string>("ArgLst".ToNonTerminal()),
 
                     //ArgLst -> Arg
                     new Production<string>("ArgLst".ToNonTerminal(), "Arg".ToNonTerminal()),
 
-                    //Arg -> Id Id
-                    new Production<string>("Arg".ToNonTerminal(), "Id".ToTerminal(), "Id".ToTerminal()),
+                    //Arg -> TypeName Id
+                    new Production<string>("Arg".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal()), 
+	                #endregion
+
+	                #endregion
                     
+                    #region Assignment Expression
+		            //AsgnExpr -> Id = Expr
+                    new Production<string>("AsgnExpr".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Expr".ToNonTerminal()),
+
+                    //AsgnExpr -> Id = Term
+                    new Production<string>("AsgnExpr".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Term".ToNonTerminal()), 
+	                #endregion
+                    
+                    #region Statements
+                    //Defines productions that match statements in a program
+
+		            //StmtLst -> Stmt
+                    new Production<string>("StmtLst".ToNonTerminal(), "Stmt".ToNonTerminal()),
+
+                    //StmtLst -> Stmt StmtLst
+                    new Production<string>("StmtLst".ToNonTerminal(), "Stmt".ToNonTerminal(), "StmtLst".ToNonTerminal()),
+
+                    //Stmt -> Expr ;
+                    new Production<string>("Stmt".ToNonTerminal(), "Expr".ToNonTerminal(), ";".ToTerminal()), 
+
+                    //Stmt -> AsgnExpr ;
+                    new Production<string>("Stmt".ToNonTerminal(), "AsngExpr".ToNonTerminal(), ";".ToTerminal()), 
+
+                    //Allow local variables to be defined.
+                    //Stmt -> Field
+                    new Production<string>("Stmt".ToNonTerminal(), "LocalField".ToNonTerminal()),
+	                #endregion
+
+                    //LocalField -> TypeName Id ;
+                    new Production<string>("LocalField".ToNonTerminal(), "TypeName".ToNonTerminal(),"Id".ToTerminal(), ";".ToTerminal()),
+
+                    //LocalField -> TypeName Id = Expr;
+                    //new Production<string>("LocalField".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), ";".ToTerminal()),
+
+                    //LocalField -> TypeName Id = Expr;
+                    new Production<string>("LocalField".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Expr".ToNonTerminal(), ";".ToTerminal()),
+
+                    //LocalField -> TypeName Id = Term;
+                    new Production<string>("LocalField".ToNonTerminal(), "TypeName".ToNonTerminal(), "Id".ToTerminal(), "=".ToTerminal(), "Term".ToNonTerminal(), ";".ToTerminal()),
+
+                    #region Expression
+                    //Expr -> Expr BiOp Term
+                    new Production<string>("Expr".ToNonTerminal(), "Expr".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()), 
+
+                    //Expr -> Term BiOp Term
+                    new Production<string>("Expr".ToNonTerminal(), "Term".ToNonTerminal(), "BiOp".ToNonTerminal(), "Term".ToNonTerminal()),
+
+                    //Expr -> ( Expr )
+                    new Production<string>("Expr".ToNonTerminal(), "(".ToTerminal(), "Expr".ToNonTerminal(), ")".ToTerminal()),
+	                #endregion
+
+                    #region MethodCall
+	            	//MethodCall -> Id ( ParamLst )
+                    new Production<string>("MethodCall".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "ParamLst".ToNonTerminal(), ")".ToTerminal()),
+
+                    //MethodCall -> Id ( )
+                    new Production<string>("MethodCall".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal()), 
+                	#endregion
+
+                    #region Constructor Call
+		            //ConstructorCall -> TypeName ( MethodParameters )
+                    new Production<string>("ConstructorCall".ToNonTerminal(), "TypeName".ToNonTerminal(), "(".ToTerminal(), "MethodParameters".ToNonTerminal(), ")".ToTerminal()), 
+ 
+	                #endregion
+
+                    #region Binary Operators
+		            //BiOp -> +|-|*|/|%
+                    new Production<string>("BiOp".ToNonTerminal(), "+".ToTerminal()),
+                    new Production<string>("BiOp".ToNonTerminal(), "-".ToTerminal()),
+                    new Production<string>("BiOp".ToNonTerminal(), "*".ToTerminal()),
+                    new Production<string>("BiOp".ToNonTerminal(), "/".ToTerminal()),
+                    new Production<string>("BiOp".ToNonTerminal(), "%".ToTerminal()), 
+	                #endregion
+
+                    //UnaryOp -> -
+                    new Production<string>("UnaryOp".ToNonTerminal(), "-".ToTerminal()),
+
+                    #region Method Parameters
+		            //MethodParameters -> ParamLst
+                    new Production<string>("MethodParameters".ToNonTerminal(), "ParamLst".ToNonTerminal()),
+
+                    //MethodParameters -> nothing
+                    new Production<string>("MethodParameters".ToNonTerminal()), 
+	                #endregion
+    
+                    #region Term
+		            //Term -> UnaryOp Term
+                    new Production<string>("Term".ToNonTerminal(), "UnaryOp".ToNonTerminal(), "Term".ToNonTerminal()),
+
+                    //Term -> MethodCall
+                    new Production<string>("Term".ToNonTerminal(), "MethodCall".ToNonTerminal()),
+
+                    //Term -> ( Term )
+                    //new Production<string>("Term".ToNonTerminal(), "(".ToTerminal(), "Term".ToNonTerminal(), ")".ToTerminal()),
+
+                    //Term -> null
+                    new Production<string>("Term".ToNonTerminal(), "null".ToTerminal()),
+
+                    //Expr -> Id ( ParamLst )
+                    //new Production<string>("Expr".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), "ParamLst".ToNonTerminal(), ")".ToTerminal()),
+
+                    //Expr -> Id ( )
+                    //new Production<string>("Expr".ToNonTerminal(), "Id".ToTerminal(), "(".ToTerminal(), ")".ToTerminal()),
+                    
+                    //Term -> Id
+                    new Production<string>("Term".ToNonTerminal(), "Id".ToTerminal()), 
+
+                    //Term -> new ConstructorCall
+                    new Production<string>("Term".ToNonTerminal(), "new".ToTerminal(), "ConstructorCall".ToNonTerminal()),
+	                #endregion
+
+                    #region Parameters
+                    //Defines productions that matches a parameter list(i.e. arguments that are provided to a called method)
+
+		            //ParamLst -> Param
+                    new Production<string>("ParamLst".ToNonTerminal(), "Param".ToNonTerminal()),
+
+                    //ParamLst -> ParamLst , Param
+                    new Production<string>("ParamLst".ToNonTerminal(), "ParamLst".ToNonTerminal(), ",".ToTerminal(), "Param".ToNonTerminal()),
+
+                    //Param -> Expr
+                    new Production<string>("Param".ToNonTerminal(), "Expr".ToNonTerminal()) 
+	                #endregion
+
+                    #endregion
                 }
-            };
+            );
             #endregion
 
             #region Def
@@ -515,10 +895,10 @@ namespace ParserGUI
 
             #region Def
             //ParserProductionTokenDefinition<string> def = new ParserProductionTokenDefinition<string>
-            //{
-            //    Definitions = new ParserTokenDefinitionCollection<string>
-            //    {
-            //        Definitions = new List<ParserTokenDefinition<string>>
+            //(
+            //    new ParserTokenDefinitionCollection<string>
+            //    (
+            //        new List<ParserTokenDefinition<string>>
             //        {
             //            new StringedParserTokenDefinition(@"\w+", "id", true),
             //            new StringedParserTokenDefinition(@"->", "->", false),
@@ -527,11 +907,11 @@ namespace ParserGUI
             //            new StringedParserTokenDefinition(@"\(", "(", false),
             //            new StringedParserTokenDefinition(@"\)", ")", false)
             //        }
-            //    },
-            //    Productions = new List<Production<string>>
+            //    ),
+            //    new List<Production<string>>
             //    {
             //        //L -> P P
-            //        new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
+            //        new Production<string>("L".ToNonTerminal<string>(), "L".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
 
             //        //L -> P
             //        new Production<string>("L".ToNonTerminal<string>(), "P".ToNonTerminal<string>()),
@@ -539,40 +919,28 @@ namespace ParserGUI
             //        //P -> Term "->" Group ;
             //        new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ";".ToTerminal<string>()),
 
-            //        //P -> Term "->" Stmt ;
-            //       // new Production<string>("P".ToNonTerminal<string>(), "Term".ToNonTerminal<string>(), "->".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ";".ToTerminal<string>()),
-
             //        //Group ->  Stmt
             //        new Production<string>("Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>()),
 
-            //        //Group -> Group Stmt
-            //        new Production<string>("Group".ToNonTerminal<string>(), "Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>()),
+            //        //Group -> Stmt | Stmt
+            //        new Production<string>("Group".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Stmt".ToNonTerminal<string>()),
 
-            //        //Stmt -> Stmt | Stmt
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Stmt".ToNonTerminal<string>()),
+            //        //Stmt -> ( Group )
+            //        new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Group".ToNonTerminal<string>(), ")".ToTerminal<string>()),
 
-            //        //Stmt -> ( Stmt )
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ")".ToTerminal<string>()),
+            //        //Stmt ->  Terms
+            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Terms".ToNonTerminal<string>()),
 
-            //        //Stmt ->  Term
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
+            //        //Terms -> Terms Term
+            //        new Production<string>("Terms".ToNonTerminal<string>(), "Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
 
-            //        //Stmt -> Stmt Term
-            //        new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
-
-
-
-            //        //Stmt -> ( Stmt )
-            //        //new Production<string>("Stmt".ToNonTerminal<string>(), "(".ToTerminal<string>(), "Stmt".ToNonTerminal<string>(), ")".ToTerminal<string>()),
-
-            //        //Stmt -> Stmt "|" Term
-            //        //new Production<string>("Stmt".ToNonTerminal<string>(), "Stmt".ToNonTerminal<string>(), "|".ToTerminal<string>(), "Term".ToNonTerminal<string>()),
+            //        //Terms -> Term
+            //        new Production<string>("Terms".ToNonTerminal<string>(), "Term".ToNonTerminal<string>()),
 
             //        //Term -> id
             //        new Production<string>("Term".ToNonTerminal<string>(), "id".ToTerminal<string>())
-
             //    }
-            //};
+            //); 
             #endregion
 
             long totalParseTime = 0;
@@ -591,14 +959,14 @@ namespace ParserGUI
             Stopwatch w = Stopwatch.StartNew();
 
 
-
             tokens = lexer.ReadTokens(text);
 
             w.Stop();
 
             Stopwatch sw = Stopwatch.StartNew();
 
-            ParseResult<Token<string>> tree = parser.ParseAST(def.ConvertToTerminals(tokens));
+            /*ParseResult<Token<string>>*/
+            var tree = parser.ParseAST(def.ConvertToTerminals(tokens));
 
             sw.Stop();
 

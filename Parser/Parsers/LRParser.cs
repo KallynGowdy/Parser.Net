@@ -39,42 +39,95 @@ namespace Parser.Parsers
             {
                 return parseTable;
             }
-            set
-            {
-                foreach (var colRow in value.ActionTable)
-                {
-                    //if we have a conflict
-                    if (colRow.Value.Count > 1)
-                    {
-                        List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>> conflicts = new List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>>();
+            //set
+            //{
+            //    foreach (var colRow in value.ActionTable)
+            //    {
+            //        //if we have a conflict
+            //        if (colRow.Value.Count > 1)
+            //        {
+            //            List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>> conflicts = new List<Tuple<ParseTableExceptionType, int, GrammarElement<T>>>();
 
-                        //ParseTableExceptionType exType;
-                        ////if we have a shift-reduce conflict
-                        if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
-                        {
-                            conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.SHIFT_REDUCE, colRow.Key.Row, colRow.Key.Column));
+            //            //ParseTableExceptionType exType;
+            //            ////if we have a shift-reduce conflict
+            //            if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
+            //            {
+            //                conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.SHIFT_REDUCE, colRow.Key.Row, colRow.Key.Column));
 
-                            //then check for a reduce-reduce conflict
-                            if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
-                            {
-                                conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
-                            }
-                        }
-                        //otherwise we have a reduce-reduce conflict
-                        else
-                        {
-                            conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
-                        }
+            //                //then check for a reduce-reduce conflict
+            //                if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
+            //                {
+            //                    conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
+            //                }
+            //            }
+            //            //otherwise we have a reduce-reduce conflict
+            //            else
+            //            {
+            //                conflicts.Add(new Tuple<ParseTableExceptionType, int, GrammarElement<T>>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key.Row, colRow.Key.Column));
+            //            }
 
-                        //throw invalid parse table exception
-                        throw new InvalidParseTableException<T>(value, conflicts.ToArray());
-                    }
 
-                }
-                this.parseTable = value;
-            }
+
+            //            //throw invalid parse table exception
+            //            throw new InvalidParseTableException<T>(value, conflicts.ToArray());
+            //        }
+
+            //    }
+            //    this.parseTable = value;
+            //}
         }
 
+        public virtual void SetParseTable(ParseTable<T> value, StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        {
+            foreach (var colRow in value.ActionTable)
+            {
+                //if we have a conflict
+                if (colRow.Value.Count > 1)
+                {
+                    List<ParseTableConflict<T>> conflicts = new List<ParseTableConflict<T>>();
+
+                    StateNode<GrammarElement<T>, LRItem<T>[]> node = graph.GetBreadthFirstTraversal().ElementAt(colRow.Key.Row);
+
+
+                    //ParseTableExceptionType exType;
+                    ////if we have a shift-reduce conflict
+                    if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
+                    {
+                        LRItem<T>[] items = node.Value.Where(a => 
+                        {
+                            GrammarElement<T> e = a.GetNextElement();
+                            if(e != null)
+                            {
+                                return e.Equals(colRow.Key.Column);
+                            }
+                            return false;
+                        }).Concat(colRow.Value.OfType<ReduceAction<T>>().Select(a => ((ReduceAction<T>)a).ReduceItem)).ToArray();
+
+                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.SHIFT_REDUCE, colRow.Key, node, items));
+
+                        //then check for a reduce-reduce conflict
+                        if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
+                        {
+                            items = colRow.Value.OfType<ReduceAction<T>>().Select(a => a.ReduceItem).ToArray();
+                            conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key, node, items));
+                        }
+                    }
+                    //otherwise we have a reduce-reduce conflict
+                    else
+                    {
+                        //get all of the reduce items
+                        LRItem<T>[] items = colRow.Value.OfType<ReduceAction<T>>().Select(a => a.ReduceItem).ToArray();
+
+                        conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, colRow.Key, node, items));
+                    }
+
+                    //throw invalid parse table exception
+                    throw new InvalidParseTableException<T>(value, node, conflicts.ToArray());
+                }
+
+            }
+            this.parseTable = value;
+        }
 
         /// <summary>
         /// Performs an LR(1) parse on the table given the current augmented input, state stack, current branches, and whether to produce a syntax tree or AST.
@@ -376,7 +429,7 @@ namespace Parser.Parsers
             ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
             root.AddChildren(currentBranches);
             var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
-            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, new Tuple<int,int>(-1,-1), rows.ToArray()));
+            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, new Tuple<int, int>(-1, -1), rows.ToArray()));
             return result;
         }
 
@@ -392,7 +445,7 @@ namespace Parser.Parsers
             ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
             root.AddChildren(currentBranches);
             var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
-            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, invalidItem, new Tuple<int,int>(-1, -1), rows.ToArray()));
+            ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, invalidItem, new Tuple<int, int>(-1, -1), rows.ToArray()));
             return result;
         }
 
@@ -446,7 +499,7 @@ namespace Parser.Parsers
             {
                 if (graph.Root.Value.FirstOrDefault() != null)
                 {
-                    ParseTable = new ParseTable<T>(graph, graph.Root.Value.First().LeftHandSide);
+                    SetParseTable(new ParseTable<T>(graph, graph.Root.Value.First().LeftHandSide), graph);
                     this.EndOfInputElement = endOfInputElement;
                 }
             }
@@ -466,7 +519,9 @@ namespace Parser.Parsers
                 throw new ArgumentNullException("grammar", "The given grammar must be non-null");
             }
 
-            ParseTable = new ParseTable<T>(grammar.CreateStateGraph(), grammar.StartElement);
+            var graph = grammar.CreateStateGraph();
+
+            SetParseTable(new ParseTable<T>(graph, grammar.StartElement), graph);
             EndOfInputElement = grammar.EndOfInputElement;
         }
     }

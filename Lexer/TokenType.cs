@@ -16,6 +16,11 @@ namespace LexicalAnalysis
         public const string KEYWORD = "keyword";
 
         /// <summary>
+        /// Defines the token type "identifier"
+        /// </summary>
+        public const string IDENTIFIER = "identifier";
+
+        /// <summary>
         /// Defines the token type "number"
         /// </summary>
         public const string NUMBER = "number";

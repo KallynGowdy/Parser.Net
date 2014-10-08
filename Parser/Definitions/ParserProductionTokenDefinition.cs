@@ -18,20 +18,31 @@ namespace Parser.Definitions
     [DataContract]
     public class ParserProductionTokenDefinition<T> where T : IEquatable<T>
     {
+
+        public ParserProductionTokenDefinition(ParserTokenDefinitionCollection<T> parserTokenDefinitionCollection, IEnumerable<Production<string>> list)
+        {
+            productions = new List<Production<string>>(list);
+            Definitions = parserTokenDefinitionCollection;
+        }
+
+        public List<Production<string>> productions;
+
         /// <summary>
         /// Gets or sets the productions matching TokenTypes as terminals.
         /// </summary>
-        [DataMember(Name="Productions")]
-        public List<Production<string>> Productions
+        [DataMember(Name = "Productions")]
+        public IList<Production<string>> Productions
         {
-            get;
-            set;
+            get
+            {
+                return productions;
+            }
         }
 
         /// <summary>
         /// Gets or sets the Defintions matching Tokens to Terminals.
         /// </summary>
-        [DataMember(Name="Definitions")]
+        [DataMember(Name = "Definitions")]
         public ParserTokenDefinitionCollection<T> Definitions
         {
             get;
@@ -76,8 +87,15 @@ namespace Parser.Definitions
                     if (e is Terminal<T>)
                     {
                         //get the first defintion whose token type matches the value of the current terminal
-                        ParserTokenDefinition<T> def = Definitions.First(a => a.TerminalMatch((Terminal<T>)(object)e));
-                        newP.DerivedElements.Add(new Terminal<Token<T>>(new Token<T>(0, e.InnerValue, default(T)), def.Keep));
+                        ParserTokenDefinition<T> def = Definitions.FirstOrDefault(a => a.TerminalMatch((Terminal<T>)(object)e));
+                        if (def != null)
+                        {
+                            newP.DerivedElements.Add(new Terminal<Token<T>>(new Token<T>(0, e.InnerValue, default(T)/*def.GetToken(0, e.InnerValue, default(T)*/), def.Keep));
+                        }
+                        else
+                        {
+                            throw new MissingTokenDefinition<T>((Terminal<string>)e);
+                        }
                     }
                     else
                     {

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Parser.Grammar;
+using Parser.StateMachine;
 
 namespace Parser.Parsers
 {
@@ -22,18 +23,20 @@ namespace Parser.Parsers
     /// Defines an exception that is thrown when given a parse table cannot be used with a certian parser.
     /// </summary>
     [Serializable]
+    [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+    [SecurityPermission(SecurityAction.InheritanceDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
     public class InvalidParseTableException<T> : Exception where T : IEquatable<T>
     {
-        private Tuple<ParseTableExceptionType, int, GrammarElement<T>>[] conflicts;
+        private ParseTableConflict<T>[] conflicts;
 
         /// <summary>
         /// Gets the conflicts contained in the parse table.
         /// </summary>
-        public ReadOnlyCollection<Tuple<ParseTableExceptionType, int, GrammarElement<T>>> Conflicts
+        public ReadOnlyCollection<ParseTableConflict<T>> Conflicts
         {
             get
             {
-                return new ReadOnlyCollection<Tuple<ParseTableExceptionType, int, GrammarElement<T>>>(conflicts);
+                return new ReadOnlyCollection<ParseTableConflict<T>>(conflicts);
             }
         }
 
@@ -64,6 +67,15 @@ namespace Parser.Parsers
             private set;
         }
 
+        /// <summary>
+        /// Gets the State node that the conflict occured at.
+        /// </summary>
+        public StateNode<GrammarElement<T>, LRItem<T>[]> InvalidNode
+        {
+            get;
+            private set;
+        }
+
         public InvalidParseTableException(string message)
             : base(message)
         {
@@ -88,27 +100,32 @@ namespace Parser.Parsers
             this.NextInput = nextInput;
         }
 
-        public InvalidParseTableException(IParseTable<T> invalidTable, params Tuple<ParseTableExceptionType, int, GrammarElement<T>>[] conflicts)
+        public InvalidParseTableException(IParseTable<T> invalidTable, params ParseTableConflict<T>[] conflicts)
             : base(createExceptionMsg(conflicts))
         {
             this.conflicts = conflicts;
             this.ParseTable = invalidTable;
         }
 
+        public InvalidParseTableException(StateMachine.ParseTable<T> invalidTable,  StateMachine.StateNode<GrammarElement<T>, LRItem<T>[]> node, params ParseTableConflict<T>[] conflicts)
+        {
+            this.conflicts = conflicts;
+            this.ParseTable = invalidTable;
+            this.InvalidNode = node;
+        }
 
-
-        private static string createExceptionMsg(Tuple<ParseTableExceptionType, int, GrammarElement<T>>[] conflicts)
+        private static string createExceptionMsg(ParseTableConflict<T>[] conflicts)
         {
             StringBuilder b = new StringBuilder();
 
-            b.AppendFormat("There are {0} conflicts contained in the parse table:", conflicts.Length);
+            b.AppendFormat("There {0} {2} conflict{1} contained in the parse table:", (conflicts.Length > 1 ? "are" : "is"), (conflicts.Length > 1 ? "s" : string.Empty), conflicts.Length);
             b.AppendLine();
 
             for(int i = 0; i < conflicts.Length; i++)
             {
                 var conflict = conflicts[i];
 
-                b.AppendFormat("{0}). {1} conflict at (State: {2}, Column {3})", i + 1, conflict.Item1, conflict.Item2, conflict.Item3);
+                b.AppendFormat("{0}). {1} conflict at (State: {2}, Column {3})", i + 1, conflict.ConflictType, conflict.TableLocation.Row, conflict.TableLocation.Column);
             }
 
             return b.ToString();
@@ -151,7 +168,10 @@ namespace Parser.Parsers
 
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            
+            info.AddValue("conflicts", conflicts);
+            info.AddValue("ParseTable", ParseTable);
+            info.AddValue("State", State);
+            info.AddValue("NextInput", NextInput);
             base.GetObjectData(info, context);
         }
     }

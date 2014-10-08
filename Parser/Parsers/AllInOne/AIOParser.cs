@@ -51,16 +51,6 @@ namespace Parser.Parsers.AllInOne
         }
 
         /// <summary>
-        /// Sets the parse table used to parse the input.
-        /// </summary>
-        /// <param name="table"></param>
-        public void SetParseTable(ParseTable<Token<T>> table)
-        {
-            parser = new LRParser<Token<T>>();
-            parser.ParseTable = table;
-        }
-
-        /// <summary>
         /// Parses an abstract Syntax tree from the given input.
         /// </summary>
         /// <param name="input"></param>

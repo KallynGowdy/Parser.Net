@@ -64,6 +64,7 @@
             // 
             // txtCFG
             // 
+            this.txtCFG.AcceptsTab = true;
             this.txtCFG.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtCFG.Location = new System.Drawing.Point(13, 183);

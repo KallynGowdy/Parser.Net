@@ -24,9 +24,32 @@ namespace LexicalAnalysis.Definitions
             this.Keyword = keyword;
         }
 
+        public KeywordTokenDefinition(string keyword, string tokenType) : base(BuildKeyword(keyword), tokenType)
+        {
+            this.Keyword = keyword;
+        }
+
+        /// <summary>
+        /// Gets a new Keyword token based on the given match.
+        /// </summary>
+        /// <param name="match"></param>
+        /// <returns></returns>
         public override Token<string> GetToken(Capture match)
         {
-            return new KeywordToken(match.Index, match.Value);
+            return new KeywordToken(match.Index, match.Value, TokenTypeToMatch);
+        }
+
+        /// <summary>
+        /// Gets a new keyword token based on the given index and value.
+        /// tokenType is ignored.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="tokenType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override Token<string> GetToken(int index, string tokenType, string value)
+        {
+            return new KeywordToken(index, value, TokenTypeToMatch);
         }
 
         /// <summary>

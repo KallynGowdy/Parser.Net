@@ -7,6 +7,10 @@ using LexicalAnalysis;
 
 namespace Parser.Definitions
 {
+    /// <summary>
+    /// Defines a relationship between a keyword and a ParserTokenDefinition.
+    /// The Token type of the object is TokenTypes.KEYWORD.
+    /// </summary>
     public class KeywordParserTokenDefinition : StringedParserTokenDefinition
     {
         /// <summary>
@@ -23,13 +27,34 @@ namespace Parser.Definitions
         /// </summary>
         /// <param name="match"></param>
         /// <returns></returns>
-        public override LexicalAnalysis.Token<string> GetToken(System.Text.RegularExpressions.Capture match)
+        public override Token<string> GetToken(System.Text.RegularExpressions.Capture match)
         {
             return new KeywordToken(match.Index, match.Value);
         }
 
+        public override Token<string> GetToken(int index, string tokenType, string value)
+        {
+            return new KeywordToken(index, value);
+        }
+
+        /// <summary>
+        /// Creates a new Keyword Definition object that defines a relationship between the given keyword and a ParserTokenDefinition.
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <param name="keep"></param>
         public KeywordParserTokenDefinition(string keyword, bool keep)
-            : base(BuildKeyword(keyword), TokenTypes.KEYWORD, keep)
+            : base(BuildKeywordRegex(keyword), TokenTypes.KEYWORD, keep)
+        {
+            this.Keyword = keyword;
+        }
+
+        /// <summary>
+        /// Creates a new Keyword Definition object that defines a relationship between the given keyword and a ParserTokenDefinition.
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <param name="keep"></param>
+        public KeywordParserTokenDefinition(string keyword, bool keep, string tokenTypeToMatch)
+            : base(BuildKeywordRegex(keyword), tokenTypeToMatch, keep)
         {
             this.Keyword = keyword;
         }
@@ -39,7 +64,7 @@ namespace Parser.Definitions
         /// </summary>
         /// <param name="keyword"></param>
         /// <returns></returns>
-        public static System.Text.RegularExpressions.Regex BuildKeyword(string keyword)
+        public static System.Text.RegularExpressions.Regex BuildKeywordRegex(string keyword)
         {
             return new System.Text.RegularExpressions.Regex(string.Format(@"\b{0}\b", keyword));
         }

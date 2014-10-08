@@ -29,6 +29,7 @@ namespace Parser.Definitions
 
 
         public abstract override Token<T> GetToken(Capture match);
+        public abstract override Token<T> GetToken(int index, string tokenType, T value);
 
         public ParserTokenDefinition(Regex regex, string tokenType, bool keep)
             : base(regex, tokenType)

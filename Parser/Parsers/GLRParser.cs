@@ -26,10 +26,15 @@ namespace Parser.Parsers
             {
                 return parseTable;
             }
-            set
-            {
-                parseTable = value;
-            }
+            //set
+            //{
+            //    parseTable = value;
+            //}
+        }
+
+        public override void SetParseTable(ParseTable<T> value, StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
+        {
+            this.parseTable = value;
         }
 
         /// <summary>
