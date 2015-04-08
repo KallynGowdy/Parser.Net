@@ -1,134 +1,203 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using KallynGowdy.ParserGenerator.Collections;
 using KallynGowdy.ParserGenerator.Grammar;
 using KallynGowdy.ParserGenerator.StateMachine;
 
 namespace KallynGowdy.ParserGenerator.Parsers
 {
 	/// <summary>
-	/// Defines an LR(1) parser.
+	///     Defines an LR(1) parser.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class LRParser<T> : IGrammarParser<T>, IGraphParser<T> where T : IEquatable<T>
+	public class LrParser<T> : IGrammarParser<T>, IGraphParser<T>
+		where T : IEquatable<T>
 	{
 		/// <summary>
-		/// Determines whether to take the first action (of the possible actions) through the parse table or to error.
+		///     The parse table.
 		/// </summary>
-		public bool TakeFirstRoute
-		{
-			get;
-			set;
-		}
+		private ParseTable<T> parseTable;
 
 		/// <summary>
-		/// Gets the end of input element.
+		///     Gets the end of input element.
 		/// </summary>
-		public Terminal<T> EndOfInputElement
-		{
-			get;
-			private set;
-		}
+		public Terminal<T> EndOfInputElement { get; private set; }
 
 		/// <summary>
-		/// The parse table.
+		///     Gets or sets the parse table used to parse input.
 		/// </summary>
-		protected ParseTable<T> parseTable;
-
-		/// <summary>
-		/// Gets or sets the parse table used to parse input.
-		/// </summary>
-		/// <exception cref="Parser.InvalidParseTableException">Thrown if an invalid parse table is provided when trying to set the parse table.</exception>
+		/// <exception cref="Parser.InvalidParseTableException">
+		///     Thrown if an invalid parse table is provided when trying to set the
+		///     parse table.
+		/// </exception>
 		public virtual ParseTable<T> ParseTable
 		{
-			get
-			{
-				return parseTable;
-			}
+			get { return parseTable; }
+			set { SetParseTable(value); }
 		}
 
 		/// <summary>
-		/// Sets the end of input element from the table by finding the first terminal that identifies itself as the end of input element.
+		///     Determines whether to take the first action (of the possible actions) through the parse table or to error.
+		/// </summary>
+		public bool TakeFirstRoute { get; set; }
+
+		/// <summary>
+		///     Parses an Abstract Syntax tree from the given input based on the rules defined in the Terminal elements.
+		/// </summary>
+		/// <param name="input"></param>
+		/// <exception cref="System.ArgumentNullException" />
+		/// <returns></returns>
+		public virtual ParseResult<T> ParseAST(IEnumerable<Terminal<T>> input)
+		{
+			if (input == null)
+				throw new ArgumentNullException("input");
+
+			CheckParseTable();
+
+			return LRParse(false, input.ToArray());
+		}
+
+		/// <summary>
+		///     Parses a concrete Syntax tree from the given input.
+		/// </summary>
+		/// <param name="input"></param>
+		/// <exception cref="System.ArgumentNullException" />
+		/// <returns></returns>
+		public virtual ParseResult<T> ParseSyntaxTree(IEnumerable<Terminal<T>> input)
+		{
+			if (input == null)
+				throw new ArgumentNullException("input");
+
+			CheckParseTable();
+
+			return LRParse(true, input.ToArray());
+		}
+
+		/// <summary>
+		///     Sets Parse Table from the given grammar.
+		/// </summary>
+		/// <param name="grammar"></param>
+		/// <exception cref="ArgumentNullException">The value of 'grammar' cannot be null. </exception>
+		/// <exception cref="InvalidParseTableException">
+		///     Thrown when the given parse table contains either a 'Shift
+		///     Reduce' conflict or a 'Reduce Reduce' conflict.
+		/// </exception>
+		public virtual void SetParseTable(ContextFreeGrammar<T> grammar)
+		{
+			if (grammar == null)
+				throw new ArgumentNullException("grammar", "The given grammar must be non-null");
+
+			StateGraph<GrammarElement<T>, LRItem<T>[]> graph = grammar.CreateStateGraph();
+
+			SetParseTable(new ParseTable<T>(graph, grammar.StartElement), graph);
+			EndOfInputElement = grammar.EndOfInputElement;
+		}
+
+		/// <summary>
+		///     Sets the Parse Table from the given graph.
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <exception cref="Parser.InvalidParseTableException" />
+		public virtual void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement)
+		{
+			if (graph == null)
+				throw new ArgumentNullException("graph", "The given graph must be non-null");
+
+			if (endOfInputElement == null)
+				throw new ArgumentNullException("endOfInputElement");
+			if (graph.Root != null)
+			{
+				if (graph.Root.Value.FirstOrDefault() != null)
+				{
+					SetParseTable(new ParseTable<T>(graph, graph.Root.Value.First().LeftHandSide), graph);
+					EndOfInputElement = endOfInputElement;
+				}
+			}
+
+			throw new ArgumentException("The given graph must have at least one state with at least one item.");
+		}
+
+		/// <summary>
+		///     Sets the end of input element from the table by finding the first terminal that identifies itself as the end of
+		///     input element.
 		/// </summary>
 		protected void SetEndOfInputFromTable()
 		{
-			this.EndOfInputElement = this.parseTable.ActionTable.Select(a => a.Value.FirstOrDefault(b => b.Key.EndOfInput).Key).Where(a => a != null).First();
+			EndOfInputElement = parseTable.ActionTable.Select(a => a.Value.FirstOrDefault(b => b.Key.EndOfInput).Key).First(a => a != null);
 		}
 
 		/// <summary>
-		/// Sets the parse table that the parser is to use. The given parse table is not checked for conflicts so a MultipleParseActions error might be returned during parse time.
+		///     Sets the parse table that the parser is to use. The given parse table is not checked for conflicts so a
+		///     MultipleParseActions error might be returned during parse time.
 		/// </summary>
 		/// <param name="table"></param>
 		public virtual void SetParseTable(ParseTable<T> table)
 		{
 			if (table == null)
-			{
 				throw new ArgumentNullException("table");
-			}
-			this.parseTable = table;
+			parseTable = table;
 			SetEndOfInputFromTable();
 		}
 
 		/// <summary>
-		/// Sets the parse table that the parser uses with the given state graph used to help resolve parse table conflicts.
+		///     Sets the parse table that the parser uses with the given state graph used to help resolve parse table conflicts.
 		/// </summary>
-		/// <exception cref="Parser.Parsers.InvalidParseTableException">Thrown when the given parse table contains either a 'Shift Reduce' conflict or a 'Reduce Reduce' conflict.</exception>
+		/// <exception cref="Parser.Parsers.InvalidParseTableException">
+		///     Thrown when the given parse table contains either a 'Shift
+		///     Reduce' conflict or a 'Reduce Reduce' conflict.
+		/// </exception>
 		/// <param name="value">The parse table to use for parsing</param>
 		/// <param name="graph">The graph to use to return informative exceptions regarding conflicts.</param>
 		public virtual void SetParseTable(ParseTable<T> value, StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
 		{
 			if (value == null)
-			{
 				throw new ArgumentNullException("value");
-			}
 			if (graph == null)
-			{
 				throw new ArgumentNullException("graph");
-			}
 
 			foreach (var colRow in value.ActionTable.Select(a =>
+			{
+				foreach (Terminal<T> b in a.Value.Keys)
 				{
-					foreach (var b in a.Value.Keys)
+					return new
 					{
-						return new
-						{
-							Row = a,
-							Column = b,
-							Value = a.Value[b]
-						};
-					}
-					return null;
-				}))
+						Row = a,
+						Column = b,
+						Value = a.Value[b]
+					};
+				}
+				return null;
+			}))
 			{
 				//if we have a conflict
 				if (colRow.Value.Count > 1)
 				{
-					List<ParseTableConflict<T>> conflicts = new List<ParseTableConflict<T>>();
+					var conflicts = new List<ParseTableConflict<T>>();
 
 					StateNode<GrammarElement<T>, LRItem<T>[]> node = graph.GetBreadthFirstTraversal().ElementAt(colRow.Row.Key);
 
 
 					//ParseTableExceptionType exType;
 					////if we have a shift-reduce conflict
-					if (colRow.Value.Any(a => a is ShiftAction<T>) && colRow.Value.Any(a => a is ReduceAction<T>))
+					if (colRow.Value.Any(a => a is ShiftAction<T>) &&
+						colRow.Value.Any(a => a is ReduceAction<T>))
 					{
 						LRItem<T>[] items = node.Value.Where(a =>
 						{
 							GrammarElement<T> e = a.GetNextElement();
 							if (e != null)
-							{
 								return e.Equals(colRow.Column);
-							}
 							return false;
-						}).Concat(colRow.Value.OfType<ReduceAction<T>>().Select(a => ((ReduceAction<T>)a).ReduceItem)).ToArray();
+						}).Concat(colRow.Value.OfType<ReduceAction<T>>().Select(a => a.ReduceItem)).ToArray();
 
-						conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.SHIFT_REDUCE, new Collections.ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
+						conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.SHIFT_REDUCE, new ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
 
 						//then check for a reduce-reduce conflict
-						if (colRow.Value.Where(a => a is ReduceAction<T>).Count() > 1)
+						if (colRow.Value.Count(a => a is ReduceAction<T>) > 1)
 						{
 							items = colRow.Value.OfType<ReduceAction<T>>().Select(a => a.ReduceItem).ToArray();
-							conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, new Collections.ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
+							conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, new ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
 						}
 					}
 					//otherwise we have a reduce-reduce conflict
@@ -137,20 +206,20 @@ namespace KallynGowdy.ParserGenerator.Parsers
 						//get all of the reduce items
 						LRItem<T>[] items = colRow.Value.OfType<ReduceAction<T>>().Select(a => a.ReduceItem).ToArray();
 
-						conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, new Collections.ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
+						conflicts.Add(new ParseTableConflict<T>(ParseTableExceptionType.REDUCE_REDUCE, new ColumnRowPair<int, Terminal<T>>(colRow.Row.Key, colRow.Column), node, items));
 					}
 
 					//throw invalid parse table exception
 					throw new InvalidParseTableException<T>(value, node, conflicts.ToArray());
 				}
-
 			}
-			this.parseTable = value;
+			parseTable = value;
 			SetEndOfInputFromTable();
 		}
 
 		/// <summary>
-		/// Performs an LR(1) parse on the table given the current augmented input, state stack, current branches, and whether to produce a syntax tree or AST.
+		///     Performs an LR(1) parse on the table given the current augmented input, state stack, current branches, and whether
+		///     to produce a syntax tree or AST.
 		/// </summary>
 		/// <param name="stateStack"></param>
 		/// <param name="currentBranches"></param>
@@ -160,7 +229,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		{
 			if (input == null)
 			{
-				ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+				var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
 				root.AddChildren(currentBranches);
 				return new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList());
 			}
@@ -172,16 +241,15 @@ namespace KallynGowdy.ParserGenerator.Parsers
 			}
 
 			if (currentBranches == null)
-			{
 				currentBranches = new List<ParseTree<T>.ParseTreebranch>();
-			}
 
 			Terminal<T>[] augmentedInput = input.Concat(new[] { EndOfInputElement }).ToArray();
 
 			//cache the length
 			int length = augmentedInput.Length;
 
-			if (length > 0 && inputProgression < length)
+			if (length > 0 &&
+				inputProgression < length)
 			{
 				for (int i = inputProgression; i < length; i++)
 				{
@@ -190,7 +258,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 					int s = stateStack.Peek().Key;
 
 					//Get the possible actions for the current state and item from the table
-					var actions = ParseTable[s, item];
+					ParserAction<T>[] actions = ParseTable[s, item];
 
 					if (actions != null)
 					{
@@ -203,28 +271,19 @@ namespace KallynGowdy.ParserGenerator.Parsers
 								KeyValuePair<int, GrammarElement<T>> currentState = stateStack.Peek();
 								return new ParseResult<T>(false, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(currentBranches)), stateStack.ToList(), new MultipleActionsParseError<T>("", currentState.Key, item, i, actions.ToArray()));
 							}
-							else
-							{
-								action = actions.First();
-							}
+							action = actions.First();
 						}
 						else
-						{
 							action = actions.SingleOrDefault();
-						}
 						//if there is an action
 						if (action != null)
 						{
 							//if we should shift
 							if (action is ShiftAction<T>)
-							{
 								Shift(stateStack, item, action);
-							}
 							//otherwise if we should reduce
 							else if (action is ReduceAction<T>)
-							{
 								Reduce(syntax, stateStack, currentBranches, action, ref i);
-							}
 							//otherwise if the parse if finished and we should accept
 							else if (action is AcceptAction<T>)
 							{
@@ -233,9 +292,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 							}
 							//should never be called, but the compiler will be satisfied...
 							else
-							{
 								return GetSyntaxErrorResult(input, i, currentBranches, stateStack, item);
-							}
 						}
 						else
 						{
@@ -247,35 +304,28 @@ namespace KallynGowdy.ParserGenerator.Parsers
 
 					//otherwise, there is no action and a Syntax error has occured.
 					else
-					{
 						return GetSyntaxErrorResult(input, i, currentBranches, stateStack, item);
-					}
 				}
 
 				//Found "END_OF_FILE" but was expecting "stuff"
 				return GetSyntaxErrorResult(input, inputProgression, currentBranches, stateStack, "END_OF_FILE");
 			}
-			else
+			//check for Start -> epsilon
+			IEnumerable<ParserAction<T>> enumerableActions = ParseTable.ActionTable[0, new Terminal<T>(default(T))];
+			if (enumerableActions != null &&
+				enumerableActions.Any())
 			{
-				//check for Start -> epsilon
-				IEnumerable<ParserAction<T>> actions = ParseTable.ActionTable[0, new Terminal<T>(default(T))];
-				if (actions != null && actions.Count() > 0)
-				{
-					var action = (ReduceAction<T>)actions.First();
+				var action = (ReduceAction<T>)enumerableActions.First();
 
-					return new ParseResult<T>(true, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(action.ReduceItem.LeftHandSide)), null);
-				}
-				else
-				{
-					return GetSyntaxErrorResult(null, null, EndOfInputElement);
-					//return new ParseResult<T>(false, null, null, new SyntaxParseError<T>("Empty input is invalid. There is no reduction of Start -> epsilon"));
-				}
+				return new ParseResult<T>(true, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(action.ReduceItem.LeftHandSide)), null);
 			}
+			return GetSyntaxErrorResult(null, null, EndOfInputElement);
+			//return new ParseResult<T>(false, null, null, new SyntaxParseError<T>("Empty input is invalid. There is no reduction of Start -> epsilon"));
 		}
 
-
 		/// <summary>
-		/// Gets a result with a syntax error describing the problem based on the given input error index, current branches, state stack, and unexpected element.
+		///     Gets a result with a syntax error describing the problem based on the given input error index, current branches,
+		///     state stack, and unexpected element.
 		/// </summary>
 		/// <param name="input">The input that contains the syntax error.</param>
 		/// <param name="index">The zero based index of the syntax error.</param>
@@ -286,30 +336,28 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		protected ParseResult<T> GetSyntaxErrorResult(Terminal<T>[] input, int index, List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string p)
 		{
 			//create a new root branch for the tree
-			ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
 
 			//get the possible expected elements
-			var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null).Select<Terminal<T>, object>(a =>
+			IEnumerable<object> rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null).Select<Terminal<T>, object>(a =>
 			{
 				if (a == EndOfInputElement)
-				{
 					return "END_OF_INPUT";
-				}
 				return a;
 			});
 
 			//get the error position
 			// TODO: Update with proper logic
-			Tuple<int, int> pos = new Tuple<int, int>(0, 0);//new Tuple<int, int>(input.GetLineNumber(index, a => a == EndOfInputElement), input.GetColumnNumber(index, (a, i) => a == EndOfInputElement));
+			var pos = new Tuple<int, int>(0, 0); //new Tuple<int, int>(input.GetLineNumber(index, a => a == EndOfInputElement), input.GetColumnNumber(index, (a, i) => a == EndOfInputElement));
 
 			//return a new result with the new root branch as the root of a new tree, the state stack, a new syntax error with the current state, unexpected element, position, and expected elements
-			ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, p, pos, rows.OfType<Terminal<T>>().ToArray()));
+			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, p, pos, rows.OfType<Terminal<T>>().ToArray()));
 			return result;
 		}
 
 		/// <summary>
-		/// Shifts the given action based on the given item, reflecting the given changes on the given stack.
+		///     Shifts the given action based on the given item, reflecting the given changes on the given stack.
 		/// </summary>
 		/// <param name="stateStack"></param>
 		/// <param name="item"></param>
@@ -321,8 +369,8 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		}
 
 		/// <summary>
-		/// Performs the given action on the given stack, branches, and current index based on the current item.
-		/// Returns whether the action was to accept.
+		///     Performs the given action on the given stack, branches, and current index based on the current item.
+		///     Returns whether the action was to accept.
 		/// </summary>
 		/// <param name="syntax"></param>
 		/// <param name="stateStack"></param>
@@ -343,14 +391,12 @@ namespace KallynGowdy.ParserGenerator.Parsers
 				currentIndex++;
 			}
 			else if (action is AcceptAction<T>)
-			{
 				return true;
-			}
 			return false;
 		}
 
 		/// <summary>
-		/// Reduces the given action, reflecting the changes on the given stack, branches, and index.
+		///     Reduces the given action, reflecting the changes on the given stack, branches, and index.
 		/// </summary>
 		/// <param name="syntax"></param>
 		/// <param name="stateStack"></param>
@@ -360,20 +406,17 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		{
 			if (action is ReduceAction<T>)
 			{
-				ReduceAction<T> r = (ReduceAction<T>)action;
+				var r = (ReduceAction<T>)action;
 
-				List<GrammarElement<T>> e = new List<GrammarElement<T>>();
+				var e = new List<GrammarElement<T>>();
 
 				//pop the number of elements in the RHS of the item
-				for (int c = 0; c < r.ReduceItem.ProductionElements.Length; c++)
-				{
+				for (var c = 0; c < r.ReduceItem.ProductionElements.Length; c++)
 					e.Add(stateStack.Pop().Value);
-				}
 				e.Reverse();
 
 				//create a new branch with the value as the LHS of the reduction item.
-				ParseTree<T>.ParseTreebranch newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
-
+				var newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
 
 
 				//Determine whether to add each element to the new branch based on whether it should be kept.
@@ -384,15 +427,15 @@ namespace KallynGowdy.ParserGenerator.Parsers
 						if (element.Keep || syntax)
 						{
 							//find the first branch that matches the reduce element
-							var b = currentBranches.Last(a => a.Value.Equals(element));
+							ParseTree<T>.ParseTreebranch b = currentBranches.Last(a => a.Value.Equals(element));
 							newBranch.AddChild(b);
 							currentBranches.Remove(b);
 						}
 						else
 						{
 							//find the first branch that matches the reduce element
-							var b = currentBranches.Last(a => a.Value.Equals(element));
-							//get the children of the branch since we dont want the current value
+							ParseTree<T>.ParseTreebranch b = currentBranches.Last(a => a.Value.Equals(element));
+							//get the children of the branch since we don't want the current value
 							IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.GetChildren();
 							//add the children
 							newBranch.AddChildren(branches);
@@ -402,12 +445,11 @@ namespace KallynGowdy.ParserGenerator.Parsers
 					else
 					{
 						//if we should keep the terminal object, then add it to the new branch
-						if (element == null || element.Keep || syntax)
-						{
+						if (element == null ||
+							element.Keep ||
+							syntax)
 							newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
-						}
 					}
-
 				}
 
 				currentBranches.Add(newBranch);
@@ -420,26 +462,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		}
 
 		/// <summary>
-		/// Parses an Abstract Syntax tree from the given input based on the rules defined in the Terminal elements.
-		/// </summary>
-		/// <param name="input"></param>
-		/// <exception cref="System.InvalidOperationException"/>
-		/// <exception cref="System.ArgumentNullException"/>
-		/// <returns></returns>
-		public virtual ParseResult<T> ParseAST(IEnumerable<Terminal<T>> input)
-		{
-			if (input == null)
-			{
-				throw new ArgumentNullException("input");
-			}
-
-			CheckParseTable();
-
-			return LRParse(false, input.ToArray());
-		}
-
-		/// <summary>
-		/// Gets a syntax error result from the current branches, stack and item.
+		///     Gets a syntax error result from the current branches, stack and item.
 		/// </summary>
 		/// <param name="currentBranches">The current branches in the parse.</param>
 		/// <param name="stateStack">The current state stack in the parse.</param>
@@ -447,20 +470,20 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <returns></returns>
 		protected ParseResult<T> GetSyntaxErrorResult(IEnumerable<Terminal<T>> input, int index, List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
 		{
-			ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
-			var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
+			IEnumerable<Terminal<T>> rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
 
 
 			// TODO: Update with proper logic
-			Tuple<int, int> pos = new Tuple<int, int>(0, 0); //new Tuple<int, int>(input.GetLineNumber(index, a => a == EndOfInputElement), input.GetColumnNumber(index, (a, i) => a == EndOfInputElement));
+			var pos = new Tuple<int, int>(0, 0); //new Tuple<int, int>(input.GetLineNumber(index, a => a == EndOfInputElement), input.GetColumnNumber(index, (a, i) => a == EndOfInputElement));
 
-			ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, pos, rows.ToArray()));
+			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, pos, rows.ToArray()));
 			return result;
 		}
 
 		/// <summary>
-		/// Gets a syntax error result from the current branches, stack and item.
+		///     Gets a syntax error result from the current branches, stack and item.
 		/// </summary>
 		/// <param name="currentBranches">The current branches in the parse.</param>
 		/// <param name="stateStack">The current state stack in the parse.</param>
@@ -468,15 +491,15 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <returns></returns>
 		protected ParseResult<T> GetSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
 		{
-			ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
-			var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
-			ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, new Tuple<int, int>(-1, -1), rows.ToArray()));
+			IEnumerable<Terminal<T>> rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
+			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, new Tuple<int, int>(-1, -1), rows.ToArray()));
 			return result;
 		}
 
 		/// <summary>
-		/// Gets a syntax error result from the current branches, stack and item.
+		///     Gets a syntax error result from the current branches, stack and item.
 		/// </summary>
 		/// <param name="currentBranches">The current branches in the parse.</param>
 		/// <param name="stateStack">The current state stack in the parse.</param>
@@ -484,87 +507,20 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <returns></returns>
 		protected ParseResult<T> GetSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string invalidItem)
 		{
-			ParseTree<T>.ParseTreebranch root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
-			var rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
-			ParseResult<T> result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, invalidItem, new Tuple<int, int>(-1, -1), rows.ToArray()));
+			IEnumerable<Terminal<T>> rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
+			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, invalidItem, new Tuple<int, int>(-1, -1), rows.ToArray()));
 			return result;
 		}
 
 		/// <summary>
-		/// Parses a concrete Syntax tree from the given input.
-		/// </summary>
-		/// <param name="input"></param>
-		/// <exception cref="System.InvalidOperationException"/>
-		/// <exception cref="System.ArgumentNullException"/>
-		/// <returns></returns>
-		public virtual ParseResult<T> ParseSyntaxTree(IEnumerable<Terminal<T>> input)
-		{
-			if (input == null)
-			{
-				throw new ArgumentNullException("input");
-			}
-
-			CheckParseTable();
-
-			return LRParse(true, input.ToArray());
-		}
-
-		/// <summary>
-		/// Throws InvalidOperationException if the parse table is not set.
+		///     Throws InvalidOperationException if the parse table is not set.
 		/// </summary>
 		protected void CheckParseTable()
 		{
 			if (ParseTable == null)
-			{
 				throw new InvalidOperationException("ParseTable must be set before trying to parse.");
-			}
-		}
-
-		/// <summary>
-		/// Sets the Parse Table from the given graph.
-		/// </summary>
-		/// <param name="graph"></param>
-		/// <exception cref="Parser.InvalidParseTableException"/>
-		public virtual void SetParseTable(StateGraph<GrammarElement<T>, LRItem<T>[]> graph, Terminal<T> endOfInputElement)
-		{
-			if (graph == null)
-			{
-				throw new ArgumentNullException("graph", "The given graph must be non-null");
-			}
-
-			if (endOfInputElement == null)
-			{
-				throw new ArgumentNullException("endOfInputElement");
-			}
-			if (graph.Root != null)
-			{
-				if (graph.Root.Value.FirstOrDefault() != null)
-				{
-					SetParseTable(new ParseTable<T>(graph, graph.Root.Value.First().LeftHandSide), graph);
-					this.EndOfInputElement = endOfInputElement;
-				}
-			}
-
-			throw new ArgumentException("The given graph must have at least one state with at least one item.");
-		}
-
-		/// <summary>
-		/// Sets Parse Table from the given grammar.
-		/// </summary>
-		/// <param name="grammar"></param>
-		/// <exception cref="Parser.InvalidParseTableException"/>
-		public virtual void SetParseTable(ContextFreeGrammar<T> grammar)
-		{
-			if (grammar == null)
-			{
-				throw new ArgumentNullException("grammar", "The given grammar must be non-null");
-			}
-
-			var graph = grammar.CreateStateGraph();
-
-			SetParseTable(new ParseTable<T>(graph, grammar.StartElement), graph);
-			EndOfInputElement = grammar.EndOfInputElement;
 		}
 	}
 }
