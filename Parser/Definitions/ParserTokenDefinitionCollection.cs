@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using LexicalAnalysis;
 using LexicalAnalysis.Definitions;
 
-namespace Parser.Definitions
+namespace KallynGowdy.ParserGenerator.Definitions
 {
     /// <summary>
     /// Provides a serializable collection of ParserTokenDefintion objects.

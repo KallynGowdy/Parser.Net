@@ -1,5 +1,6 @@
 ﻿using System;
-namespace Parser.Grammar
+
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Provides an interface for non terminal elements, Equals(and therefore GetHashCode) is required to be implemented to provide a strong/consistant equality interface.

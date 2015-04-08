@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Xml;
-using Parser.Collections;
-using Parser.Grammar;
-using Parser.Parsers;
-using System.IO.Compression;
+using KallynGowdy.ParserGenerator.Collections;
+using KallynGowdy.ParserGenerator.Grammar;
+using KallynGowdy.ParserGenerator.Parsers;
 
-namespace Parser.StateMachine
+namespace KallynGowdy.ParserGenerator.StateMachine
 {
     /// <summary>
     /// Provides an implementation of a parse table.

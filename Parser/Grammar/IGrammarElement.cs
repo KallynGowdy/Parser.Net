@@ -1,5 +1,4 @@
-﻿using System;
-namespace Parser.Grammar
+﻿namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Provides an interface for a Context Free Grammar Element.

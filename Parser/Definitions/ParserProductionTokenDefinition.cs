@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
+using KallynGowdy.ParserGenerator.Grammar;
 using LexicalAnalysis;
 using LexicalAnalysis.Definitions;
-using Parser.Grammar;
 
-namespace Parser.Definitions
+namespace KallynGowdy.ParserGenerator.Definitions
 {
     /// <summary>
     /// Defines a relation between a production and a ParserTokenDefintionCollection. This is done in two parts, The Productions and the Definitions.

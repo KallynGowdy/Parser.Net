@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Parser.Collections
+namespace KallynGowdy.ParserGenerator.Collections
 {
     /// <summary>
     /// Provides a dictionary for keys that can have multiple hashes that point to the same object such that when accessing an object the single hash code points to the desired object.

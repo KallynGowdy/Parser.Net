@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using Parser.Collections;
+using KallynGowdy.ParserGenerator.Collections;
 
-namespace Parser.Grammar
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Defines a element of grammar that is used in productions.

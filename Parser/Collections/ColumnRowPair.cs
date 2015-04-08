@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Parser.Collections
+namespace KallynGowdy.ParserGenerator.Collections
 {
     /// <summary>
     /// Defines a column that relates to a row.

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using Parser.Grammar;
-using Parser.StateMachine;
+using KallynGowdy.ParserGenerator.Grammar;
+using KallynGowdy.ParserGenerator.StateMachine;
 using LexicalAnalysis;
 
-namespace Parser.Parsers
+namespace KallynGowdy.ParserGenerator.Parsers
 {
     /// <summary>
     /// Defines an LR(1) parser.

@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using KallynGowdy.ParserGenerator.Definitions;
+using KallynGowdy.ParserGenerator.Grammar;
 using LexicalAnalysis;
-using Parser.Definitions;
-using Parser.Grammar;
-using Parser.Parsers;
-using Parser.StateMachine;
 
-namespace Parser.Parsers.AllInOne
+namespace KallynGowdy.ParserGenerator.Parsers.AllInOne
 {
     /// <summary>
     /// Defines an All-in-One LR parser, that provided a collection of ParserTokenDefinitions can successfully parse a given string of input characters.

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 
-namespace Parser.Grammar
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Defines an element that has one or more terminal elements that represent it.

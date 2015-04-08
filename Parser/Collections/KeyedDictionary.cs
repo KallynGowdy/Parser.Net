@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Parser.Collections
+namespace KallynGowdy.ParserGenerator.Collections
 {
     /// <summary>
     /// Provides a dictionary that supports keys that contain extra information that does not affect equality.

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace Parser.Grammar
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Defines a relation between a non terminal element and several terminal/non-terminal elements.

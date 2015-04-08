@@ -5,9 +5,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
-using Parser.StateMachine;
+using KallynGowdy.ParserGenerator.StateMachine;
 
-namespace Parser.Grammar
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Defines a Context Free Grammar(CFG) such that given a string of terminal elements, they will be

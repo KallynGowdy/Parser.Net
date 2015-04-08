@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using Parser.Collections;
-using Parser.Grammar;
-using Parser.StateMachine;
+using KallynGowdy.ParserGenerator.Collections;
+using KallynGowdy.ParserGenerator.Grammar;
+using KallynGowdy.ParserGenerator.StateMachine;
 
-namespace Parser.Parsers
+namespace KallynGowdy.ParserGenerator.Parsers
 {
     /// <summary>
     /// Defines a conflict for a LR parser as either a ShiftReduce or ReduceReduce conflict.

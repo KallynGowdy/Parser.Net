@@ -8,20 +8,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Parser.Grammar;
-using Parser.StateMachine;
 using LexicalAnalysis.Definitions;
 using LexicalAnalysis;
-using Parser.Parsers;
-using Parser.Definitions;
 using System.Threading;
 using System.IO;
 using System.IO.Compression;
-using Parser.Parsers.AllInOne;
 using Parser;
 using Parser.RegularExpressions;
 using System.Xml;
 using GrammarBuilder;
+using KallynGowdy.ParserGenerator.Definitions;
+using KallynGowdy.ParserGenerator.Grammar;
+using KallynGowdy.ParserGenerator.Parsers;
+using KallynGowdy.ParserGenerator.Parsers.AllInOne;
+using KallynGowdy.ParserGenerator.StateMachine;
 
 namespace ParserGUI
 {

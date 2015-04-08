@@ -1,5 +1,6 @@
 ﻿using System;
-namespace Parser.Grammar
+
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Interface for Terminal elements, Equals(and therefore GetHashCode) is required to be overriden to provide a strong equality interface

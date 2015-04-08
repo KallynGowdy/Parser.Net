@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Parser.Grammar
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// Defines a value that cannot be derived into a further 'child' element.

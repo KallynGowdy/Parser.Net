@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Parser.StateMachine;
 
-namespace Parser.StateMachine
+namespace KallynGowdy.ParserGenerator.StateMachine
 {
     /// <summary>
     /// Provides a graph that relates states to other states based on transitions.

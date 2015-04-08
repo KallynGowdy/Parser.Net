@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using LexicalAnalysis;
 
-namespace Parser.Definitions
+namespace KallynGowdy.ParserGenerator.Definitions
 {
     /// <summary>
     /// Defines a parser token defintion that contains a string.

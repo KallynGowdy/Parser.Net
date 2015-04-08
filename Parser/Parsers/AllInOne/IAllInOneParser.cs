@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LexicalAnalysis;
-using Parser.Parsers;
 
-namespace Parser.Parsers.AllInOne
+namespace KallynGowdy.ParserGenerator.Parsers.AllInOne
 {
     /// <summary>
     /// Defines an interface for an All-in-One parser.

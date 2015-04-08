@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using LexicalAnalysis.Definitions;
+using KallynGowdy.ParserGenerator.Grammar;
 using LexicalAnalysis;
-using Parser.Grammar;
+using LexicalAnalysis.Definitions;
 
-
-namespace Parser.Definitions
+namespace KallynGowdy.ParserGenerator.Definitions
 {
     /// <summary>
     /// Defines a relation between a TokenDefinition and a Terminal element.

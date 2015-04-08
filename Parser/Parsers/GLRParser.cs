@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
+using KallynGowdy.ParserGenerator.Grammar;
+using KallynGowdy.ParserGenerator.StateMachine;
 
-using Parser.Grammar;
-using Parser.Collections;
-using Parser.StateMachine;
-using System.Reflection;
-
-namespace Parser.Parsers
+namespace KallynGowdy.ParserGenerator.Parsers
 {
     /// <summary>
     /// Provides an implementation of a GLR Parser that can parse any table.

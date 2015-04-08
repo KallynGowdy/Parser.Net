@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using LexicalAnalysis.Definitions;
-using LexicalAnalysis;
+﻿using LexicalAnalysis;
 
-namespace Parser.Definitions
+namespace KallynGowdy.ParserGenerator.Definitions
 {
     /// <summary>
     /// Defines a relationship between a keyword and a ParserTokenDefinition.

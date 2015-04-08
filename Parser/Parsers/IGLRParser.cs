@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Parser.Grammar;
-using Parser.StateMachine;
+using KallynGowdy.ParserGenerator.Grammar;
+using KallynGowdy.ParserGenerator.StateMachine;
 
-namespace Parser.Parsers
+namespace KallynGowdy.ParserGenerator.Parsers
 {
     public interface IGLRParser<T> : IParser<T> where T : IEquatable<T>
     {

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using Parser.Grammar;
+using KallynGowdy.ParserGenerator.Grammar;
 
-namespace Parser.Parsers
+namespace KallynGowdy.ParserGenerator.Parsers
 {
     /// <summary>
     /// Represents a parse tree.

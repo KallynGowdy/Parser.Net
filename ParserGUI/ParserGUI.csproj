@@ -87,9 +87,9 @@
       <Project>{585c5449-33fd-45d6-8da0-948c41b0859d}</Project>
       <Name>LexicalAnalysis</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Parser\Parser.csproj">
+    <ProjectReference Include="..\Parser\KallynGowdy.ParserGenerator.csproj">
       <Project>{7bf0258e-f67b-45fe-9710-83955acd4cf2}</Project>
-      <Name>Parser</Name>
+      <Name>KallynGowdy.ParserGenerator</Name>
     </ProjectReference>
     <ProjectReference Include="..\RegularExpressions\RegularExpressions.csproj">
       <Project>{7d3a9de2-e08d-4cf4-8bc1-81a8121b1912}</Project>

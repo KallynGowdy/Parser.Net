@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using KallynGowdy.ParserGenerator.Collections;
 using LexicalAnalysis;
-using Parser.Collections;
-using Parser.Grammar;
 
-namespace Parser.Grammar
+namespace KallynGowdy.ParserGenerator.Grammar
 {
     /// <summary>
     /// A static class defining extension methods for the Grammar namespace.

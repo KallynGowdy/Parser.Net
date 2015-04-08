@@ -7,8 +7,8 @@
     <ProjectGuid>{7BF0258E-F67B-45FE-9710-83955ACD4CF2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Parser</RootNamespace>
-    <AssemblyName>Parser</AssemblyName>
+    <RootNamespace>KallynGowdy.ParserGenerator</RootNamespace>
+    <AssemblyName>KallynGowdy.ParserGenerator</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -49,21 +49,31 @@
     <Compile Include="Grammar\IGrammarElement.cs" />
     <Compile Include="Grammar\INonTerminal.cs" />
     <Compile Include="Grammar\ITerminal.cs" />
-    <Compile Include="Parsers\AllInOne\AIOParser.cs" />
+    <Compile Include="Parsers\AcceptAction.cs" />
+    <Compile Include="Parsers\AllInOne\AIOLRParser.cs" />
     <Compile Include="Parsers\AllInOne\IAllInOneParser.cs" />
     <Compile Include="Collections\ColumnRowPair.cs" />
-    <Compile Include="Definitions\ITokenMatch.cs" />
+    <Compile Include="Definitions\ITerminalMatch.cs" />
     <Compile Include="Definitions\KeywordParserTokenDefinition.cs" />
     <Compile Include="Definitions\ParserProductionTokenDefinition.cs" />
     <Compile Include="Definitions\ParserTokenDefinition.cs" />
-    <Compile Include="Definitions\ParserTokenDefintionCollection.cs" />
+    <Compile Include="Definitions\ParserTokenDefinitionCollection.cs" />
     <Compile Include="Definitions\StringedParserTokenDefinition.cs" />
     <Compile Include="Grammar\ContextFreeGrammar.cs" />
     <Compile Include="Grammar\IParseTable.cs" />
     <Compile Include="Parsers\GLRParser.cs" />
     <Compile Include="Parsers\IGLRParser.cs" />
-    <Compile Include="Parsers\ITree.cs" />
+    <Compile Include="Parsers\IGrammarParser.cs" />
+    <Compile Include="Parsers\IGraphParser.cs" />
+    <Compile Include="Parsers\IParseError.cs" />
+    <Compile Include="Parsers\ITableParser.cs" />
+    <Compile Include="Parsers\ITreebranch.cs" />
+    <Compile Include="Parsers\MultipleActionsParseError.cs" />
     <Compile Include="Parsers\ParseTableConflict.cs" />
+    <Compile Include="Parsers\ParseTableExceptionType.cs" />
+    <Compile Include="Parsers\ReduceAction.cs" />
+    <Compile Include="Parsers\ShiftAction.cs" />
+    <Compile Include="Parsers\SyntaxParseError.cs" />
     <Compile Include="StateMachine\ParseTable.cs" />
     <Compile Include="Grammar\GrammarElement.cs" />
     <Compile Include="Grammar\GrammarExtensions.cs" />
@@ -74,7 +84,7 @@
     <Compile Include="Grammar\Terminal.cs" />
     <Compile Include="Parsers\InvalidParseTableException.cs" />
     <Compile Include="Parsers\IParser.cs" />
-    <Compile Include="Parsers\ParseAction.cs" />
+    <Compile Include="Parsers\ParserAction.cs" />
     <Compile Include="ParserExtensions.cs" />
     <Compile Include="Parsers\LRParser.cs" />
     <Compile Include="Parsers\ParseResult.cs" />
@@ -89,7 +99,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Lexer\LexicalAnalysis.csproj">
       <Project>{585c5449-33fd-45d6-8da0-948c41b0859d}</Project>
-      <Name>Lexer</Name>
+      <Name>LexicalAnalysis</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,26 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using Parser.Grammar;
-using Parser.StateMachine;
 using System.Security.Permissions;
+using System.Text;
+using KallynGowdy.ParserGenerator.Grammar;
+using KallynGowdy.ParserGenerator.StateMachine;
 
-namespace Parser.Parsers
+namespace KallynGowdy.ParserGenerator.Parsers
 {
-    /// <summary>
-    /// Defines a set of values that determine the possible errors(shift-reduce/reduce-reduce) that can occur with a parse table.
-    /// </summary>
-    [Flags]
-    public enum ParseTableExceptionType
-    {
-        SHIFT_REDUCE = 1,
-        REDUCE_REDUCE = 2,
-        FIRST_SET = 3
-    };
-
-    /// <summary>
+	/// <summary>
     /// Defines an exception that is thrown when given a parse table cannot be used with a certian parser.
     /// </summary>
     [Serializable]

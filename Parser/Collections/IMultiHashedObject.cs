@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Parser.Collections
+﻿namespace KallynGowdy.ParserGenerator.Collections
 {
     /// <summary>
     /// Provides an interface for objects that can have multiple valid hashes, therefore allowing for relational equality in dictionaries.
