@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>KallynGowdy.ParserGenerator</RootNamespace>
     <AssemblyName>KallynGowdy.ParserGenerator</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,22 +45,13 @@
     <Compile Include="Collections\IMultiHashedObject.cs" />
     <Compile Include="Collections\KeyedDictionary.cs" />
     <Compile Include="Collections\MultiHashedDictionary.cs" />
-    <Compile Include="Definitions\KeywordIdentifierParserTokenDefinition.cs" />
     <Compile Include="Definitions\MissingTokenDefinition.cs" />
-    <Compile Include="Definitions\StringedIdentifierParserTokenDefinition.cs" />
     <Compile Include="Grammar\IGrammarElement.cs" />
     <Compile Include="Grammar\INonTerminal.cs" />
     <Compile Include="Grammar\ITerminal.cs" />
     <Compile Include="Parsers\AcceptAction.cs" />
-    <Compile Include="Parsers\AllInOne\AIOLRParser.cs" />
-    <Compile Include="Parsers\AllInOne\IAllInOneParser.cs" />
     <Compile Include="Collections\ColumnRowPair.cs" />
     <Compile Include="Definitions\ITerminalMatch.cs" />
-    <Compile Include="Definitions\KeywordParserTokenDefinition.cs" />
-    <Compile Include="Definitions\ParserProductionTokenDefinition.cs" />
-    <Compile Include="Definitions\ParserTokenDefinition.cs" />
-    <Compile Include="Definitions\ParserTokenDefinitionCollection.cs" />
-    <Compile Include="Definitions\StringedParserTokenDefinition.cs" />
     <Compile Include="Grammar\ContextFreeGrammar.cs" />
     <Compile Include="Grammar\IParseTable.cs" />
     <Compile Include="Parsers\GLRParser.cs" />
@@ -94,13 +87,6 @@
     <Compile Include="StateMachine\StateGraph.cs" />
     <Compile Include="StateMachine\StateNode.cs" />
     <Compile Include="Collections\Table.cs" />
-    <Compile Include="Tuple.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lexer\LexicalAnalysis.csproj">
-      <Project>{585c5449-33fd-45d6-8da0-948c41b0859d}</Project>
-      <Name>LexicalAnalysis</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

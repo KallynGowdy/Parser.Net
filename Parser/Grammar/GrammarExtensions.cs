@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using KallynGowdy.ParserGenerator.Collections;
-using LexicalAnalysis;
 
 namespace KallynGowdy.ParserGenerator.Grammar
 {
@@ -57,11 +56,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
             }
             return table;
         }
-
-        public static Terminal<Token<T>> ToTerminal<T>(this Token<T> value, bool keep)
-        {
-            return new Terminal<Token<T>>(value, keep);
-        }
+		
 
         /// <summary>
         /// Returns a new Terminal(T) object whose value is currentValue.ToString().
@@ -84,17 +79,5 @@ namespace KallynGowdy.ParserGenerator.Grammar
         {
             return new NonTerminal<string>(value.ToString(), keep);
         }
-
-
-        ///// <summary>
-        ///// Returns a new NonTerminal(T) object whose name is currentValue.ToString().
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="value"></param>
-        ///// <returns></returns>
-        //public static NonTerminal<T> ToNonTerminal<T>(this T value, bool keep = true)
-        //{
-        //    return new NonTerminal<T>(value.ToString(), keep);
-        //}
     }
 }
