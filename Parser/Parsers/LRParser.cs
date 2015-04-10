@@ -225,13 +225,13 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="currentBranches"></param>
 		/// <param name="syntax">Determines whether to produce a syntax tree or AST.</param>
 		/// <returns></returns>
-		protected ParseResult<T> LRParse(bool syntax, Terminal<T>[] input, int inputProgression = 0, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = null, List<ParseTree<T>.ParseTreebranch> currentBranches = null)
+		protected ParseResult<T> LRParse(bool syntax, Terminal<T>[] input, int inputProgression = 0, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = null, List<SyntaxNode<T>> currentBranches = null)
 		{
 			if (input == null)
 			{
-				var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+				var root = new SyntaxNode<T>((GrammarElement<T>)null);
 				root.AddChildren(currentBranches);
-				return new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList());
+				return new ParseResult<T>(false, new SyntaxTree<T>(root), stateStack.ToList());
 			}
 
 			if (stateStack == null)
@@ -241,7 +241,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 			}
 
 			if (currentBranches == null)
-				currentBranches = new List<ParseTree<T>.ParseTreebranch>();
+				currentBranches = new List<SyntaxNode<T>>();
 
 			Terminal<T>[] augmentedInput = input.Concat(new[] { EndOfInputElement }).ToArray();
 
@@ -269,7 +269,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 							if (!TakeFirstRoute)
 							{
 								KeyValuePair<int, GrammarElement<T>> currentState = stateStack.Peek();
-								return new ParseResult<T>(false, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(currentBranches)), stateStack.ToList(), new MultipleActionsParseError<T>("", currentState.Key, item, i, actions.ToArray()));
+								return new ParseResult<T>(false, new SyntaxTree<T>(new SyntaxNode<T>(currentBranches)), stateStack.ToList(), new MultipleActionsParseError<T>("", currentState.Key, item, i, actions.ToArray()));
 							}
 							action = actions.First();
 						}
@@ -287,8 +287,8 @@ namespace KallynGowdy.ParserGenerator.Parsers
 							//otherwise if the parse if finished and we should accept
 							else if (action is AcceptAction<T>)
 							{
-								//return a new ParseTree with the root as the current branch
-								return new ParseResult<T>(true, new ParseTree<T>(currentBranches.First()), stateStack.ToList());
+								//return a new SyntaxTree with the root as the current branch
+								return new ParseResult<T>(true, new SyntaxTree<T>(currentBranches.First()), stateStack.ToList());
 							}
 							//should never be called, but the compiler will be satisfied...
 							else
@@ -317,7 +317,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 			{
 				var action = (ReduceAction<T>)enumerableActions.First();
 
-				return new ParseResult<T>(true, new ParseTree<T>(new ParseTree<T>.ParseTreebranch(action.ReduceItem.LeftHandSide)), null);
+				return new ParseResult<T>(true, new SyntaxTree<T>(new SyntaxNode<T>(action.ReduceItem.LeftHandSide)), null);
 			}
 			return GetSyntaxErrorResult(null, null, EndOfInputElement);
 			//return new ParseResult<T>(false, null, null, new SyntaxParseError<T>("Empty input is invalid. There is no reduction of Start -> epsilon"));
@@ -333,10 +333,10 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="stateStack">The current stack representing the transitions that were taken through the state graph.</param>
 		/// <param name="p">The string representation of the unexpected element.</param>
 		/// <returns></returns>
-		protected ParseResult<T> GetSyntaxErrorResult(Terminal<T>[] input, int index, List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string p)
+		protected ParseResult<T> GetSyntaxErrorResult(Terminal<T>[] input, int index, List<SyntaxNode<T>> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string p)
 		{
 			//create a new root branch for the tree
-			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new SyntaxNode<T>((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
 
 			//get the possible expected elements
@@ -352,7 +352,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 			var pos = new Tuple<int, int>(0, 0); //new Tuple<int, int>(input.GetLineNumber(index, a => a == EndOfInputElement), input.GetColumnNumber(index, (a, i) => a == EndOfInputElement));
 
 			//return a new result with the new root branch as the root of a new tree, the state stack, a new syntax error with the current state, unexpected element, position, and expected elements
-			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, p, pos, rows.OfType<Terminal<T>>().ToArray()));
+			var result = new ParseResult<T>(false, new SyntaxTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, p, pos, rows.OfType<Terminal<T>>().ToArray()));
 			return result;
 		}
 
@@ -378,7 +378,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="action"></param>
 		/// <param name="currentIndex"></param>
 		/// <returns></returns>
-		protected bool PerformAction(bool syntax, Terminal<T> currentItem, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, List<ParseTree<T>.ParseTreebranch> currentBranches, ParserAction<T> action, ref int currentIndex)
+		protected bool PerformAction(bool syntax, Terminal<T> currentItem, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, List<SyntaxNode<T>> currentBranches, ParserAction<T> action, ref int currentIndex)
 		{
 			if (action is ShiftAction<T>)
 			{
@@ -402,7 +402,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="stateStack"></param>
 		/// <param name="currentBranches"></param>
 		/// <param name="action"></param>
-		protected void Reduce(bool syntax, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, List<ParseTree<T>.ParseTreebranch> currentBranches, ParserAction<T> action, ref int currentIndex)
+		protected void Reduce(bool syntax, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, List<SyntaxNode<T>> currentBranches, ParserAction<T> action, ref int currentIndex)
 		{
 			if (action is ReduceAction<T>)
 			{
@@ -416,7 +416,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 				e.Reverse();
 
 				//create a new branch with the value as the LHS of the reduction item.
-				var newBranch = new ParseTree<T>.ParseTreebranch(r.ReduceItem.LeftHandSide);
+				var newBranch = new SyntaxNode<T>(r.ReduceItem.LeftHandSide);
 
 
 				//Determine whether to add each element to the new branch based on whether it should be kept.
@@ -427,16 +427,16 @@ namespace KallynGowdy.ParserGenerator.Parsers
 						if (element.Keep || syntax)
 						{
 							//find the first branch that matches the reduce element
-							ParseTree<T>.ParseTreebranch b = currentBranches.Last(a => a.Value.Equals(element));
+							SyntaxNode<T> b = currentBranches.Last(a => a.Value.Equals(element));
 							newBranch.AddChild(b);
 							currentBranches.Remove(b);
 						}
 						else
 						{
 							//find the first branch that matches the reduce element
-							ParseTree<T>.ParseTreebranch b = currentBranches.Last(a => a.Value.Equals(element));
+							SyntaxNode<T> b = currentBranches.Last(a => a.Value.Equals(element));
 							//get the children of the branch since we don't want the current value
-							IEnumerable<ParseTree<T>.ParseTreebranch> branches = b.GetChildren();
+							IEnumerable<SyntaxNode<T>> branches = b.GetChildren();
 							//add the children
 							newBranch.AddChildren(branches);
 							currentBranches.Remove(b);
@@ -448,7 +448,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 						if (element == null ||
 							element.Keep ||
 							syntax)
-							newBranch.AddChild(new ParseTree<T>.ParseTreebranch(element));
+							newBranch.AddChild(new SyntaxNode<T>(element));
 					}
 				}
 
@@ -468,9 +468,9 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="stateStack">The current state stack in the parse.</param>
 		/// <param name="item">The next terminal item from the augmented input.</param>
 		/// <returns></returns>
-		protected ParseResult<T> GetSyntaxErrorResult(IEnumerable<Terminal<T>> input, int index, List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
+		protected ParseResult<T> GetSyntaxErrorResult(IEnumerable<Terminal<T>> input, int index, List<SyntaxNode<T>> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
 		{
-			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new SyntaxNode<T>((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
 			IEnumerable<Terminal<T>> rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
 
@@ -478,7 +478,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 			// TODO: Update with proper logic
 			var pos = new Tuple<int, int>(0, 0); //new Tuple<int, int>(input.GetLineNumber(index, a => a == EndOfInputElement), input.GetColumnNumber(index, (a, i) => a == EndOfInputElement));
 
-			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, pos, rows.ToArray()));
+			var result = new ParseResult<T>(false, new SyntaxTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, pos, rows.ToArray()));
 			return result;
 		}
 
@@ -489,12 +489,12 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="stateStack">The current state stack in the parse.</param>
 		/// <param name="item">The next terminal item from the augmented input.</param>
 		/// <returns></returns>
-		protected ParseResult<T> GetSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
+		protected ParseResult<T> GetSyntaxErrorResult(List<SyntaxNode<T>> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, Terminal<T> item)
 		{
-			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new SyntaxNode<T>((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
 			IEnumerable<Terminal<T>> rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
-			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, new Tuple<int, int>(-1, -1), rows.ToArray()));
+			var result = new ParseResult<T>(false, new SyntaxTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, item, new Tuple<int, int>(-1, -1), rows.ToArray()));
 			return result;
 		}
 
@@ -505,12 +505,12 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="stateStack">The current state stack in the parse.</param>
 		/// <param name="invalidItem">The next terminal item from the augmented input.</param>
 		/// <returns></returns>
-		protected ParseResult<T> GetSyntaxErrorResult(List<ParseTree<T>.ParseTreebranch> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string invalidItem)
+		protected ParseResult<T> GetSyntaxErrorResult(List<SyntaxNode<T>> currentBranches, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack, string invalidItem)
 		{
-			var root = new ParseTree<T>.ParseTreebranch((GrammarElement<T>)null);
+			var root = new SyntaxNode<T>((GrammarElement<T>)null);
 			root.AddChildren(currentBranches);
 			IEnumerable<Terminal<T>> rows = ParseTable.ActionTable.GetColumns(stateStack.Peek().Key).Where(a => a != null);
-			var result = new ParseResult<T>(false, new ParseTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, invalidItem, new Tuple<int, int>(-1, -1), rows.ToArray()));
+			var result = new ParseResult<T>(false, new SyntaxTree<T>(root), stateStack.ToList(), new SyntaxParseError<T>(stateStack.Peek().Key, invalidItem, new Tuple<int, int>(-1, -1), rows.ToArray()));
 			return result;
 		}
 

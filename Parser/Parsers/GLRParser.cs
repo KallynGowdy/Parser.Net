@@ -89,7 +89,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		/// <param name="inputProgression">The index of the current item to parse from.</param>
 		/// <param name="stateStack">The current stack used to parse.</param>
 		/// <param name="currentBranches">The current progression of the created tree.</param>
-		protected void ParseTrees(int id, ParseCallback callback, ParseBegin newParseBeginning, bool syntax, IEnumerable<Terminal<T>> input, int inputProgression = 0, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = null, List<ParseTree<T>.ParseTreebranch> currentBranches = null)
+		protected void ParseTrees(int id, ParseCallback callback, ParseBegin newParseBeginning, bool syntax, IEnumerable<Terminal<T>> input, int inputProgression = 0, Stack<KeyValuePair<int, GrammarElement<T>>> stateStack = null, List<SyntaxNode<T>> currentBranches = null)
 		{
 			var results = new List<ParseResult<T>>();
 
@@ -123,7 +123,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 								Terminal<T> item = input.ElementAt(progression >= input.Count() ? input.Count() - 1 : progression);
 
 								//get a new list of current branches
-								var branches = new List<ParseTree<T>.ParseTreebranch>(result.GetParseTree().Root.Children);
+								var branches = new List<SyntaxNode<T>>(result.GetParseTree().Root.Children);
 
 								//perform the action
 								if (PerformAction(true, item, stack, branches, action, ref progression))
@@ -132,7 +132,7 @@ namespace KallynGowdy.ParserGenerator.Parsers
 									lock (results)
 									{
 										//add the successful result
-										results.Add(new ParseResult<T>(true, new ParseTree<T>(branches.First()), stack.ToList()));
+										results.Add(new ParseResult<T>(true, new SyntaxTree<T>(branches.First()), stack.ToList()));
 									}
 									continue;
 								}
