@@ -6,14 +6,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{61CBEB50-2021-4E95-B52A-CFE9516840E9}</ProjectGuid>
+    <ProjectGuid>{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KallynGowdy.SyntaxTree.Tests</RootNamespace>
-    <AssemblyName>KallynGowdy.SyntaxTree.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>KallynGowdy.ParserGenerator.Tests</RootNamespace>
+    <AssemblyName>KallynGowdy.ParserGenerator.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>225b4765</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>1f18591c</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,10 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable, Version=1.1.34.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.1.1.34-rc\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,21 +55,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Syntax\Internal\FirstNameInternalNode.cs" />
-    <Compile Include="Syntax\FirstNameNode.cs" />
-    <Compile Include="Syntax\Internal\FullNameInternalSyntaxNode.cs" />
-    <Compile Include="Syntax\FullNameNode.cs" />
-    <Compile Include="Syntax\Internal\LastNameInternalNode.cs" />
-    <Compile Include="Syntax\LastNameNode.cs" />
-    <Compile Include="Syntax\Internal\MockInternalSyntaxTree.cs" />
-    <Compile Include="Syntax\MockSyntaxTree.cs" />
+    <Compile Include="ContextFreeGrammarTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyntaxTreeTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KallynGowdy.SyntaxTree\KallynGowdy.SyntaxTree.csproj">
-      <Project>{564b08db-f700-4347-a0b1-e80c93e15fc0}</Project>
-      <Name>KallynGowdy.SyntaxTree</Name>
+    <ProjectReference Include="..\..\lib\Parser\KallynGowdy.ParserGenerator.csproj">
+      <Project>{7bf0258e-f67b-45fe-9710-83955acd4cf2}</Project>
+      <Name>KallynGowdy.ParserGenerator</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
