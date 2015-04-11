@@ -1,6 +1,11 @@
+install:
+  - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 before_build:
   - nuget restore
 version: 1.0.{build}
 os: Visual Studio 2015 CTP 6
 build:
   verbosity: minimal
+test:
+  assemblies:
+    - '**\*.Tests.dll'
