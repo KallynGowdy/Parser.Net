@@ -6,4 +6,4 @@ os: Visual Studio 2015 CTP 6
 build:
   verbosity: minimal
 test:
-  - **\*.Tests.dll
+  - '**\*.Tests.dll'
