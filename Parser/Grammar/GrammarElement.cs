@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Serialization;
 using KallynGowdy.ParserGenerator.Collections;
 
@@ -49,7 +50,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 
 		public virtual int[] GetHashCodes()
 		{
-			return new[] {GetHashCode()};
+			return new[] { GetHashCode() };
 		}
 
 		public override bool Equals(object obj)
@@ -61,7 +62,33 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		{
 			if (InnerValue != null)
 				return InnerValue.GetHashCode();
-			return unchecked(521*typeof (T).GetHashCode());
+			return unchecked(521 * typeof(T).GetHashCode());
+		}
+
+		public static GrammarElement<T>[] operator +(GrammarElement<T> left, GrammarElement<T> right)
+		{
+			return new[] { left, right };
+		}
+
+		public static GrammarElement<T>[] operator +(GrammarElement<T>[] left, GrammarElement<T> right)
+		{
+			GrammarElement<T>[] elements = new GrammarElement<T>[left.Length + 1];
+			left.CopyTo(elements, 0);
+			elements[elements.Length - 1] = right;
+			return elements;
+		}
+
+		public static GrammarElement<T>[] operator *(GrammarElement<T> left, int right)
+		{
+			if (right < 0) throw new ArgumentOutOfRangeException("right", "Must be greater than or equal to 0.");
+			GrammarElement<T>[] elements = new GrammarElement<T>[right];
+
+			for (int i = 0; i < right; i++)
+			{
+				elements[i] = left;
+			}
+
+			return elements;
 		}
 	}
 }

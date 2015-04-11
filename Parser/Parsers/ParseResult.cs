@@ -12,13 +12,13 @@ namespace KallynGowdy.ParserGenerator.Parsers
 	public struct ParseResult<T>
 		where T : IEquatable<T>
 	{
-		private readonly ParseTree<T> parseTree;
+		private readonly SyntaxTree<T> syntaxTree;
 
-		public ParseResult(bool success, ParseTree<T> tree, IList<KeyValuePair<int, GrammarElement<T>>> parseStack, params IParseError[] errors)
+		public ParseResult(bool success, SyntaxTree<T> tree, IList<KeyValuePair<int, GrammarElement<T>>> parseStack, params IParseError[] errors)
 			: this()
 		{
 			Success = success;
-			parseTree = tree;
+			syntaxTree = tree;
 			if (parseStack != null)
 				Stack = new ReadOnlyCollection<KeyValuePair<int, GrammarElement<T>>>(parseStack);
 			if (errors != null)
@@ -45,10 +45,10 @@ namespace KallynGowdy.ParserGenerator.Parsers
 		///     This tree may or may not be complete, depending on if the parse was a success.
 		/// </summary>
 		/// <returns></returns>
-		public ParseTree<T> GetParseTree()
+		public SyntaxTree<T> GetParseTree()
 		{
-			if (parseTree != null)
-				return new ParseTree<T>(parseTree);
+			if (syntaxTree != null)
+				return new SyntaxTree<T>(syntaxTree);
 			return null;
 		}
 	}
