@@ -1,3 +1,6 @@
 before_build:
   - nuget restore
 version: 1.0.{build}
+os: Visual Studio 2015 CTP 6
+build:
+  verbosity: minimal
