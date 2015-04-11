@@ -103,5 +103,15 @@ namespace KallynGowdy.ParserGenerator.Grammar
 			return Name;
 			//}
 		}
+
+		public static Production<T> operator ^(NonTerminal<T> left, GrammarElement<T>[] right)
+		{
+			return new Production<T>(left, right);
+		}
+
+		public static Production<T> operator ^(NonTerminal<T> left, GrammarElement<T> right)
+		{
+			return left ^ new[] { right };
+		}
 	}
 }

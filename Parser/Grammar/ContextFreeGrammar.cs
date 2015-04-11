@@ -14,7 +14,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 	///     reduced to the starting element by the rules defined in the productions.
 	/// </summary>
 	[Serializable]
-	public class ContextFreeGrammar<T>
+	public class ContextFreeGrammar<T> : IEquatable<ContextFreeGrammar<T>>
 		where T : IEquatable<T>
 	{
 		private readonly Dictionary<LRItem<T>, IEnumerable<LRItem<T>>> closures = new Dictionary<LRItem<T>, IEnumerable<LRItem<T>>>();
@@ -24,16 +24,10 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// </summary>
 		/// <param name="startingElement"></param>
 		/// <param name="productions"></param>
+		/// <exception cref="ArgumentNullException">The value of 'startingElement', 'endOfInput' and 'productions' cannot be null. </exception>
 		public ContextFreeGrammar(NonTerminal<T> startingElement, IEnumerable<Production<T>> productions)
+			: this(startingElement, new Terminal<T>(default(T), false), productions)
 		{
-			//add the production S -> startingElement
-			StartElement = new NonTerminal<T>("S'" + (new Random()).Next(int.MaxValue).ToString("X"));
-			Productions = new List<Production<T>>();
-			Productions.Add(new Production<T>(StartElement, startingElement));
-
-			Productions.AddRange(productions);
-
-			EndOfInputElement = new Terminal<T>(default(T), false);
 		}
 
 		/// <summary>
@@ -42,11 +36,18 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// <param name="startingElement"></param>
 		/// <param name="endOfInput"></param>
 		/// <param name="productions"></param>
+		/// <exception cref="ArgumentNullException">The value of 'startingElement', 'endOfInput' and 'productions' cannot be null. </exception>
 		public ContextFreeGrammar(NonTerminal<T> startingElement, Terminal<T> endOfInput, IEnumerable<Production<T>> productions)
 		{
-			StartElement = new NonTerminal<T>("S'" + (new Random()).Next(int.MaxValue).ToString("X"));
-			Productions = new List<Production<T>>();
-			Productions.Add(new Production<T>(StartElement, startingElement));
+			if (startingElement == null) throw new ArgumentNullException("startingElement");
+			if (endOfInput == null) throw new ArgumentNullException("endOfInput");
+			if (productions == null) throw new ArgumentNullException("productions");
+
+			StartElement = new NonTerminal<T>("S'");
+			Productions = new List<Production<T>>
+			{
+				new Production<T>(StartElement, startingElement)
+			};
 			Productions.AddRange(productions);
 			EndOfInputElement = endOfInput;
 		}
@@ -90,7 +91,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// <exception cref="System.ArgumentNullException" />
 		public void WriteToStream(Stream stream)
 		{
-			var ser = new DataContractSerializer(typeof (ContextFreeGrammar<T>));
+			var ser = new DataContractSerializer(typeof(ContextFreeGrammar<T>));
 			XmlWriter writer = XmlWriter.Create(stream, new XmlWriterSettings
 			{
 				Indent = true
@@ -105,8 +106,8 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// <returns></returns>
 		public static ContextFreeGrammar<T> ReadFromStream(Stream stream)
 		{
-			var ser = new DataContractSerializer(typeof (ContextFreeGrammar<T>));
-			return (ContextFreeGrammar<T>) ser.ReadObject(stream);
+			var ser = new DataContractSerializer(typeof(ContextFreeGrammar<T>));
+			return (ContextFreeGrammar<T>)ser.ReadObject(stream);
 		}
 
 		/// <summary>
@@ -123,7 +124,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		}
 
 		/// <summary>
-		///     Gets the LR(1) closure of the given item.
+		///     Gets the LR(1) Closure of the given item.
 		/// </summary>
 		/// <param name="item"></param>
 		/// <returns></returns>
@@ -131,18 +132,18 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		{
 			if (closures.ContainsKey(item))
 				return closures[item];
-			IEnumerable<LRItem<T>> closure = lr1Closure(item, new HashSet<LRItem<T>>());
+			IEnumerable<LRItem<T>> closure = Lr1Closure(item, new HashSet<LRItem<T>>());
 			closures.Add(item, closure);
 			return closure;
 		}
 
 		/// <summary>
-		///     Gets the LR(1) closure of the given item, using currentItems to filter out duplicates.
+		///     Gets the LR(1) Closure of the given item, using currentItems to filter out duplicates.
 		/// </summary>
 		/// <param name="item"></param>
 		/// <param name="currentItems"></param>
 		/// <returns></returns>
-		private IEnumerable<LRItem<T>> lr1Closure(LRItem<T> item, HashSet<LRItem<T>> currentItems)
+		private IEnumerable<LRItem<T>> Lr1Closure(LRItem<T> item, HashSet<LRItem<T>> currentItems)
 		{
 			//<LRItem<T>> items;
 
@@ -163,7 +164,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				IEnumerable<Production<T>> productions = Productions.Where(a => a.NonTerminal.Equals(nextElement));
 
 				//for each of the possible following elements of item
-				foreach (Terminal<T> l in follow(item, currentItems))
+				foreach (Terminal<T> l in Follow(item, currentItems))
 				{
 					foreach (Production<T> p in productions)
 					{
@@ -178,8 +179,8 @@ namespace KallynGowdy.ParserGenerator.Grammar
 						{
 							//add the new item(but make sure it is not a duplicate
 							//items.Add(newItem);
-							//add the LR1 closure of the new item
-							lr1Closure(newItem, currentItems);
+							//add the LR1 Closure of the new item
+							Lr1Closure(newItem, currentItems);
 						}
 					}
 				}
@@ -195,7 +196,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// <returns></returns>
 		public IEnumerable<LRItem<T>> Closure(LRItem<T> item)
 		{
-			return closure(item, null);
+			return Closure(item, null);
 		}
 
 		/// <summary>
@@ -204,7 +205,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// <param name="item"></param>
 		/// <param name="currentItems"></param>
 		/// <returns></returns>
-		private IEnumerable<LRItem<T>> closure(LRItem<T> item, IEnumerable<LRItem<T>> currentItems)
+		private IEnumerable<LRItem<T>> Closure(LRItem<T> item, IEnumerable<LRItem<T>> currentItems)
 		{
 			List<LRItem<T>> items;
 
@@ -226,11 +227,11 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				//add the productions as LRItems
 				items.AddRange(productions.Select(a => new LRItem<T>(0, a)));
 
-				//add the closure of each found production
+				//add the Closure of each found production
 				foreach (Production<T> p in productions)
 				{
 					if (p.DerivedElements[0] is NonTerminal<T>)
-						items.AddRange(closure(new LRItem<T>(0, p), items));
+						items.AddRange(Closure(new LRItem<T>(0, p), items));
 				}
 			}
 
@@ -279,10 +280,10 @@ namespace KallynGowdy.ParserGenerator.Grammar
 					productions = productions.Where(a => !currentItems.Any(i => i.LeftHandSide.Equals(a.NonTerminal))).ToArray();
 
 
-				//add all of the items to the closure
+				//add all of the items to the Closure
 				items.AddRange(productions.Select(a => new LRItem<T>(0, a)).ToArray());
 
-				//find the closure of each production
+				//find the Closure of each production
 				foreach (Production<T> p in productions)
 				{
 					if (p.DerivedElements[0] is NonTerminal<T>)
@@ -293,7 +294,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				}
 				return items;
 			}
-			return new LRItem<T>[] {};
+			return new LRItem<T>[] { };
 		}
 
 		/// <summary>
@@ -322,14 +323,14 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// <param name="graph"></param>
 		public void CreateTransitions(StateGraph<GrammarElement<T>, LRItem<T>[]> graph)
 		{
-			createTransitions(graph.Root);
+			CreateTransitions(graph.Root);
 		}
 
 		/// <summary>
 		///     Creates transitions from the given node to other nodes based on the items contained in the given node.
 		/// </summary>
 		/// <param name="startingNode"></param>
-		private void createTransitions(StateNode<GrammarElement<T>, LRItem<T>[]> startingNode)
+		private void CreateTransitions(StateNode<GrammarElement<T>, LRItem<T>[]> startingNode)
 		{
 			//List<IEnumerable<LRItem<T>>> existingSets = new List<IEnumerable<LRItem<T>>>(startingNode.FromTransitions.Select(a => a.Value.Value));
 
@@ -350,7 +351,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 
 				state.ForEach(a => a.DotIndex++);
 
-				//add the closure
+				//add the Closure
 				LRItem<T>[] closure = state.Select(a => LR1Closure(a)).SelectMany(a => a).DistinctBy(a => a.ToString()).ToArray();
 
 				state.AddRange(closure);
@@ -371,7 +372,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				{
 					//add the state transition
 					startingNode.AddTransition(next, node);
-					createTransitions(node);
+					CreateTransitions(node);
 				}
 			}
 		}
@@ -391,12 +392,12 @@ namespace KallynGowdy.ParserGenerator.Grammar
 			firstState.Add(startingItem);
 
 			//get the rest of the first state
-			firstState.AddRange(lr1Closure(startingItem, new HashSet<LRItem<T>>()));
+			firstState.AddRange(Lr1Closure(startingItem, new HashSet<LRItem<T>>()));
 			return firstState;
 		}
 
 		/// <summary>
-		///     Returns the union of the LR(0) closure of each LRItem in the given set.
+		///     Returns the union of the LR(0) Closure of each LRItem in the given set.
 		/// </summary>
 		/// <param name="set"></param>
 		/// <returns></returns>
@@ -422,7 +423,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		/// </example>
 		/// <param name="nonTerminal"></param>
 		/// <returns></returns>
-		private IEnumerable<Terminal<T>> follow(LRItem<T> item, IEnumerable<LRItem<T>> totalItems)
+		private IEnumerable<Terminal<T>> Follow(LRItem<T> item, IEnumerable<LRItem<T>> totalItems)
 		{
 			//Follow(item) is First(b) where item is:
 			//A -> a•Eb
@@ -443,7 +444,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 					{
 						//if the current element is the end of the current item's production
 						if (item.GetNextElement(2) == null)
-							firstSet.Add(item.LookaheadElement == null ? EndOfInputElement : item.LookaheadElement);
+							firstSet.Add(item.LookaheadElement ?? EndOfInputElement);
 					}
 
 					//select the lookahead element or end of input element for each item in the previous set
@@ -456,8 +457,8 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				return First(element);
 			}
 			if (item.LookaheadElement == null)
-				return new[] {EndOfInputElement};
-			return new[] {item.LookaheadElement};
+				return new[] { EndOfInputElement };
+			return new[] { item.LookaheadElement };
 		}
 
 		/// <summary>
@@ -498,8 +499,8 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				//}
 			}
 			if (item.LookaheadElement == null)
-				return new[] {EndOfInputElement};
-			return new[] {item.LookaheadElement};
+				return new[] { EndOfInputElement };
+			return new[] { item.LookaheadElement };
 		}
 
 		/// <summary>
@@ -545,8 +546,8 @@ namespace KallynGowdy.ParserGenerator.Grammar
 		public IEnumerable<Terminal<T>> First(GrammarElement<T> element)
 		{
 			if (element is Terminal<T>)
-				return new[] {(Terminal<T>) element};
-			return First((NonTerminal<T>) element);
+				return new[] { (Terminal<T>)element };
+			return First((NonTerminal<T>)element);
 		}
 
 		/// <summary>
@@ -581,7 +582,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				{
 					//add to first elements if the first element of production is a terminal
 					if (production.DerivedElements[0] is Terminal<T>)
-						firstElements.Add((Terminal<T>) production.DerivedElements[0]);
+						firstElements.Add((Terminal<T>)production.DerivedElements[0]);
 					//otherwise for all of the productions whose LHS == first element
 					else
 					{
@@ -593,7 +594,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 							//    //add First(p)
 							//    firstElements.AddRange(First(p));
 							//}
-							firstElements.AddRange(First((NonTerminal<T>) production.DerivedElements[0]));
+							firstElements.AddRange(First((NonTerminal<T>)production.DerivedElements[0]));
 						}
 					}
 				}
@@ -630,9 +631,9 @@ namespace KallynGowdy.ParserGenerator.Grammar
 
 			//if nextElement is a Terminal then return {T}
 			if (nextElement is Terminal<T>)
-				return new[] {(Terminal<T>) nextElement};
-				//otherwise find all of the productions that have nextElement on the LHS.
-			Production<T> production = Productions.Where(p => p.NonTerminal == item.LeftHandSide && p.DerivedElements.SequenceEqual(item.ProductionElements)).First();
+				return new[] { (Terminal<T>)nextElement };
+			//otherwise find all of the productions that have nextElement on the LHS.
+			Production<T> production = Productions.First(p => p.NonTerminal == item.LeftHandSide && p.DerivedElements.SequenceEqual(item.ProductionElements));
 
 			var firstElements = new List<Terminal<T>>();
 
@@ -645,7 +646,7 @@ namespace KallynGowdy.ParserGenerator.Grammar
 					{
 						//if it is a Terminal add to first elements
 						if (productionItem is Terminal<T>)
-							firstElements.Add((Terminal<T>) productionItem);
+							firstElements.Add((Terminal<T>)productionItem);
 						//otherwise add First(new LRItem(production)) of all of the productions where the LHS == productionItem
 						else
 						{
@@ -672,6 +673,42 @@ namespace KallynGowdy.ParserGenerator.Grammar
 				builder.AppendLine();
 			}
 			return builder.ToString();
+		}
+
+		public bool Equals(ContextFreeGrammar<T> other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return StartElement.Equals(other.StartElement) && EndOfInputElement.Equals(other.EndOfInputElement) && Productions.SequenceEqual(other.Productions);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((ContextFreeGrammar<T>)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int hashCode = StartElement.GetHashCode();
+				hashCode = (hashCode * 397) ^ EndOfInputElement.GetHashCode();
+				hashCode = (hashCode * 397) ^ Productions.GetHashCode();
+				return hashCode;
+			}
+		}
+
+		public static bool operator ==(ContextFreeGrammar<T> left, ContextFreeGrammar<T> right)
+		{
+			return Equals(left, right);
+		}
+
+		public static bool operator !=(ContextFreeGrammar<T> left, ContextFreeGrammar<T> right)
+		{
+			return !Equals(left, right);
 		}
 	}
 }
