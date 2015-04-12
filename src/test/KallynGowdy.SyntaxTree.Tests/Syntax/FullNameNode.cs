@@ -26,5 +26,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax
 		public NameNode MiddleName => (NameNode)Children[1];
 
 		public NameNode LastName => (NameNode)Children[2];
+
+		
 	}
 }

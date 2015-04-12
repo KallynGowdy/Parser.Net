@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,12 +12,13 @@ namespace KallynGowdy.SyntaxTree.Tests
 	/// <summary>
 	/// Tests for <see cref="SyntaxTree"/>.
 	/// </summary>
+	[SuppressMessage("ReSharper", "ExceptionNotDocumented")]
 	public class SyntaxTreeTests
 	{
 		[Fact]
 		public void Test_TreeIsProperlyCreatedWithReferences()
 		{
-			var firstName = new NameNode("Kallyn");
+			NameNode firstName = new NameNode("Kallyn");
 
 			Assert.Equal("Kallyn", firstName.Name);
 			Assert.Null(firstName.Parent);
@@ -26,7 +28,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Equal(0, firstName.Children.Count);
 			Assert.Equal(6, firstName.Length);
 
-			var lastName = new NameNode("Gowdy");
+			NameNode lastName = new NameNode("Gowdy");
 
 			Assert.Equal("Gowdy", lastName.Name);
 			Assert.Null(lastName.Parent);
@@ -37,7 +39,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Equal(5, lastName.Length);
 
 
-			var fullName = new FullNameNode(
+			FullNameNode fullName = new FullNameNode(
 					firstName,
 					lastName
 			);
@@ -91,7 +93,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 				new NameNode("G")
 			);
 
-			var newTree = tree.SetRoot(newFullName);
+			SyntaxTree newTree = tree.SetRoot(newFullName);
 
 			Assert.NotNull(newTree);
 			Assert.IsType<MockSyntaxTree>(newTree);
@@ -101,7 +103,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 		[Fact]
 		public void Test_InternalNodeCanBeSharedBetweenDifferentTrees()
 		{
-			var firstName = new NameNode("Kallyn");
+			NameNode firstName = new NameNode("Kallyn");
 
 			MockSyntaxTree tree = new MockSyntaxTree(
 				new FullNameNode(
@@ -112,7 +114,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 
 			Assert.Equal("Kallyn", tree.FullName.FirstName.ToString());
 
-			var newTree = tree.SetRoot(
+			MockSyntaxTree newTree = tree.SetRoot(
 				new FullNameNode(
 					firstName,
 					new NameNode("G")
@@ -150,7 +152,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.NotNull(tree);
 			Assert.NotNull(tree.Root);
 
-			var root = tree.Root as FullNameNode;
+			FullNameNode root = tree.Root as FullNameNode;
 
 			Assert.Null(root.Parent);
 			Assert.NotNull(root.Tree);
@@ -159,14 +161,14 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Equal(11, root.Length);
 			Assert.Equal("{Kallyn Gowdy}", root.ToString());
 
-			var firstName = root.FirstName;
+			NameNode firstName = root.FirstName;
 
 			Assert.NotNull(firstName.Parent);
 			Assert.Same(root, firstName.Parent);
 			Assert.Same(tree, firstName.Tree);
 			Assert.Equal(0, firstName.Position);
 
-			var lastName = root.LastName;
+			NameNode lastName = root.LastName;
 
 			Assert.NotNull(lastName);
 			Assert.Same(root, lastName.Parent);
@@ -195,7 +197,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 
 			Assert.Equal("Kal", newName.Name);
 
-			var newRoot = tree.Root.ReplaceNode(tree.Root.FirstName, newName);
+			FullNameNode newRoot = tree.Root.ReplaceNode(tree.Root.FirstName, newName);
 
 			Assert.Null(newRoot.Parent);
 			Assert.NotNull(newRoot.Tree);
@@ -217,10 +219,10 @@ namespace KallynGowdy.SyntaxTree.Tests
 				)
 			);
 
-			var lastName = tree.FullName.LastName;
-			var newLastName = new NameNode("G");
+			NameNode lastName = tree.FullName.LastName;
+			NameNode newLastName = new NameNode("G");
 
-			var newFullName = tree.FullName.ReplaceNode(lastName, newLastName);
+			FullNameNode newFullName = tree.FullName.ReplaceNode(lastName, newLastName);
 
 			Assert.NotSame(tree.FullName, newFullName);
 			Assert.NotEqual(tree.FullName, newFullName);
@@ -243,7 +245,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 
 			NameNode middleName = new NameNode("G.");
 
-			var fullName = (FullNameNode)tree.FullName.InsertNode(1, middleName);
+			FullNameNode fullName = (FullNameNode)tree.FullName.InsertNode(1, middleName);
 
 			Assert.NotNull(fullName.MiddleName);
 			Assert.Equal(middleName, fullName.MiddleName);
@@ -263,6 +265,13 @@ namespace KallynGowdy.SyntaxTree.Tests
 				n => Assert.Same(n.InternalNode, fullName.FirstName.InternalNode),
 				n => Assert.Null(n),
 				n => Assert.Same(n.InternalNode, fullName.LastName.InternalNode)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.NotSame(n, fullName.FirstName),
+				n => Assert.Null(n),
+				n => Assert.NotSame(n, fullName.LastName)
 			);
 
 			Assert.Collection(
@@ -286,9 +295,9 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Null(tree.FullName.MiddleName);
 			Assert.Equal(3, tree.FullName.Children.Count);
 
-			var otherLastName = new NameNode("Other");
+			NameNode otherLastName = new NameNode("Other");
 
-			var fullName = (FullNameNode)tree.FullName.AddNode(otherLastName);
+			FullNameNode fullName = (FullNameNode)tree.FullName.AddNode(otherLastName);
 
 			Assert.Collection(
 				fullName.Children,
@@ -303,6 +312,101 @@ namespace KallynGowdy.SyntaxTree.Tests
 				n => Assert.Same(n.InternalNode, fullName.FirstName.InternalNode),
 				n => Assert.Null(n),
 				n => Assert.Same(n.InternalNode, fullName.LastName.InternalNode)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.NotSame(n, fullName.FirstName),
+				n => Assert.Null(n),
+				n => Assert.NotSame(n, fullName.LastName)
+			);
+
+			Assert.Equal(16, fullName.Length);
+			Assert.Equal("{Kallyn Gowdy Other}", fullName.ToString());
+		}
+
+		[Fact]
+		public void Test_RemoveNode()
+		{
+			MockSyntaxTree tree = new MockSyntaxTree(
+				new FullNameNode(
+					new NameNode("Kallyn"),
+					new NameNode("G."),
+					new NameNode("Gowdy"),
+					new NameNode("Other")
+				)
+			);
+
+			FullNameNode fullName = (FullNameNode)tree.FullName.RemoveNode(tree.FullName.Children[3]);
+
+			Assert.Throws<ArgumentException>(() =>
+			{
+				fullName.RemoveNode(fullName.MiddleName);
+			});
+
+			Assert.Collection(
+				fullName.Children,
+				n => Assert.Equal(new NameNode("Kallyn"), n),
+				n => Assert.Equal(new NameNode("G."), n),
+				n => Assert.Equal(new NameNode("Gowdy"), n)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.Same(n.InternalNode, fullName.FirstName.InternalNode),
+				n => Assert.Same(n.InternalNode, fullName.MiddleName.InternalNode),
+				n => Assert.Same(n.InternalNode, fullName.LastName.InternalNode),
+				Assert.NotNull
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.NotSame(n, fullName.FirstName),
+				n => Assert.NotSame(n, fullName.MiddleName),
+				n => Assert.NotSame(n, fullName.LastName),
+				Assert.NotNull
+			);
+
+			Assert.Equal(13, fullName.Length);
+			Assert.Equal("{Kallyn G. Gowdy}", fullName.ToString());
+			
+		}
+
+		[Fact]
+		public void Test_RemoveNodeShiftsChildren()
+		{
+			MockSyntaxTree tree = new MockSyntaxTree(
+				new FullNameNode(
+					new NameNode("Kallyn"),
+					new NameNode("G."),
+					new NameNode("Gowdy"),
+					new NameNode("Other")
+				)
+			);
+
+			var fullName = (FullNameNode)tree.FullName.RemoveNode(tree.FullName.MiddleName);
+
+			Assert.Collection(
+				fullName.Children,
+				n => Assert.Equal(new NameNode("Kallyn"), n),
+				n => Assert.Equal(new NameNode("Gowdy"), n),
+				n => Assert.Equal(new NameNode("Other"), n)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.Same(n.InternalNode, fullName.FirstName.InternalNode),
+				Assert.NotNull,
+				n => Assert.Same(n.InternalNode, fullName.MiddleName.InternalNode),
+				n => Assert.Same(n.InternalNode, fullName.LastName.InternalNode)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.NotSame(n, fullName.FirstName),
+				Assert.NotNull,
+				n => Assert.NotSame(n, fullName.MiddleName),
+				n => Assert.NotSame(n, fullName.LastName)
 			);
 
 			Assert.Equal(16, fullName.Length);

@@ -34,7 +34,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 		{
 			if (children.Count >= 3)
 			{
-				var c = children.Where(t => t == null || t is NameInternalNode).ToArray();
+				InternalSyntaxNode[] c = children.Where(t => t == null || t is NameInternalNode).ToArray();
 				if (c.Length == children.Count)
 				{
 					return new FullNameInternalSyntaxNode(c.Cast<NameInternalNode>());

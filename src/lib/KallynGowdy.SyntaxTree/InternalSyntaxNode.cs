@@ -99,5 +99,15 @@ namespace KallynGowdy.SyntaxTree
 				return CreateNewNode(Children.Insert(index, newNode));
 			}
 		}
+
+		/// <summary>
+		/// Removes the given node from this node's children and returns a new instance of this.
+		/// </summary>
+		/// <param name="internalNode">The node that should be removed.</param>
+		/// <returns></returns>
+		public InternalSyntaxNode RemoveNode(InternalSyntaxNode internalNode)
+		{
+			return CreateNewNode(Children.Remove(internalNode));
+		}
 	}
 }
