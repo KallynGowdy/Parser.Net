@@ -17,7 +17,7 @@
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile>Profile151</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <NuGetPackageImportStamp>150c6c2d</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>ef7e42ff</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,16 +39,18 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyntaxTreeTests.cs" />
-    <Compile Include="Syntax\FirstNameNode.cs" />
+    <Compile Include="Syntax\NameNode.cs" />
     <Compile Include="Syntax\FullNameNode.cs" />
-    <Compile Include="Syntax\Internal\FirstNameInternalNode.cs" />
+    <Compile Include="Syntax\Internal\NameInternalNode.cs" />
     <Compile Include="Syntax\Internal\FullNameInternalSyntaxNode.cs" />
-    <Compile Include="Syntax\Internal\LastNameInternalNode.cs" />
     <Compile Include="Syntax\Internal\MockInternalSyntaxTree.cs" />
-    <Compile Include="Syntax\LastNameNode.cs" />
     <Compile Include="Syntax\MockSyntaxTree.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System.Collections.Immutable, Version=1.1.34.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Collections.Immutable.1.1.34-rc\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.0\lib\portable-net45+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.abstractions.dll</HintPath>
       <Private>True</Private>

@@ -3,31 +3,31 @@ using System.Collections.Immutable;
 
 namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 {
-	public class FirstNameInternalNode : InternalSyntaxNode
+	public class NameInternalNode : InternalSyntaxNode
 	{
-		public string FirstName { get; }
+		public string Name { get; }
 
-		public FirstNameInternalNode(string firstName) : base(ImmutableArray.Create<InternalSyntaxNode>())
+		public NameInternalNode(string firstName) : base(ImmutableArray.Create<InternalSyntaxNode>())
 		{
 			if (firstName == null) throw new ArgumentNullException("firstName");
-			FirstName = firstName;
+			Name = firstName;
 		}
 
 		protected override InternalSyntaxNode CreateNewNode(IImmutableList<InternalSyntaxNode> children)
 		{
-			return new FirstNameInternalNode(FirstName);
+			return new NameInternalNode(Name);
 		}
 
 		public override SyntaxNode CreateSyntaxNode(Func<SyntaxNode, SyntaxNode> parent, Func<SyntaxNode, SyntaxTree> tree)
 		{
-			return new FirstNameNode(this, parent, tree);
+			return new NameNode(this, parent, tree);
 		}
 
-		public override long Length => FirstName.Length;
+		public override long Length => Name.Length;
 
 		public override string ToString()
 		{
-			return FirstName;
+			return Name;
 		}
 	}
 }

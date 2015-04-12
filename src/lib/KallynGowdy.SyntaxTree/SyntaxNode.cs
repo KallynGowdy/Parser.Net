@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 
 namespace KallynGowdy.SyntaxTree
 {
@@ -73,10 +74,10 @@ namespace KallynGowdy.SyntaxTree
 
 			lazyPosition = new Lazy<long>(() =>
 			{
-				return Parent != null ? (Parent.Position + Parent.InternalNode.Children.TakeWhile(c => !ReferenceEquals(c, internalNode)).Sum(c => c.Length)) : 0;
+				return Parent != null ? (Parent.Position + Parent.InternalNode.Children.Where(c => c != null).TakeWhile(c => !ReferenceEquals(c, internalNode)).Sum(c => c.Length)) : 0;
 			});
 
-			
+
 		}
 
 		/// <summary>
@@ -90,7 +91,7 @@ namespace KallynGowdy.SyntaxTree
 		/// <summary>
 		/// Gets the read only list of child nodes of this syntax node. Never null.
 		/// </summary>
-		public IReadOnlyList<SyntaxNode> Children => children ?? (children = new ReadOnlyCollection<SyntaxNode>(InternalNode.Children.Select(c => c.CreateSyntaxNode(this, Tree)).ToArray()));
+		public IReadOnlyList<SyntaxNode> Children => children ?? (children = new ReadOnlyCollection<SyntaxNode>(InternalNode.Children.Select(c => c?.CreateSyntaxNode(this, Tree)).ToArray()));
 
 		/// <summary>
 		/// Gets the parent of this node. Null if this node does not have a parent.
@@ -120,7 +121,38 @@ namespace KallynGowdy.SyntaxTree
 		/// <returns></returns>
 		public SyntaxNode ReplaceNode(SyntaxNode oldNode, SyntaxNode newNode)
 		{
-			return InternalNode.ReplaceNode(oldNode.InternalNode, newNode.InternalNode).CreateSyntaxNode((n) => Parent?.ReplaceNode(this, n), root => Tree.SetRoot(root));
+			return CreateNewNodeFromThisNode(InternalNode.ReplaceNode(oldNode.InternalNode, newNode.InternalNode));
+		}
+
+		/// <summary>
+		/// Adds the given syntax node to the end of this node's children and returns the new instance of 'this'.
+		/// If the last node contained in the children array is null, it will be set to the new node.
+		/// </summary>
+		/// <param name="newNode">The new node that should be added to this node.</param>
+		/// <returns></returns>
+		public SyntaxNode AddNode(SyntaxNode newNode)
+		{
+			return InsertNode(InternalNode.Children.Count, newNode);
+		}
+
+		/// <summary>
+		/// Inserts the given new node into the given index in the children of this node.
+		/// If the child node at the given index is null, it is filled with the given node.
+		/// If the given index is equal to Children.Count, then the node is inserted at the end.
+		/// </summary>
+		/// <param name="index">The index that the child should be inserted at.</param>
+		/// <param name="newNode">The new node that should be inserted.</param>
+		/// <returns>Returns a new <see cref="SyntaxNode"/> that represents the new node that contains the new child.</returns>
+		/// <exception cref="ArgumentNullException">The value of 'newNode' cannot be null. </exception>
+		/// <exception cref="ArgumentOutOfRangeException">index is less than 0 or greater than Children.Count</exception>
+		public SyntaxNode InsertNode(int index, SyntaxNode newNode)
+		{
+			return CreateNewNodeFromThisNode(InternalNode.InsertNode(index, newNode.InternalNode));
+		}
+
+		protected virtual SyntaxNode CreateNewNodeFromThisNode(InternalSyntaxNode node)
+		{
+			return node.CreateSyntaxNode(n => Parent?.ReplaceNode(this, n), root => Tree.SetRoot(root));
 		}
 
 		public virtual bool Equals(SyntaxNode other)

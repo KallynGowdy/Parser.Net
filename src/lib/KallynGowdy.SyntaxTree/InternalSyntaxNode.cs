@@ -23,7 +23,7 @@ namespace KallynGowdy.SyntaxTree
 		/// <summary>
 		/// Gets the length of this node.
 		/// </summary>
-		public virtual long Length => Children.Sum(c => c.Length);
+		public virtual long Length => Children.Where(c => c != null).Sum(c => c.Length);
 
 		/// <summary>
 		/// Gets the mutable list of this syntax node's children.
@@ -68,6 +68,35 @@ namespace KallynGowdy.SyntaxTree
 			else
 			{
 				return CreateNewNode(Children.Replace(oldNode, newNode));
+			}
+		}
+
+		/// <summary>
+		/// Inserts the given node at the given index. 
+		/// If the child node at the given index is null, it is filled with the given node.
+		/// If the given index is equal to Children.Count, then the node is inserted at the end.
+		/// </summary>
+		/// <param name="index">The index that the node should be inserted at.</param>
+		/// <param name="newNode">The node that should be inserted at the given location.</param>
+		/// <returns>Returns a new <see cref="SyntaxNode"/> that represents this internal node after the manipulation.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">index is less than 0 or greater than Children.Count</exception>
+		/// <exception cref="ArgumentNullException">The value of 'newNode' cannot be null. </exception>
+		public virtual InternalSyntaxNode InsertNode(int index, InternalSyntaxNode newNode)
+		{
+			if (index < 0 || index > Children.Count) throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to 0 and less than Children.Count");
+			if (newNode == null) throw new ArgumentNullException("newNode");
+
+			if(index == Children.Count)
+			{
+				return CreateNewNode(Children.Add(newNode));
+			}
+			else if (Children[index] == null)
+			{
+				return CreateNewNode(Children.SetItem(index, newNode));
+			}
+			else
+			{
+				return CreateNewNode(Children.Insert(index, newNode));
 			}
 		}
 	}

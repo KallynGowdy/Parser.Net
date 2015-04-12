@@ -7,26 +7,37 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 {
 	public class FullNameInternalSyntaxNode : InternalSyntaxNode
 	{
-		public FullNameInternalSyntaxNode(FirstNameInternalNode firstName, LastNameInternalNode lastName) : base(ImmutableArray.Create<InternalSyntaxNode>(firstName, lastName))
+		public FullNameInternalSyntaxNode(NameInternalNode name, NameInternalNode lastName) : this(name, null, lastName)
 		{
-			if (firstName == null) throw new ArgumentNullException("firstName");
+		}
+
+		public FullNameInternalSyntaxNode(NameInternalNode name, NameInternalNode middleName,  NameInternalNode lastName) 
+			: base(ImmutableList.Create<InternalSyntaxNode>(name, middleName, lastName))
+		{
+			if (name == null) throw new ArgumentNullException("name");
 			if (lastName == null) throw new ArgumentNullException("lastName");
 		}
 
-		public FirstNameInternalNode FirstName => (FirstNameInternalNode)Children[0];
+		public FullNameInternalSyntaxNode(IEnumerable<NameInternalNode> names)
+			: base(ImmutableList.Create(names.Cast<InternalSyntaxNode>().ToArray()))
+		{
+			if (names.Count() < 3) throw new ArgumentException("Not enough required names. Min 3", "names");
+		}
 
-		public LastNameInternalNode LastName => (LastNameInternalNode)Children[1];
+		public NameInternalNode FirstName => (NameInternalNode)Children[0];
+
+		public NameInternalNode MiddleName => (NameInternalNode)Children[1];
+
+		public NameInternalNode LastName => (NameInternalNode)Children[2];
 
 		protected override InternalSyntaxNode CreateNewNode(IImmutableList<InternalSyntaxNode> children)
 		{
-			if (children.Count == 2)
+			if (children.Count >= 3)
 			{
-				var firstName = children[0] as FirstNameInternalNode;
-				var lastName = children[1] as LastNameInternalNode;
-				if (firstName != null &&
-					lastName != null)
+				var c = children.Where(t => t == null || t is NameInternalNode).ToArray();
+				if (c.Length == children.Count)
 				{
-					return new FullNameInternalSyntaxNode(firstName, lastName);
+					return new FullNameInternalSyntaxNode(c.Cast<NameInternalNode>());
 				}
 			}
 			throw new ArgumentException("Invalid Children");
@@ -39,7 +50,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 
 		public override string ToString()
 		{
-			return string.Format("{{{0} {1}}}", FirstName, LastName);
+			return string.Format("{{{0}}}", string.Join(" ", Children.Where(c => c != null)));
 		}
 	}
 }

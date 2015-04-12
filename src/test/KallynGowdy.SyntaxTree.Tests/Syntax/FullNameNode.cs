@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using KallynGowdy.SyntaxTree.Tests.Syntax.Internal;
 
 namespace KallynGowdy.SyntaxTree.Tests.Syntax
@@ -10,14 +11,20 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax
 		{
 		}
 
-		public FullNameNode(FirstNameNode firstName, LastNameNode lastName) : base(new FullNameInternalSyntaxNode(firstName.InternalNode, lastName.InternalNode), null, null)
+		public FullNameNode(NameNode name, NameNode lastName) : base(new FullNameInternalSyntaxNode(name.InternalNode, lastName.InternalNode), null, null)
+		{
+		}
+
+		public FullNameNode(params NameNode[] names) : base(new FullNameInternalSyntaxNode(names.Where(n => n != null).Select(n => n.InternalNode)), null, null)
 		{
 		}
 
 		protected new FullNameInternalSyntaxNode InternalNode => (FullNameInternalSyntaxNode)base.InternalNode;
 
-		public FirstNameNode FirstName => (FirstNameNode)Children[0];
+		public NameNode FirstName => (NameNode)Children[0];
 
-		public LastNameNode LastName => (LastNameNode)Children[1];
+		public NameNode MiddleName => (NameNode)Children[1];
+
+		public NameNode LastName => (NameNode)Children[2];
 	}
 }
