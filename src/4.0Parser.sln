@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22609.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KallynGowdy.ParserGenerator", "lib\Parser\KallynGowdy.ParserGenerator.csproj", "{7BF0258E-F67B-45FE-9710-83955ACD4CF2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KallynGowdy.ParserGenerator.Tests", "test\KallynGowdy.ParserGenerator.Tests\KallynGowdy.ParserGenerator.Tests.csproj", "{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KallynGowdy.SyntaxTree", "lib\KallynGowdy.SyntaxTree\KallynGowdy.SyntaxTree.csproj", "{443959EE-2063-4C72-B4C8-3F377F282DD9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KallynGowdy.SyntaxTree.Tests", "test\KallynGowdy.SyntaxTree.Tests\KallynGowdy.SyntaxTree.Tests.csproj", "{51DA5199-3855-43D9-B2ED-461F1D667860}"
@@ -25,28 +21,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|Mixed Platforms.Build.0 = Release|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2}.Release|x86.ActiveCfg = Release|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Debug|x86.Build.0 = Debug|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Release|x86.ActiveCfg = Release|Any CPU
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B}.Release|x86.Build.0 = Release|Any CPU
 		{443959EE-2063-4C72-B4C8-3F377F282DD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{443959EE-2063-4C72-B4C8-3F377F282DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{443959EE-2063-4C72-B4C8-3F377F282DD9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -76,8 +50,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{7BF0258E-F67B-45FE-9710-83955ACD4CF2} = {1EC2BFE5-4BA0-46C0-8546-D7C0E25B64AB}
-		{4FDEFFD9-7AE6-44C6-9769-7B8ACEC9BD6B} = {AE8CD069-B67F-43BE-BA50-DF34AAE4FC7C}
 		{443959EE-2063-4C72-B4C8-3F377F282DD9} = {1EC2BFE5-4BA0-46C0-8546-D7C0E25B64AB}
 		{51DA5199-3855-43D9-B2ED-461F1D667860} = {AE8CD069-B67F-43BE-BA50-DF34AAE4FC7C}
 	EndGlobalSection
