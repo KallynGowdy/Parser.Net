@@ -3,6 +3,7 @@ install:
 before_build:
   - cd src
   - nuget restore
+  - cd ..
 version: 1.0.{build}
 os: Visual Studio 2015 CTP 6
 build:
