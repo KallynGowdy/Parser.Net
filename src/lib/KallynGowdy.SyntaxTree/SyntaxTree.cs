@@ -40,17 +40,7 @@ namespace KallynGowdy.SyntaxTree
 		/// </summary>
 		/// <param name="newRoot">The root node.</param>
 		/// <returns></returns>
-		public SyntaxTree SetRoot(SyntaxNode newRoot)
-		{
-			if (!ReferenceEquals(newRoot, Root))
-			{
-				return CreateNewTree(newRoot);
-			}
-			else
-			{
-				return this;
-			}
-		}
+		public SyntaxTree SetRoot(SyntaxNode newRoot) => !ReferenceEquals(newRoot, Root) ? CreateNewTree(newRoot) : this;
 
 		protected abstract SyntaxTree CreateNewTree(SyntaxNode root);
 

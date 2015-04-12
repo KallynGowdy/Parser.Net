@@ -57,7 +57,7 @@ namespace KallynGowdy.SyntaxTree
 			lazyParent = new Lazy<SyntaxNode>(() => parent(this));
 			lazyTree = new Lazy<SyntaxTree>(() =>
 			{
-				var p = this;
+				SyntaxNode p = this;
 				while (p != null) // Walk all the way to the root
 				{
 					if (p.Parent != null)
@@ -153,6 +153,16 @@ namespace KallynGowdy.SyntaxTree
 		protected virtual SyntaxNode CreateNewNodeFromThisNode(InternalSyntaxNode node)
 		{
 			return node.CreateSyntaxNode(n => Parent?.ReplaceNode(this, n), root => Tree.SetRoot(root));
+		}
+
+		/// <summary>
+		/// Removes the given node from this node's children and returns a new instance of this.
+		/// </summary>
+		/// <param name="node">The node that should be removed.</param>
+		/// <returns></returns>
+		public SyntaxNode RemoveNode(SyntaxNode node)
+		{
+			return CreateNewNodeFromThisNode(InternalNode.RemoveNode(node.InternalNode));
 		}
 
 		public virtual bool Equals(SyntaxNode other)
