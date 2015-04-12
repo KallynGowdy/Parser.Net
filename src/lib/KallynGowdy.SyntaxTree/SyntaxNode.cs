@@ -156,13 +156,23 @@ namespace KallynGowdy.SyntaxTree
 		}
 
 		/// <summary>
-		/// Removes the given node from this node's children and returns a new instance of this.
+		/// Removes the given node from this node's children and returns a new <see cref="SyntaxNode"/> that represents the changes.
 		/// </summary>
 		/// <param name="node">The node that should be removed.</param>
 		/// <returns></returns>
 		public SyntaxNode RemoveNode(SyntaxNode node)
 		{
 			return CreateNewNodeFromThisNode(InternalNode.RemoveNode(node.InternalNode));
+		}
+
+		/// <summary>
+		/// Removes the node at the given index and returns a new <see cref="SyntaxNode"/> that represents the changes.
+		/// </summary>
+		/// <param name="index">The index of the node that should be removed.</param>
+		/// <returns></returns>
+		public SyntaxNode RemoveNodeAt(int index)
+		{
+			return CreateNewNodeFromThisNode(InternalNode.RemoveNodeAt(index));
 		}
 
 		public virtual bool Equals(SyntaxNode other)
