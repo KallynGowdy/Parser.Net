@@ -178,17 +178,16 @@ namespace KallynGowdy.SyntaxTree
 
 		public virtual bool Equals(SyntaxNode other)
 		{
-			if (ReferenceEquals(null, other)) return false;
-			if (ReferenceEquals(this, other)) return true;
-			return InternalNode.Equals(other.InternalNode);
+			return ((object) other) != null && 
+					((object) this == (object) other || 
+					InternalNode.Equals(other.InternalNode));
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj)) return false;
+			if (obj == null) return false;
 			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != this.GetType()) return false;
-			return Equals((SyntaxNode)obj);
+			return Equals(obj as SyntaxNode);
 		}
 
 		public override int GetHashCode()

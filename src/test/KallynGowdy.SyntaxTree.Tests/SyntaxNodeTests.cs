@@ -506,10 +506,17 @@ namespace KallynGowdy.SyntaxTree.Tests
 		public void Test_NodeOperatorEquality(SyntaxNode first, SyntaxNode second)
 		{
 			Assert.Equal(first, second);
+			Assert.Equal((object)first, (object)second);
+			Assert.Equal(first.InternalNode, second.InternalNode);
+			Assert.Equal((object)first.InternalNode, (object)second.InternalNode);
 			Assert.True(first == second, "first == second");
 			Assert.False(first != second, "first != second");
+			Assert.True(first.InternalNode == second.InternalNode, "first.InternalNode == second.InternalNode");
+			Assert.False(first.InternalNode != second.InternalNode, "first.InternalNode != second.InternalNode");
 			Assert.NotSame(first, second);
 			Assert.Equal(first.GetHashCode(), second.GetHashCode());
+			Assert.True(first.Equals((object)first), "first.Equals(first)");
+			Assert.True(second.Equals((object)second), "second.Equals(second)");
 		}
 
 		[Theory]
@@ -517,8 +524,13 @@ namespace KallynGowdy.SyntaxTree.Tests
 		public void Test_NodeOperatorNotEqual(SyntaxNode first, SyntaxNode second)
 		{
 			Assert.NotEqual(first, second);
+			Assert.NotEqual((object)first, (object)second);
+			Assert.NotEqual(first.InternalNode, second.InternalNode);
+			Assert.NotEqual((object)first.InternalNode, (object)second.InternalNode);
 			Assert.True(first != second, "first != second");
 			Assert.False(first == second, "first == second");
+			Assert.True(first.InternalNode != second.InternalNode, "first.InternalNode != second.InternalNode");
+			Assert.False(first.InternalNode == second.InternalNode, "first.InternalNode == second.InternalNode");
 			Assert.NotSame(first, second);
 			Assert.NotEqual(first.GetHashCode(), second.GetHashCode());
 			Assert.False(first.Equals(null));
