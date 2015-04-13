@@ -17,7 +17,7 @@ namespace KallynGowdy.SyntaxTree
 	/// new nodes are created whenever an operation occurs (Adding, Replacing, Removing nodes/values). Some <see cref="InternalSyntaxNode"/> objects are able to be reused because
 	/// they don't contain parent links, but <see cref="SyntaxNode"/> objects cannot be reused, so they're rebuilt on every change.
 	/// </remarks>
-	public abstract class InternalSyntaxNode
+	public abstract class InternalSyntaxNode : IEquatable<InternalSyntaxNode>
 	{
 		protected InternalSyntaxNode(IImmutableList<InternalSyntaxNode> children)
 		{
@@ -125,6 +125,44 @@ namespace KallynGowdy.SyntaxTree
 		{
 			if (index < 0 || index >= Children.Count) throw new ArgumentOutOfRangeException("index", "Must be between 0 and Children.Count");
 			return CreateNewNode(Children.RemoveAt(index));
+		}
+
+		public virtual bool Equals(InternalSyntaxNode other)
+		{
+			return other != null &&
+				Children.SequenceEqual(other.Children);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((InternalSyntaxNode) obj);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int hashCode = 1209233;
+				for (int i = 0; i < Children.Count; i++)
+				{
+					hashCode = (hashCode * 575557) ^ i.GetHashCode();
+					hashCode = (hashCode * 575557) ^ (Children[i]?.GetHashCode() ?? 3);
+				}
+				return hashCode;
+            }
+		}
+
+		public static bool operator ==(InternalSyntaxNode left, InternalSyntaxNode right)
+		{
+			return Equals(left, right);
+		}
+
+		public static bool operator !=(InternalSyntaxNode left, InternalSyntaxNode right)
+		{
+			return !Equals(left, right);
 		}
 	}
 }

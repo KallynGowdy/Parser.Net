@@ -180,7 +180,7 @@ namespace KallynGowdy.SyntaxTree
 		{
 			if (ReferenceEquals(null, other)) return false;
 			if (ReferenceEquals(this, other)) return true;
-			return Children.SequenceEqual(other.Children);
+			return InternalNode.Equals(other.InternalNode);
 		}
 
 		public override bool Equals(object obj)
@@ -195,9 +195,8 @@ namespace KallynGowdy.SyntaxTree
 		{
 			unchecked
 			{
-				int hashCode = Children.GetHashCode();
-				hashCode = (hashCode * 397) ^ Parent.GetHashCode();
-				hashCode = (hashCode * 397) ^ Tree.GetHashCode();
+				int hashCode = 1230331;
+				hashCode = (hashCode * 695369) ^ InternalNode.GetHashCode();
 				return hashCode;
 			}
 		}

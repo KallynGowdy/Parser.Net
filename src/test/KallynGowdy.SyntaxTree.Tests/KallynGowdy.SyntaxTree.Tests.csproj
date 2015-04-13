@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SyntaxTreeTests.cs" />
+    <Compile Include="SyntaxNodeTests.cs" />
     <Compile Include="Syntax\NameNode.cs" />
     <Compile Include="Syntax\FullNameNode.cs" />
     <Compile Include="Syntax\Internal\NameInternalNode.cs" />

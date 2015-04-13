@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 {
-	public class NameInternalNode : InternalSyntaxNode
+	public class NameInternalNode : InternalSyntaxNode, IEquatable<NameInternalNode>
 	{
 		public string Name { get; }
 
@@ -28,6 +28,48 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual bool Equals(NameInternalNode other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return this.Name.Equals(other.Name);
+		}
+
+		public override bool Equals(InternalSyntaxNode other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			if (other.GetType() != this.GetType()) return false;
+			return base.Equals(other) &&
+				Equals((NameInternalNode)other);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((NameInternalNode)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return (base.GetHashCode() * 397) ^ Name.GetHashCode();
+			}
+		}
+
+		public static bool operator ==(NameInternalNode left, NameInternalNode right)
+		{
+			return Equals(left, right);
+		}
+
+		public static bool operator !=(NameInternalNode left, NameInternalNode right)
+		{
+			return !Equals(left, right);
 		}
 	}
 }

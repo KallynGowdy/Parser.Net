@@ -23,15 +23,5 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax
 		{
 			return new NameNode(firstName);
 		}
-
-		public override bool Equals(SyntaxNode other)
-		{
-			return base.Equals(other) && Equals((NameNode)other);
-		}
-
-		private bool Equals(NameNode other)
-		{
-			return other.Name == this.Name;
-		}
 	}
 }
