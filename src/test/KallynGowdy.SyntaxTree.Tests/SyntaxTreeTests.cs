@@ -412,5 +412,93 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Equal(16, fullName.Length);
 			Assert.Equal("{Kallyn Gowdy Other}", fullName.ToString());
 		}
+
+		[Fact]
+		public void Test_RemoveNodeAt()
+		{
+			MockSyntaxTree tree = new MockSyntaxTree(
+				new FullNameNode(
+					new NameNode("Kallyn"),
+					new NameNode("G."),
+					new NameNode("Gowdy"),
+					new NameNode("Other")
+				)
+			);
+
+			FullNameNode fullName = (FullNameNode)tree.FullName.RemoveNodeAt(3);
+
+			Assert.Throws<ArgumentException>(() =>
+			{
+				fullName.RemoveNode(fullName.MiddleName);
+			});
+
+			Assert.Collection(
+				fullName.Children,
+				n => Assert.Equal(new NameNode("Kallyn"), n),
+				n => Assert.Equal(new NameNode("G."), n),
+				n => Assert.Equal(new NameNode("Gowdy"), n)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.Same(n.InternalNode, fullName.FirstName.InternalNode),
+				n => Assert.Same(n.InternalNode, fullName.MiddleName.InternalNode),
+				n => Assert.Same(n.InternalNode, fullName.LastName.InternalNode),
+				Assert.NotNull
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.NotSame(n, fullName.FirstName),
+				n => Assert.NotSame(n, fullName.MiddleName),
+				n => Assert.NotSame(n, fullName.LastName),
+				Assert.NotNull
+			);
+
+			Assert.Equal(13, fullName.Length);
+			Assert.Equal("{Kallyn G. Gowdy}", fullName.ToString());
+
+		}
+
+		[Fact]
+		public void Test_RemoveNodeAtShiftsChildren()
+		{
+			MockSyntaxTree tree = new MockSyntaxTree(
+				new FullNameNode(
+					new NameNode("Kallyn"),
+					new NameNode("G."),
+					new NameNode("Gowdy"),
+					new NameNode("Other")
+				)
+			);
+
+			var fullName = (FullNameNode)tree.FullName.RemoveNodeAt(1);
+
+			Assert.Collection(
+				fullName.Children,
+				n => Assert.Equal(new NameNode("Kallyn"), n),
+				n => Assert.Equal(new NameNode("Gowdy"), n),
+				n => Assert.Equal(new NameNode("Other"), n)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.Same(n.InternalNode, fullName.FirstName.InternalNode),
+				Assert.NotNull,
+				n => Assert.Same(n.InternalNode, fullName.MiddleName.InternalNode),
+				n => Assert.Same(n.InternalNode, fullName.LastName.InternalNode)
+			);
+
+			Assert.Collection(
+				tree.FullName.Children,
+				n => Assert.NotSame(n, fullName.FirstName),
+				Assert.NotNull,
+				n => Assert.NotSame(n, fullName.MiddleName),
+				n => Assert.NotSame(n, fullName.LastName)
+			);
+
+			Assert.Equal(16, fullName.Length);
+			Assert.Equal("{Kallyn Gowdy Other}", fullName.ToString());
+		}
 	}
 }

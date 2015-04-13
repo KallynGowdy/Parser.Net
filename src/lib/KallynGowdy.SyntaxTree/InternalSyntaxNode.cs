@@ -12,6 +12,11 @@ namespace KallynGowdy.SyntaxTree
 	/// This allows us to reuse them on processing.
 	/// Implementation detail.
 	/// </summary>
+	/// <remarks>
+	/// Because both <see cref="SyntaxNode"/> and <see cref="InternalSyntaxNode"/> objects are immutable,
+	/// new nodes are created whenever an operation occurs (Adding, Replacing, Removing nodes/values). Some <see cref="InternalSyntaxNode"/> objects are able to be reused because
+	/// they don't contain parent links, but <see cref="SyntaxNode"/> objects cannot be reused, so they're rebuilt on every change.
+	/// </remarks>
 	public abstract class InternalSyntaxNode
 	{
 		protected InternalSyntaxNode(IImmutableList<InternalSyntaxNode> children)
@@ -108,6 +113,18 @@ namespace KallynGowdy.SyntaxTree
 		public InternalSyntaxNode RemoveNode(InternalSyntaxNode internalNode)
 		{
 			return CreateNewNode(Children.Remove(internalNode));
+		}
+
+		/// <summary>
+		/// Removes the node at the given index and returns a new <see cref="SyntaxNode"/> that represents the changes.
+		/// </summary>
+		/// <param name="index">The index of the node that should be removed.</param>
+		/// <returns>Returns a new <see cref="SyntaxNode"/> that contains the changes.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">'index' must be between 0 and Children.Count.</exception>
+		public InternalSyntaxNode RemoveNodeAt(int index)
+		{
+			if (index < 0 || index >= Children.Count) throw new ArgumentOutOfRangeException("index", "Must be between 0 and Children.Count");
+			return CreateNewNode(Children.RemoveAt(index));
 		}
 	}
 }
