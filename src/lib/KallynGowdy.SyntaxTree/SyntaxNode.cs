@@ -116,8 +116,8 @@ namespace KallynGowdy.SyntaxTree
 		/// <summary>
 		/// Replaces the given old node with the given new node and returns a node that represents this node after the operation.
 		/// </summary>
-		/// <param name="oldNode"></param>
-		/// <param name="newNode"></param>
+		/// <param name="oldNode">The node that should be replaced.</param>
+		/// <param name="newNode">The new node that should take the place of the old node.</param>
 		/// <returns></returns>
 		public SyntaxNode ReplaceNode(SyntaxNode oldNode, SyntaxNode newNode)
 		{
@@ -130,6 +130,7 @@ namespace KallynGowdy.SyntaxTree
 		/// </summary>
 		/// <param name="newNode">The new node that should be added to this node.</param>
 		/// <returns></returns>
+		/// <exception cref="ArgumentNullException">The value of 'newNode' cannot be null. </exception>
 		public SyntaxNode AddNode(SyntaxNode newNode)
 		{
 			return InsertNode(InternalNode.Children.Count, newNode);
@@ -150,11 +151,6 @@ namespace KallynGowdy.SyntaxTree
 			return CreateNewNodeFromThisNode(InternalNode.InsertNode(index, newNode.InternalNode));
 		}
 
-		protected virtual SyntaxNode CreateNewNodeFromThisNode(InternalSyntaxNode node)
-		{
-			return node.CreateSyntaxNode(n => Parent?.ReplaceNode(this, n), root => Tree.SetRoot(root));
-		}
-
 		/// <summary>
 		/// Removes the given node from this node's children and returns a new <see cref="SyntaxNode"/> that represents the changes.
 		/// </summary>
@@ -173,6 +169,11 @@ namespace KallynGowdy.SyntaxTree
 		public SyntaxNode RemoveNodeAt(int index)
 		{
 			return CreateNewNodeFromThisNode(InternalNode.RemoveNodeAt(index));
+		}
+
+		protected virtual SyntaxNode CreateNewNodeFromThisNode(InternalSyntaxNode node)
+		{
+			return node.CreateSyntaxNode(n => Parent?.ReplaceNode(this, n), root => Tree.SetRoot(root));
 		}
 
 		public virtual bool Equals(SyntaxNode other)
@@ -232,9 +233,61 @@ namespace KallynGowdy.SyntaxTree
 		{
 		}
 
+		/// <summary>
+		/// Replaces the given old node with the given new node and returns a node that represents this node after the operation.
+		/// </summary>
+		/// <param name="oldNode">The node that should be replaced.</param>
+		/// <param name="newNode">The new node that should take the place of the old node.</param>
+		/// <returns></returns>
 		public new TSyntax ReplaceNode(SyntaxNode oldNode, SyntaxNode newNode)
 		{
 			return (TSyntax)base.ReplaceNode(oldNode, newNode);
+		}
+
+		/// <summary>
+		/// Adds the given syntax node to the end of this node's children and returns the new instance of 'this'.
+		/// If the last node contained in the children array is null, it will be set to the new node.
+		/// </summary>
+		/// <param name="newNode">The new node that should be added to this node.</param>
+		/// <returns></returns>
+		public new TSyntax AddNode(SyntaxNode newNode)
+		{
+			return (TSyntax)base.AddNode(newNode);
+		}
+
+		/// <summary>
+		/// Removes the given node from this node's children and returns a new <see cref="SyntaxNode"/> that represents the changes.
+		/// </summary>
+		/// <param name="node">The node that should be removed.</param>
+		/// <returns></returns>
+		public new TSyntax RemoveNode(SyntaxNode node)
+		{
+			return (TSyntax)base.RemoveNode(node);
+		}
+
+		/// <summary>
+		/// Inserts the given new node into the given index in the children of this node.
+		/// If the child node at the given index is null, it is filled with the given node.
+		/// If the given index is equal to Children.Count, then the node is inserted at the end.
+		/// </summary>
+		/// <param name="index">The index that the child should be inserted at.</param>
+		/// <param name="newNode">The new node that should be inserted.</param>
+		/// <returns>Returns a new <see cref="SyntaxNode"/> that represents the new node that contains the new child.</returns>
+		/// <exception cref="ArgumentNullException">The value of 'newNode' cannot be null. </exception>
+		/// <exception cref="ArgumentOutOfRangeException">index is less than 0 or greater than Children.Count</exception>
+		public new TSyntax InsertNode(int index, SyntaxNode newNode)
+		{
+			return (TSyntax)base.InsertNode(index, newNode);
+		}
+
+		/// <summary>
+		/// Removes the node at the given index and returns a new <see cref="SyntaxNode"/> that represents the changes.
+		/// </summary>
+		/// <param name="index">The index of the node that should be removed.</param>
+		/// <returns></returns>
+		public new TSyntax RemoveNodeAt(int index)
+		{
+			return (TSyntax)base.RemoveNodeAt(index);
 		}
 	}
 }
