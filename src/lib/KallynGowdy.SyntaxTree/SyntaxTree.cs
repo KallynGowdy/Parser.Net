@@ -8,11 +8,11 @@ namespace KallynGowdy.SyntaxTree
 {
 	/// <summary>
 	/// Defines a class that represents a syntax tree.
-	/// If you are defining your own syntax trees, you should use <see cref="SyntaxTree{TMutable}"/>.
+	/// If you are defining your own syntax trees, you should use <see cref="SyntaxTree{TMutable, TRoot}"/>.
 	/// </summary>
 	public abstract class SyntaxTree : IEquatable<SyntaxTree>
 	{
-		private SyntaxNode root;
+		private readonly Lazy<SyntaxNode> root;
 
 		/// <summary>
 		/// Gets the mutable version of this tree.
@@ -28,12 +28,20 @@ namespace KallynGowdy.SyntaxTree
 		{
 			if (internalTree == null) throw new ArgumentNullException("internalTree");
 			this.InternalTree = internalTree;
+			root = new Lazy<SyntaxNode>(() => InternalTree.Root.CreateSyntaxNode(null, this));
 		}
 
 		/// <summary>
 		/// Gets the root of the syntax tree.
 		/// </summary>
-		public SyntaxNode Root => root ?? (root = InternalTree.Root.CreateSyntaxNode(null, this));
+		public SyntaxNode Root => root.Value;
+
+		/// <summary>
+		/// Gets the root of the syntax tree.
+		/// Semantically, there is no difference between calling <see cref="GetRoot()"/> and retrieving <see cref="Root"/>.
+		/// </summary>
+		/// <returns></returns>
+		public SyntaxNode GetRoot() => Root;
 
 		/// <summary>
 		/// Creates a new <see cref="SyntaxTree"/> that possesses the given root.
@@ -42,6 +50,11 @@ namespace KallynGowdy.SyntaxTree
 		/// <returns></returns>
 		public SyntaxTree SetRoot(SyntaxNode newRoot) => !ReferenceEquals(newRoot, Root) ? CreateNewTree(newRoot) : this;
 
+		/// <summary>
+		/// Creates a new <see cref="SyntaxTree"/> that contains the given root.
+		/// </summary>
+		/// <param name="root">The root that should be contained in the new <see cref="SyntaxTree"/>.</param>
+		/// <returns></returns>
 		protected abstract SyntaxTree CreateNewTree(SyntaxNode root);
 
 		public override string ToString()

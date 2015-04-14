@@ -8,13 +8,14 @@ namespace KallynGowdy.SyntaxTree
 {
 	/// <summary>
 	/// Defines an abstract class that represents a node in a syntax tree.
+	/// Syntax nodes are the non-terminal representations of language constructs.
 	/// </summary>
 	public abstract class SyntaxNode : IEquatable<SyntaxNode>
 	{
 		private readonly Lazy<SyntaxNode> lazyParent;
 		private readonly Lazy<SyntaxTree> lazyTree;
 		private readonly Lazy<long> lazyPosition;
-		private ReadOnlyCollection<SyntaxNode> children;
+		private readonly Lazy<ReadOnlyCollection<SyntaxNode>> children;
 
 		/// <summary>
 		/// Creates a new syntax node that represents the given mutable node.
@@ -77,7 +78,7 @@ namespace KallynGowdy.SyntaxTree
 				return Parent != null ? (Parent.Position + Parent.InternalNode.Children.Where(c => c != null).TakeWhile(c => !ReferenceEquals(c, internalNode)).Sum(c => c.Length)) : 0;
 			});
 
-
+			children = new Lazy<ReadOnlyCollection<SyntaxNode>>(() => new ReadOnlyCollection<SyntaxNode>(InternalNode.Children.Select(c => c?.CreateSyntaxNode(this, Tree)).ToArray()));
 		}
 
 		/// <summary>
@@ -91,7 +92,7 @@ namespace KallynGowdy.SyntaxTree
 		/// <summary>
 		/// Gets the read only list of child nodes of this syntax node. Never null.
 		/// </summary>
-		public IReadOnlyList<SyntaxNode> Children => children ?? (children = new ReadOnlyCollection<SyntaxNode>(InternalNode.Children.Select(c => c?.CreateSyntaxNode(this, Tree)).ToArray()));
+		public IReadOnlyList<SyntaxNode> Children => children.Value;
 
 		/// <summary>
 		/// Gets the parent of this node. Null if this node does not have a parent.
@@ -111,7 +112,7 @@ namespace KallynGowdy.SyntaxTree
 		/// <summary>
 		/// Gets the number of characters that the node possesses.
 		/// </summary>
-		public long Length => InternalNode.Length;
+		public long Width => InternalNode.Length;
 
 		/// <summary>
 		/// Replaces the given old node with the given new node and returns a node that represents this node after the operation.

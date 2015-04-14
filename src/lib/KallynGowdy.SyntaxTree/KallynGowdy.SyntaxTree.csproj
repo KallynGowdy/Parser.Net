@@ -37,8 +37,11 @@
     <Compile Include="InternalSyntaxNode.cs" />
     <Compile Include="InternalSyntaxTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SyntaxElement.cs" />
     <Compile Include="SyntaxNode.cs" />
+    <Compile Include="SyntaxToken.cs" />
     <Compile Include="SyntaxTree.cs" />
+    <Compile Include="TextSpan.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Collections.Immutable, Version=1.1.34.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">

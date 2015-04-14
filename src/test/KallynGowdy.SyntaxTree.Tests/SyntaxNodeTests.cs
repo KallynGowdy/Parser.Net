@@ -26,7 +26,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Equal(0, firstName.Position);
 			Assert.NotNull(firstName.Children);
 			Assert.Equal(0, firstName.Children.Count);
-			Assert.Equal(6, firstName.Length);
+			Assert.Equal(6, firstName.Width);
 
 			NameNode lastName = new NameNode("Gowdy");
 
@@ -36,7 +36,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.NotNull(lastName.Children);
 			Assert.Equal(0, lastName.Position);
 			Assert.Equal(0, lastName.Children.Count);
-			Assert.Equal(5, lastName.Length);
+			Assert.Equal(5, lastName.Width);
 
 
 			FullNameNode fullName = new FullNameNode(
@@ -54,7 +54,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Same(fullName.FirstName, fullName.Children[0]);
 			Assert.Same(fullName.LastName, fullName.Children[2]);
 
-			Assert.Equal(11, fullName.Length);
+			Assert.Equal(11, fullName.Width);
 
 			Assert.Equal(firstName, fullName.FirstName);
 			Assert.Equal(lastName, fullName.LastName);
@@ -158,7 +158,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.NotNull(root.Tree);
 			Assert.Same(tree, root.Tree);
 			Assert.Equal(0, root.Position);
-			Assert.Equal(11, root.Length);
+			Assert.Equal(11, root.Width);
 			Assert.Equal("{Kallyn Gowdy}", root.ToString());
 
 			NameNode firstName = root.FirstName;
@@ -249,7 +249,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 
 			Assert.NotNull(fullName.MiddleName);
 			Assert.Equal(middleName, fullName.MiddleName);
-			Assert.Equal(13, fullName.Length);
+			Assert.Equal(13, fullName.Width);
 			Assert.Equal("{Kallyn G. Gowdy}", fullName.ToString());
 			Assert.NotSame(tree, fullName.Tree);
 
@@ -321,7 +321,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 				n => Assert.NotSame(n, fullName.LastName)
 				);
 
-			Assert.Equal(16, fullName.Length);
+			Assert.Equal(16, fullName.Width);
 			Assert.Equal("{Kallyn Gowdy Other}", fullName.ToString());
 		}
 
@@ -367,7 +367,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 				Assert.NotNull
 				);
 
-			Assert.Equal(13, fullName.Length);
+			Assert.Equal(13, fullName.Width);
 			Assert.Equal("{Kallyn G. Gowdy}", fullName.ToString());
 
 		}
@@ -409,7 +409,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 				n => Assert.NotSame(n, fullName.LastName)
 				);
 
-			Assert.Equal(16, fullName.Length);
+			Assert.Equal(16, fullName.Width);
 			Assert.Equal("{Kallyn Gowdy Other}", fullName.ToString());
 		}
 
@@ -455,7 +455,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 				Assert.NotNull
 				);
 
-			Assert.Equal(13, fullName.Length);
+			Assert.Equal(13, fullName.Width);
 			Assert.Equal("{Kallyn G. Gowdy}", fullName.ToString());
 
 		}
@@ -497,7 +497,7 @@ namespace KallynGowdy.SyntaxTree.Tests
 				n => Assert.NotSame(n, fullName.LastName)
 				);
 
-			Assert.Equal(16, fullName.Length);
+			Assert.Equal(16, fullName.Width);
 			Assert.Equal("{Kallyn Gowdy Other}", fullName.ToString());
 		}
 
