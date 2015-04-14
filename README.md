@@ -5,6 +5,8 @@ A Parser and Parser Generator for .Net
 
 [![Master Build status](https://ci.appveyor.com/api/projects/status/2bllnjr75h37vi5w/branch/master?svg=true&passingText=master%20-%20passing&failingText=master%20-%20failing&pendingText=master%20-%20pending)](https://ci.appveyor.com/project/KallynGowdy/parser-net/branch/master)
 [![Develop Build status](https://ci.appveyor.com/api/projects/status/2bllnjr75h37vi5w/branch/develop?svg=true&passingText=develop%20-%20passing&failingText=develop%20-%20failing&pendingText=develop%20-%20pending)](https://ci.appveyor.com/project/KallynGowdy/parser-net/branch/develop)
+[![Develop Syntax APIs Build status](https://ci.appveyor.com/api/projects/status/2bllnjr75h37vi5w/branch/develop-syntax-apis?svg=true&passingText=develop-syntax-apis%20-%20passing&failingText=develop-syntax-apis%20-%20failing&pendingText=develop-syntax-apis%20-%20pending)](https://ci.appveyor.com/project/KallynGowdy/parser-net/branch/develop-syntax-apis)
+
 
 Goals:
 
@@ -31,3 +33,21 @@ Goals:
 4). Port Projects over to PCL
   - [x] Syntax Tree API
   - [ ] Parser Generator
+
+# License
+
+```
+  Copyright 2015 Kallyn Gowdy
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+```
