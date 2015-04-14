@@ -130,15 +130,15 @@ namespace KallynGowdy.SyntaxTree
 		public virtual bool Equals(InternalSyntaxNode other)
 		{
 			return other != null &&
-				Children.SequenceEqual(other.Children);
+				(((object)this == (object)other) ||
+				Children.SequenceEqual(other.Children));
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != this.GetType()) return false;
-			return Equals((InternalSyntaxNode) obj);
+			return obj != null &&
+				(((object)this == (object)obj) ||
+				Equals(obj as InternalSyntaxNode));
 		}
 
 		public override int GetHashCode()

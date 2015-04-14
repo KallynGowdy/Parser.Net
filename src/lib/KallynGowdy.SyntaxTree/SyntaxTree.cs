@@ -51,17 +51,16 @@ namespace KallynGowdy.SyntaxTree
 
 		public bool Equals(SyntaxTree other)
 		{
-			if (ReferenceEquals(null, other)) return false;
-			if (ReferenceEquals(this, other)) return true;
-			return other.Root.Equals(this.Root);
+			return (object)other != null &&
+					((object)this == (object)other ||
+					 other.Root.Equals(this.Root));
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != this.GetType()) return false;
-			return Equals((SyntaxTree) obj);
+			return (object)obj != null &&
+					((object)this == (object)obj ||
+					 Equals(obj as SyntaxTree));
 		}
 
 		public override int GetHashCode()
@@ -78,7 +77,7 @@ namespace KallynGowdy.SyntaxTree
 		{
 			return !Equals(left, right);
 		}
-    }
+	}
 
 	/// <summary>
 	/// Defines an abstract class that 

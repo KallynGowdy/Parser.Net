@@ -32,26 +32,25 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 
 		public virtual bool Equals(NameInternalNode other)
 		{
-			if (ReferenceEquals(null, other)) return false;
-			if (ReferenceEquals(this, other)) return true;
-			return this.Name.Equals(other.Name);
+			return (object)other != null &&
+					(((object)this == (object)other) ||
+					// ReSharper disable once PossibleNullReferenceException
+					Name.Equals(other.Name));
 		}
 
 		public override bool Equals(InternalSyntaxNode other)
 		{
-			if (ReferenceEquals(null, other)) return false;
-			if (ReferenceEquals(this, other)) return true;
-			if (other.GetType() != this.GetType()) return false;
-			return base.Equals(other) &&
-				Equals((NameInternalNode)other);
+			return (object)other != null &&
+				   ((object)this == (object)other ||
+					(base.Equals(other) &&
+					Equals(other as NameInternalNode)));
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != this.GetType()) return false;
-			return Equals((NameInternalNode)obj);
+			return obj != null &&
+				   ((object)this == (object)obj ||
+					Equals(obj as InternalSyntaxNode));
 		}
 
 		public override int GetHashCode()
