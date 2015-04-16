@@ -1,4 +1,5 @@
 ﻿using System;
+using KallynGowdy.SyntaxTree.Internal;
 using KallynGowdy.SyntaxTree.Tests.Syntax.Internal;
 
 namespace KallynGowdy.SyntaxTree.Tests.Syntax

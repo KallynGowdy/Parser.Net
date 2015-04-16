@@ -77,13 +77,11 @@ namespace KallynGowdy.SyntaxTree
 		/// <returns></returns>
 		public TextSpan? Overlap(TextSpan other)
 		{
-			if (other.Start < End)
+			int start = Math.Max(Start, other.Start);
+			int end = Math.Min(End, other.End);
+			if (start < end)
 			{
-				return new TextSpan(other.Start, other.End < End ? other.Length : End - other.Start);
-			}
-			else if (Start < other.End)
-			{
-				return new TextSpan(Start, End < other.End ? Length : other.End - Start);
+				return new TextSpan(start, end - start);
 			}
 			else
 			{
@@ -99,6 +97,11 @@ namespace KallynGowdy.SyntaxTree
 		public bool OverlapsWith(TextSpan other)
 		{
 			return Overlap(other) != null;
+		}
+
+		public override string ToString()
+		{
+			return string.Format("({0}-{1})", Start, Length);
 		}
 	}
 }

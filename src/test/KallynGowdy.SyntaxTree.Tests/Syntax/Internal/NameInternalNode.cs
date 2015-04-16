@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using KallynGowdy.SyntaxTree.Internal;
 
 namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 {

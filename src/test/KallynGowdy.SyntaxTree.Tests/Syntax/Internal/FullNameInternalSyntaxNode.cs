@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using KallynGowdy.SyntaxTree.Internal;
 
 namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 {

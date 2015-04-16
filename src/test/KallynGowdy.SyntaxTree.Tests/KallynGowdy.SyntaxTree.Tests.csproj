@@ -39,12 +39,14 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SyntaxNodeTests.cs" />
+    <Compile Include="SyntaxTriviaTests.cs" />
     <Compile Include="Syntax\NameNode.cs" />
     <Compile Include="Syntax\FullNameNode.cs" />
     <Compile Include="Syntax\Internal\NameInternalNode.cs" />
     <Compile Include="Syntax\Internal\FullNameInternalSyntaxNode.cs" />
     <Compile Include="Syntax\Internal\MockInternalSyntaxTree.cs" />
     <Compile Include="Syntax\MockSyntaxTree.cs" />
+    <Compile Include="TextSpanTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Collections.Immutable, Version=1.1.34.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
