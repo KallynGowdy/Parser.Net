@@ -10,7 +10,7 @@ A Parser and Parser Generator for .Net
 
 Goals:
 
-- A reusable Syntax Tree API that functions and appears similar to Microsoft's Project Roslyn API.
+- A simple and reusable Syntax Tree API that provides support for representing abstract syntax trees in an easy-to-use way
 - A super parser generator that can create a parser for any context-free grammar and integrate with a strongly-typed syntax tree
 
 ### Right Now
@@ -20,7 +20,7 @@ Goals:
 
 2). Add Syntax Tree API
   - [x] Add basic working implementation
-  - [ ] Refactor to mimic Roslyn API
+  - [ ] Provide API for comparing trees for differences and determining which nodes need updating (Thereby allowing partial parsing)
   - [ ] Add detailed documentation on using and extending (utilize tests for examples)
 
 3). Refactor Parser Generator
