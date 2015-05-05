@@ -8,7 +8,7 @@ namespace KallynGowdy.SyntaxTree
 	/// <summary>
 	/// Defines an interface that represents an element of syntax.
 	/// </summary>
-	public interface ISyntaxElement : IHasSyntaxTree, IHasSyntaxTrivia, IHasSyntaxPosition
+	public interface ISyntaxElement : IHasSyntaxTree, IHasSyntaxPosition
 	{
 		/// <summary>
 		/// Gets whether the node represents a language construct that was not actually parsed from the source.

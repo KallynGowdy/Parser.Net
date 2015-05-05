@@ -36,16 +36,13 @@
   <ItemGroup>
     <Compile Include="IHasSyntaxPosition.cs" />
     <Compile Include="IHasSyntaxTree.cs" />
-    <Compile Include="IHasSyntaxTrivia.cs" />
     <Compile Include="Internal\InternalSyntaxTrivia.cs" />
     <Compile Include="Internal\InternalSyntaxNode.cs" />
     <Compile Include="Internal\InternalSyntaxTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ISyntaxElement.cs" />
     <Compile Include="SyntaxNode.cs" />
-    <Compile Include="SyntaxToken.cs" />
     <Compile Include="SyntaxTree.cs" />
-    <Compile Include="SyntaxTrivia.cs" />
     <Compile Include="TextSpan.cs" />
   </ItemGroup>
   <ItemGroup>
