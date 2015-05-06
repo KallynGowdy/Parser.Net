@@ -17,8 +17,7 @@ namespace KallynGowdy.SyntaxTree
 		private readonly Lazy<SyntaxTree> lazyTree;
 		private readonly Lazy<int> lazyPosition;
 		private readonly Lazy<ReadOnlyCollection<SyntaxNode>> children;
-        private readonly Lazy<TextSpan> lazySpan; 
-
+        
 		/// <summary>
 		/// Creates a new syntax node that represents the given mutable node.
 		/// </summary>
@@ -79,8 +78,6 @@ namespace KallynGowdy.SyntaxTree
 			{
 				return Parent != null ? (Parent.Position + Parent.InternalNode.Children.Where(c => c != null).TakeWhile(c => !ReferenceEquals(c, internalNode)).Sum(c => c.Length)) : 0;
 			});
-
-            lazySpan = new Lazy<TextSpan>(() => new TextSpan(Position, Width));
 
 			children = new Lazy<ReadOnlyCollection<SyntaxNode>>(() => new ReadOnlyCollection<SyntaxNode>(InternalNode.Children.Select(c => c?.CreateSyntaxNode(this, Tree)).ToArray()));
 		}
@@ -176,12 +173,20 @@ namespace KallynGowdy.SyntaxTree
 			return CreateNewNodeFromThisNode(InternalNode.RemoveNodeAt(index));
 		}
 
-		protected virtual SyntaxNode CreateNewNodeFromThisNode(InternalSyntaxNode node)
-		{
-			return node.CreateSyntaxNode(n => Parent?.ReplaceNode(this, n), root => Tree.SetRoot(root));
-		}
+	    /// <summary>
+	    /// Creates a new <see cref="SyntaxNode"/> from the given <see cref="InternalSyntaxNode"/>.
+	    /// Most often used in manipulative functions to generate a new immutable <see cref="SyntaxNode"/> from a <see cref="InternalSyntaxNode"/>.
+	    /// </summary>
+	    /// <param name="node">The internal node that the new <see cref="SyntaxNode"/> should be created from.</param>
+	    /// <returns>Returns a new <see cref="SyntaxNode"/>.</returns>
+	    /// <exception cref="ArgumentNullException"><paramref name="node"/> is <see langword="null" />.</exception>
+	    protected virtual SyntaxNode CreateNewNodeFromThisNode(InternalSyntaxNode node)
+        {
+            if (node == null) throw new ArgumentNullException("node");
+            return node.CreateSyntaxNode(n => Parent?.ReplaceNode(this, n), root => Tree.SetRoot(root));
+        }
 
-		public virtual bool Equals(SyntaxNode other)
+	    public virtual bool Equals(SyntaxNode other)
 		{
 			return ((object) other) != null && 
 					((object) this == (object) other || 
@@ -223,7 +228,7 @@ namespace KallynGowdy.SyntaxTree
 	    /// <summary>
 	    /// Gets the representation of this element's span of text.
 	    /// </summary>
-	    public TextSpan Span => lazySpan.Value;
+	    public TextSpan Span => new TextSpan(Position, Width); // We don't need a lazy span because TextSpan is a struct, so it gets copied every time.
 
 	    /// <summary>
 	    /// Gets whether the node represents a language construct that was not actually parsed from the source.

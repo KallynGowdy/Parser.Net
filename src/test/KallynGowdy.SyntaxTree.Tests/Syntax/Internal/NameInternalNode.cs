@@ -8,10 +8,10 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 	{
 		public string Name { get; }
 
-		public NameInternalNode(string firstName) : base(ImmutableArray.Create<InternalSyntaxNode>())
+		public NameInternalNode(string name) : base(ImmutableArray.Create<InternalSyntaxNode>())
 		{
-			if (firstName == null) throw new ArgumentNullException("firstName");
-			Name = firstName;
+			if (name == null) throw new ArgumentNullException("name");
+			Name = name;
 		}
 
 		protected override InternalSyntaxNode CreateNewNode(IImmutableList<InternalSyntaxNode> children)
