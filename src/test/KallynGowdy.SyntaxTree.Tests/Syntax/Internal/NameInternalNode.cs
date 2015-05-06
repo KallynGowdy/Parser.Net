@@ -24,7 +24,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 			return new NameNode(this, parent, tree);
 		}
 
-		public override long Length => Name.Length;
+		public override int Length => Name.Length;
 
 		public override string ToString()
 		{

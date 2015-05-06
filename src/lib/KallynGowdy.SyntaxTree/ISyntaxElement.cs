@@ -16,19 +16,5 @@ namespace KallynGowdy.SyntaxTree
 		/// in order to compile successfully but were actually missing.
 		/// </summary>
 		bool IsMissing { get; }
-
-		/// <summary>
-		/// Gets the text span that represents the entire width of this element's text. (Includes leading and trailing trivia)
-		/// </summary>
-		/// <remarks>
-		/// API Notes:
-		/// 
-		/// This member is apart of <see cref="ISyntaxElement"/> and not <see cref="IHasSyntaxPosition"/> because
-		/// it's semantic meaning relates not only to position, but also to containing <see cref="SyntaxTrivia"/>, which
-		/// is not specified by <see cref="IHasSyntaxPosition"/>.
-		/// 
-		/// May be moved to an extension method in the future.
-		/// </remarks>
-		TextSpan FullSpan { get; }
 	}
 }

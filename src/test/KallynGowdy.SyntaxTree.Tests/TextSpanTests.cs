@@ -56,65 +56,96 @@ namespace KallynGowdy.SyntaxTree.Tests
 			Assert.Equal(expectedOverlap, first.Overlap(second));
 		}
 
-		public static object[] Test_SpansOverlap_Data => new object[]
-		{
-			new object[]
-			{
-				new TextSpan(0, 10),
-				new TextSpan(1, 10),
-				new TextSpan(1, 9)
-			},
-			new object[]
-			{
-				// '''''-
-				// '-----
-				new TextSpan(5, 1),
-				new TextSpan(1, 5),
-				new TextSpan(5, 1)
-			},
-			new object[]
-			{
-				new TextSpan(0, 2),
-				new TextSpan(1, 1),
-				new TextSpan(1, 1)
-			},
-			new object[]
-			{
-				new TextSpan(1, 1),
-				new TextSpan(0, 2),
-				new TextSpan(1, 1)
-			},
-			new object[]
-			{
-				new TextSpan(0, 10),
-				new TextSpan(1, 11),
-				new TextSpan(1, 9)
-			},
-			new object[]
-			{
-				new TextSpan(0, 1),
-				new TextSpan(0, 1),
-				new TextSpan(0, 1)
-			},
-			new object[]
-			{
-				new TextSpan(0, 1),
-				new TextSpan(1, 1),
-				null
-			},
-			new object[]
-			{
-				new TextSpan(1, 1),
-				new TextSpan(0, 1),
-				null
-			},
-			new object[]
-			{
-				new TextSpan(0, 0),
-				new TextSpan(0, 0),
-				null
-			},
-		};
-		
-	}
+        public static object[] Test_SpansOverlap_Data => new object[]
+        {
+            new object[]
+            {
+                new TextSpan(0, 10),
+                new TextSpan(1, 10),
+                new TextSpan(1, 9)
+            },
+            new object[]
+            {
+                // '''''-
+                // '-----
+                new TextSpan(5, 1),
+                new TextSpan(1, 5),
+                new TextSpan(5, 1)
+            },
+            new object[]
+            {
+                new TextSpan(0, 2),
+                new TextSpan(1, 1),
+                new TextSpan(1, 1)
+            },
+            new object[]
+            {
+                new TextSpan(1, 1),
+                new TextSpan(0, 2),
+                new TextSpan(1, 1)
+            },
+            new object[]
+            {
+                new TextSpan(0, 10),
+                new TextSpan(1, 11),
+                new TextSpan(1, 9)
+            },
+            new object[]
+            {
+                new TextSpan(0, 1),
+                new TextSpan(0, 1),
+                new TextSpan(0, 1)
+            },
+            new object[]
+            {
+                new TextSpan(0, 1),
+                new TextSpan(1, 1),
+                null
+            },
+            new object[]
+            {
+                new TextSpan(1, 1),
+                new TextSpan(0, 1),
+                null
+            },
+            new object[]
+            {
+                new TextSpan(0, 0),
+                new TextSpan(0, 0),
+                null
+            },
+        };
+
+        [Theory]
+	    [MemberData("Test_SpansAreEqual_Data")]
+	    public void Test_SpansAreEqual(TextSpan first, TextSpan second)
+	    {
+            Assert.Equal(first, second);
+	    }
+
+	    public static object[] Test_SpansAreEqual_Data
+	    {
+	        get
+	        {
+                return new object[]
+                {
+                    new object[]
+                    {
+                        new TextSpan(0, 0),
+                        new TextSpan(0, 0)
+                    },
+                    new object[]
+                    {
+                        new TextSpan(0, 4),
+                        new TextSpan(0, 4)
+                    },
+                    new object[]
+                    {
+                        new TextSpan(1, 4),
+                        new TextSpan(1, 4)
+                    }
+                };
+	        }
+	    }
+    }
 }
