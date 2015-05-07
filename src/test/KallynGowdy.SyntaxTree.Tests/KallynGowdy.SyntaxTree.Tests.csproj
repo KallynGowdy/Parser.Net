@@ -37,7 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Example\BuildSyntaxTreeExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SynaxTriviaTests.cs" />
     <Compile Include="SyntaxNodeTests.cs" />
     <Compile Include="Syntax\NameNode.cs" />
     <Compile Include="Syntax\FullNameNode.cs" />
@@ -45,6 +47,7 @@
     <Compile Include="Syntax\Internal\FullNameInternalSyntaxNode.cs" />
     <Compile Include="Syntax\Internal\MockInternalSyntaxTree.cs" />
     <Compile Include="Syntax\MockSyntaxTree.cs" />
+    <Compile Include="TextSpanTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Collections.Immutable, Version=1.1.34.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -73,6 +76,7 @@
       <Name>KallynGowdy.SyntaxTree</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

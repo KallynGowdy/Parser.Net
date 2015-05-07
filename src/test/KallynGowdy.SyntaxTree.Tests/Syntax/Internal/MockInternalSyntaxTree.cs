@@ -1,3 +1,5 @@
+using KallynGowdy.SyntaxTree.Internal;
+
 namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 {
 	public class MockInternalSyntaxTree : InternalSyntaxTree

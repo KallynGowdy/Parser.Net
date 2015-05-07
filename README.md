@@ -5,10 +5,12 @@ A Parser and Parser Generator for .Net
 
 [![Master Build status](https://ci.appveyor.com/api/projects/status/2bllnjr75h37vi5w/branch/master?svg=true&passingText=master%20-%20passing&failingText=master%20-%20failing&pendingText=master%20-%20pending)](https://ci.appveyor.com/project/KallynGowdy/parser-net/branch/master)
 [![Develop Build status](https://ci.appveyor.com/api/projects/status/2bllnjr75h37vi5w/branch/develop?svg=true&passingText=develop%20-%20passing&failingText=develop%20-%20failing&pendingText=develop%20-%20pending)](https://ci.appveyor.com/project/KallynGowdy/parser-net/branch/develop)
+[![Develop Syntax APIs Build status](https://ci.appveyor.com/api/projects/status/2bllnjr75h37vi5w/branch/develop-syntax-apis?svg=true&passingText=develop-syntax-apis%20-%20passing&failingText=develop-syntax-apis%20-%20failing&pendingText=develop-syntax-apis%20-%20pending)](https://ci.appveyor.com/project/KallynGowdy/parser-net/branch/develop-syntax-apis)
+
 
 Goals:
 
-- A reusable Syntax Tree API that functions and appears similar to Microsoft's Project Roslyn API.
+- A simple and reusable Syntax Tree API that provides support for representing abstract syntax trees in an easy-to-use way
 - A super parser generator that can create a parser for any context-free grammar and integrate with a strongly-typed syntax tree
 
 ### Right Now
@@ -18,7 +20,7 @@ Goals:
 
 2). Add Syntax Tree API
   - [x] Add basic working implementation
-  - [ ] Refactor to mimic Roslyn API
+  - [ ] Provide API for comparing trees for differences and determining which nodes need updating (Thereby allowing partial parsing)
   - [ ] Add detailed documentation on using and extending (utilize tests for examples)
 
 3). Refactor Parser Generator

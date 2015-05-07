@@ -21,11 +21,9 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax
 
 		protected new FullNameInternalSyntaxNode InternalNode => (FullNameInternalSyntaxNode)base.InternalNode;
 
-		public NameNode FirstName => (NameNode)Children[0];
+		public NameNode FirstName => (NameNode)Children.First();
 
-		public NameNode MiddleName => (NameNode)Children[1];
-
-		public NameNode LastName => (NameNode)Children[2];
+        public NameNode LastName => (NameNode)Children.Last();
 
 		
 	}

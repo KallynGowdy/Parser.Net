@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KallynGowdy.SyntaxTree
+namespace KallynGowdy.SyntaxTree.Internal
 {
 	/// <summary>
 	/// Defines a syntax tree that is immutable.
