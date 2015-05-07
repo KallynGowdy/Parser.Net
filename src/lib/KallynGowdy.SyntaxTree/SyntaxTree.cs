@@ -8,7 +8,7 @@ using KallynGowdy.SyntaxTree.Internal;
 namespace KallynGowdy.SyntaxTree
 {
 	/// <summary>
-	/// Defines a class that represents a syntax tree.
+	/// Defines an abstract class that represents a syntax tree.
 	/// If you are defining your own syntax trees, you should use <see cref="SyntaxTree{TMutable, TRoot}"/>.
 	/// </summary>
 	public abstract class SyntaxTree : IEquatable<SyntaxTree>

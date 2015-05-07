@@ -56,7 +56,37 @@ namespace KallynGowdy.SyntaxTree.Tests.Example
                 tree.Root.Children,
                 node => Assert.Equal("First", node.ToString()),
                 node => Assert.Equal("Last", node.ToString())
-                );
+            );
+        }
+
+        [Fact]
+        public void Test_FindChangesInSyntaxTree()
+        {
+            // "First Last"
+            NameNode firstName = new NameNode("First", new SyntaxTrivia(), new SyntaxTrivia(" "));
+            NameNode lastName = new NameNode("Last");
+            FullNameNode fullName = new FullNameNode(
+                firstName,
+                lastName
+            );
+
+            MockSyntaxTree tree = new MockSyntaxTree(fullName);
+
+            SyntaxTreeDifferences changes = tree.FindChanges("\nFirst Middle Last ");
+
+            Assert.Same(tree, changes.OriginalTree);
+            Assert.True(changes.HasChanges);
+            Assert.Equal(
+                new MockSyntaxTree(
+                    new FullNameNode(
+                        new SyntaxChangeNode("\n"),
+                        firstName,
+                        new SyntaxChangeNode("Middle "),
+                        lastName,
+                        new SyntaxChangeNode(" ")
+                    )
+                ),
+                changes.NewTree);
         }
 
     }
