@@ -210,6 +210,19 @@ namespace KallynGowdy.SyntaxTree
             return Equals(obj as SyntaxNode);
         }
 
+        /// <summary>
+        /// Compares this node against the given other node and determines if every facet of them are equal.
+        /// Comparison includes leading/trailing trivia, IsMissing and recursive evaluation of children for strict equality.
+        /// </summary>
+        /// <param name="other">The node that should be compared against this node for 100% equality.</param>
+        /// <returns>Returns whether the given node is exactly the same as the other node.</returns>
+        public virtual bool StrictEquals(SyntaxNode other)
+        {
+            return ((object)other) != null &&
+                    ((object)this == (object)other ||
+                    InternalNode.StrictEquals(other.InternalNode));
+        }
+
         public override int GetHashCode()
         {
             unchecked

@@ -10,7 +10,11 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax
 		{
 		}
 
-		public NameNode(string firstName, Func<SyntaxNode, SyntaxNode> parent, Func<SyntaxNode, SyntaxTree> tree) : this(new NameInternalNode(firstName), parent, tree)
+	    public NameNode(string name, SyntaxTrivia leadingTrivia, SyntaxTrivia trailingTrivia) : this(new NameInternalNode(name, leadingTrivia, trailingTrivia), n => null, t => null)
+	    {
+	    }
+
+	    public NameNode(string firstName, Func<SyntaxNode, SyntaxNode> parent, Func<SyntaxNode, SyntaxTree> tree) : this(new NameInternalNode(firstName), parent, tree)
 		{
 		}
 

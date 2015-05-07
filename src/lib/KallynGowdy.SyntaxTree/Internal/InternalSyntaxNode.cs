@@ -220,5 +220,19 @@ namespace KallynGowdy.SyntaxTree.Internal
 	    {
             return string.Join("", Children.Where(c => c != null).Select(c => c.ToString()));
         }
+
+        /// <summary>
+        /// Compares this node against the given other node and determines if every facet of them are equal.
+        /// </summary>
+        /// <param name="other">The node that should be compared against this node for 100% equality.</param>
+        /// <returns>Returns whether the given node is exactly the same as the other node.</returns>
+	    public virtual bool StrictEquals(InternalSyntaxNode other)
+	    {
+            return Equals(other) &&
+                other.Children.Zip(this.Children, (c1, c2) => new { First = c1, Second = c2}).All(c => c.First.StrictEquals(c.Second)) &&
+                other.LeadingTrivia.Equals(this.LeadingTrivia) &&
+                other.TrailingTrivia.Equals(this.TrailingTrivia) &&
+                other.IsMissing == this.IsMissing;
+        }
 	}
 }

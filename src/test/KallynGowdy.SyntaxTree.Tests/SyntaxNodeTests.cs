@@ -478,6 +478,54 @@ namespace KallynGowdy.SyntaxTree.Tests
             Assert.Equal("{Kallyn Gowdy Other}", fullName.ToString());
         }
 
+        [Fact]
+        public void Test_CreateNodeWithTrivia()
+        {
+            NameNode name = new NameNode("Name", new SyntaxTrivia("\n\n "), new SyntaxTrivia("\n"));
+
+            Assert.Equal(new SyntaxTrivia("\n\n "), name.LeadingTrivia);
+            Assert.Equal(new SyntaxTrivia("\n"), name.TrailingTrivia);
+            Assert.Equal("\n\n Name\n", name.ToString());
+        }
+
+        [Fact]
+        public void Test_TriviaDoesNotFactorIntoEquality()
+        {
+            NameNode name = new NameNode("Name", new SyntaxTrivia("\n\n "), new SyntaxTrivia("\n"));
+            NameNode otherName = new NameNode("Name");
+
+            Assert.NotEqual(name.LeadingTrivia, otherName.LeadingTrivia);
+            Assert.NotEqual(name.TrailingTrivia, otherName.TrailingTrivia);
+            Assert.NotEqual(name.ToString(), otherName.ToString());
+            Assert.Equal(name, otherName);
+        }
+
+        [Fact]
+        public void Test_StrictEqualsCoversTrivia()
+        {
+            NameNode name = new NameNode("Name", new SyntaxTrivia("\n\n "), new SyntaxTrivia("\n"));
+            NameNode otherName = new NameNode("Name");
+
+            Assert.NotEqual(name.LeadingTrivia, otherName.LeadingTrivia);
+            Assert.NotEqual(name.TrailingTrivia, otherName.TrailingTrivia);
+            Assert.NotEqual(name.ToString(), otherName.ToString());
+            Assert.False(name.StrictEquals(otherName));
+        }
+
+        [Fact]
+        public void Test_StrictEqualsCoversChildren()
+        {
+            NameNode firstName = new NameNode("First", new SyntaxTrivia("\n\n "), new SyntaxTrivia("\n"));
+            NameNode lastName= new NameNode("Last", new SyntaxTrivia(" "), new SyntaxTrivia("\t\t"));
+            FullNameNode fullName = new FullNameNode(firstName, lastName);
+
+            NameNode otherFirstName = new NameNode("First", new SyntaxTrivia("\n "), new SyntaxTrivia("\n"));
+            FullNameNode otherFullName = new FullNameNode(otherFirstName, lastName);
+
+            Assert.Equal(fullName, otherFullName);
+            Assert.False(fullName.StrictEquals(otherFullName));
+        }
+
         [Theory]
         [MemberData("Test_NodeCalculatesSpanCorrectly_Data")]
         public void Test_NodeCalculatesSpanCorrectly(SyntaxNode node, TextSpan expectedSpan)

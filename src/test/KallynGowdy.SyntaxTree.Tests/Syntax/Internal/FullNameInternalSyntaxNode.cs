@@ -42,7 +42,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax.Internal
 			return new FullNameNode(this, parent, tree);
 		}
 
-		public override string ToString()
+		protected override string ToStringInternal()
 		{
 			return string.Format("{{{0}}}", string.Join(" ", Children.Where(c => c != null)));
 		}
