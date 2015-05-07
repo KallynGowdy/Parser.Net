@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="Example\BuildSyntaxTreeExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SynaxTriviaTests.cs" />
     <Compile Include="SyntaxNodeTests.cs" />
     <Compile Include="Syntax\NameNode.cs" />
     <Compile Include="Syntax\FullNameNode.cs" />

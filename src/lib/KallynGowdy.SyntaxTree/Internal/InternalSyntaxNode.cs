@@ -18,11 +18,30 @@ namespace KallynGowdy.SyntaxTree.Internal
 	/// </remarks>
 	public abstract class InternalSyntaxNode : IEquatable<InternalSyntaxNode>
 	{
-		protected InternalSyntaxNode(IImmutableList<InternalSyntaxNode> children)
+	    /// <summary>
+	    /// Creates a new <see cref="InternalSyntaxNode"/> object.
+	    /// </summary>
+	    /// <param name="children">The immutable list of children that this node contains.</param>
+	    /// <exception cref="ArgumentNullException"><paramref name="children"/> is <see langword="null" />.</exception>
+	    protected InternalSyntaxNode(IImmutableList<InternalSyntaxNode> children)
 		{
 			if (children == null) throw new ArgumentNullException("children");
 			Children = children;
 		}
+
+        /// <summary>
+	    /// Creates a new <see cref="InternalSyntaxNode"/> object.
+	    /// </summary>
+	    /// <param name="children">The immutable list of children that this node contains.</param>
+        /// <param name="leadingTrivia">The amount of trivia that appears directly in front of this node in the source.</param>
+        /// <param name="trailingTrivia">The amount of trivia that appears directly after this node in the source.</param>
+	    /// <exception cref="ArgumentNullException"><paramref name="children"/> is <see langword="null" />.</exception>
+	    protected InternalSyntaxNode(IImmutableList<InternalSyntaxNode> children, SyntaxTrivia leadingTrivia, SyntaxTrivia trailingTrivia)
+            : this(children)
+	    {
+            this.LeadingTrivia = leadingTrivia;
+            this.TrailingTrivia = trailingTrivia;
+	    }
 
         /// <summary>
 	    /// Gets whether the node represents a language construct that was not actually parsed from the source.
@@ -43,7 +62,17 @@ namespace KallynGowdy.SyntaxTree.Internal
 		/// </summary>
 		public IImmutableList<InternalSyntaxNode> Children { get; }
 
-		/// <summary>
+        /// <summary>
+        /// Gets the trivia (non-meaningful content) that is contained between this node and its previous "brother" node.
+        /// </summary>
+	    public SyntaxTrivia LeadingTrivia { get; }
+
+        /// <summary>
+        /// Gets the trivia (non-meaningful content) that is contained between this node and its next "sister" node.
+        /// </summary>
+	    public SyntaxTrivia TrailingTrivia { get; }
+
+	    /// <summary>
 		/// Creates a new <see cref="InternalSyntaxNode"/> from the given children.
 		/// This method is used to create new nodes from the existing immutable one.
 		/// </summary>
@@ -176,5 +205,20 @@ namespace KallynGowdy.SyntaxTree.Internal
 		{
 			return !Equals(left, right);
 		}
+
+	    public override string ToString()
+	    {
+            return LeadingTrivia + ToStringInternal() + TrailingTrivia;
+	    }
+
+        /// <summary>
+        /// Gets the string representation of the content directly contained in this node.
+        /// Override this method to provide a string representation of the syntax node while preserving the formatting for <see cref="LeadingTrivia"/> and <see cref="TrailingTrivia"/>.
+        /// </summary>
+        /// <returns>Returns a string that represents the content of this node.</returns>
+	    protected virtual string ToStringInternal()
+	    {
+            return string.Join("", Children.Where(c => c != null).Select(c => c.ToString()));
+        }
 	}
 }

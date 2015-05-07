@@ -30,7 +30,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Example
             // The input string into the parser
             // In our case, the parser is a very simple lastname-firstname parser, where the first token in
             // the input is the first name and the rest are just added on.
-            string[] input = { "First", "Last" };
+            string[] input = {"First", "Last"};
 
             NameNode[] names = new NameNode[input.Length];
 
@@ -56,7 +56,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Example
                 tree.Root.Children,
                 node => Assert.Equal("First", node.ToString()),
                 node => Assert.Equal("Last", node.ToString())
-            );
+                );
         }
 
     }
