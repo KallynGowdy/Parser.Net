@@ -25,7 +25,7 @@ namespace KallynGowdy.SyntaxTree.Internal
 	    /// <exception cref="ArgumentNullException"><paramref name="children"/> is <see langword="null" />.</exception>
 	    protected InternalSyntaxNode(IImmutableList<InternalSyntaxNode> children)
 		{
-			if (children == null) throw new ArgumentNullException("children");
+			if (children == null) throw new ArgumentNullException(nameof(children));
 			Children = children;
 		}
 
@@ -78,6 +78,12 @@ namespace KallynGowdy.SyntaxTree.Internal
 		/// </summary>
 		/// <param name="children">The children that should be contained in the node.</param>
 		/// <returns></returns>
+		/// <example>
+		/// Usually implemented like this: 
+		/// <code>
+		/// return new InternalSyntaxNodeType(children); // Add any other needed parameters as well
+		/// </code> 
+		/// </example>
 		protected abstract InternalSyntaxNode CreateNewNode(IImmutableList<InternalSyntaxNode> children);
 
 		/// <summary>
@@ -86,6 +92,12 @@ namespace KallynGowdy.SyntaxTree.Internal
 		/// <param name="parent">The function that produces the parent of the new node.</param>
 		/// <param name="tree">The function that produces the tree of the new node.</param>
 		/// <returns></returns>
+		/// <example>
+		/// Usually implemented like this:
+		/// <code>
+		/// return new SyntaxNodeType(this, parent, tree);
+		/// </code>
+		/// </example>
 		public abstract SyntaxNode CreateSyntaxNode(Func<SyntaxNode, SyntaxNode> parent, Func<SyntaxNode, SyntaxTree> tree);
 
         /// <summary>
@@ -129,8 +141,8 @@ namespace KallynGowdy.SyntaxTree.Internal
 		/// <exception cref="ArgumentNullException">The value of 'newNode' cannot be null. </exception>
 		public virtual InternalSyntaxNode InsertNode(int index, InternalSyntaxNode newNode)
 		{
-			if (index < 0 || index > Children.Count) throw new ArgumentOutOfRangeException("index", "Must be greater than or equal to 0 and less than Children.Count");
-			if (newNode == null) throw new ArgumentNullException("newNode");
+			if (index < 0 || index > Children.Count) throw new ArgumentOutOfRangeException(nameof(index), "Must be greater than or equal to 0 and less than Children.Count");
+			if (newNode == null) throw new ArgumentNullException(nameof(newNode));
 
 			if(index == Children.Count)
 			{
@@ -164,7 +176,7 @@ namespace KallynGowdy.SyntaxTree.Internal
 		/// <exception cref="ArgumentOutOfRangeException">'index' must be between 0 and Children.Count.</exception>
 		public InternalSyntaxNode RemoveNodeAt(int index)
 		{
-			if (index < 0 || index >= Children.Count) throw new ArgumentOutOfRangeException("index", "Must be between 0 and Children.Count");
+			if (index < 0 || index >= Children.Count) throw new ArgumentOutOfRangeException(nameof(index), "Must be between 0 and Children.Count");
 			return CreateNewNode(Children.RemoveAt(index));
 		}
 

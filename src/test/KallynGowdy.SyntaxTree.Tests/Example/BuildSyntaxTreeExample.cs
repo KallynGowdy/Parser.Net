@@ -74,6 +74,7 @@ namespace KallynGowdy.SyntaxTree.Tests.Example
 
             SyntaxTreeDifferences changes = tree.FindChanges("\nFirst Middle Last ");
 
+            Assert.NotNull(changes);
             Assert.Same(tree, changes.OriginalTree);
             Assert.True(changes.HasChanges);
             Assert.Equal(
@@ -88,6 +89,5 @@ namespace KallynGowdy.SyntaxTree.Tests.Example
                 ),
                 changes.NewTree);
         }
-
     }
 }

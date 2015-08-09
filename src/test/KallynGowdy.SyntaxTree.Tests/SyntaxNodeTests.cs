@@ -526,8 +526,61 @@ namespace KallynGowdy.SyntaxTree.Tests
             Assert.False(fullName.StrictEquals(otherFullName));
         }
 
+        [Fact]
+        public void Test_FindChangeAfterSyntaxNode()
+        {
+            SyntaxNode firstName = new NameNode("First", new SyntaxTrivia(), new SyntaxTrivia());
+
+            SyntaxNode[] changes = firstName.DetectChanges("First ");
+
+            Assert.Collection(changes,
+                change => Assert.Same(firstName, change),
+                change =>
+                {
+                    Assert.IsType<SyntaxChangeNode>(change);
+                    Assert.Equal(new SyntaxChangeNode(" "), change);
+                });
+        }
+
+        [Fact]
+        public void Test_FindChangeBeforeSyntaxNode()
+        {
+            SyntaxNode lastName = new NameNode("Last", new SyntaxTrivia(), new SyntaxTrivia());
+
+            SyntaxNode[] changes = lastName.DetectChanges(" Last");
+
+            Assert.Collection(changes,
+                change =>
+                {
+                    Assert.IsType<SyntaxChangeNode>(change);
+                    Assert.Equal(new SyntaxChangeNode(" "), change);
+                },
+                change => Assert.Same(lastName, change));
+        }
+
+        [Fact]
+        public void Test_FindChangesBeforeAndAfterSyntaxNode()
+        {
+            SyntaxNode firstName = new NameNode("Name", new SyntaxTrivia(), new SyntaxTrivia());
+
+            SyntaxNode[] changes = firstName.DetectChanges(" First ");
+
+            Assert.Collection(changes,
+                change =>
+                {
+                    Assert.IsType<SyntaxChangeNode>(change);
+                    Assert.Equal(new SyntaxChangeNode(" "), change);
+                },
+                change => Assert.Same(firstName, change),
+                change =>
+                {
+                    Assert.IsType<SyntaxChangeNode>(change);
+                    Assert.Equal(new SyntaxChangeNode(" "), change);
+                });
+        }
+
         [Theory]
-        [MemberData("Test_NodeCalculatesSpanCorrectly_Data")]
+        [MemberData(nameof(Test_NodeCalculatesSpanCorrectly_Data))]
         public void Test_NodeCalculatesSpanCorrectly(SyntaxNode node, TextSpan expectedSpan)
         {
             TextSpan span = node.Span;
@@ -554,7 +607,7 @@ namespace KallynGowdy.SyntaxTree.Tests
         };
 
         [Theory]
-        [MemberData("Test_NodeOperatorEquality_Data")]
+        [MemberData(nameof(Test_NodeOperatorEquality_Data))]
         public void Test_NodeOperatorEquality(SyntaxNode first, SyntaxNode second)
         {
             Assert.Equal(first, second);
@@ -572,7 +625,7 @@ namespace KallynGowdy.SyntaxTree.Tests
         }
 
         [Theory]
-        [MemberData("Test_NodeOperatorNotEqual_Data")]
+        [MemberData(nameof(Test_NodeOperatorNotEqual_Data))]
         public void Test_NodeOperatorNotEqual(SyntaxNode first, SyntaxNode second)
         {
             Assert.NotEqual(first, second);

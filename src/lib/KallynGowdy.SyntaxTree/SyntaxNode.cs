@@ -259,18 +259,25 @@ namespace KallynGowdy.SyntaxTree
         /// in order to compile successfully but were actually missing.
         /// </summary>
         public bool IsMissing => InternalNode.IsMissing;
+
+        int ISyntaxElement.Length => Width;
+
+        public SyntaxNode[] DetectChanges(string first)
+        {
+            return null;
+        }
     }
 
     /// <summary>
 	/// Defines a class that represents a syntax node that is a wrapper for the TMutable <see cref="InternalSyntaxNode"/>.
 	/// </summary>
-	/// <typeparam name="TMutable">The type of <see cref="InternalSyntaxNode"/> that this wrapper represents.</typeparam>
+	/// <typeparam name="TInternal">The type of <see cref="InternalSyntaxNode"/> that this wrapper represents.</typeparam>
 	/// <typeparam name="TSyntax">The type of <see cref="SyntaxNode"/> that this wrapper represents.</typeparam>
-	public abstract class SyntaxNode<TMutable, TSyntax> : SyntaxNode
-        where TMutable : InternalSyntaxNode
+	public abstract class SyntaxNode<TInternal, TSyntax> : SyntaxNode
+        where TInternal : InternalSyntaxNode
         where TSyntax : SyntaxNode
     {
-        public new TMutable InternalNode => (TMutable)base.InternalNode;
+        public new TInternal InternalNode => (TInternal)base.InternalNode;
 
         protected SyntaxNode(InternalSyntaxNode internalNode, Func<SyntaxNode, SyntaxNode> parent, Func<SyntaxNode, SyntaxTree> tree) : base(internalNode, parent, tree)
         {

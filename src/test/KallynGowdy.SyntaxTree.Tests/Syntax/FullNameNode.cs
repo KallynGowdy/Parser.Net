@@ -15,15 +15,15 @@ namespace KallynGowdy.SyntaxTree.Tests.Syntax
 		{
 		}
 
-		public FullNameNode(params NameNode[] names) : base(new FullNameInternalSyntaxNode(names.Where(n => n != null).Select(n => n.InternalNode)), null, null)
+		public FullNameNode(params SyntaxNode[] nodes) : base(new FullNameInternalSyntaxNode(nodes.Where(n => n != null).Select(n => n.InternalNode)), null, null)
 		{
 		}
 
 		protected new FullNameInternalSyntaxNode InternalNode => (FullNameInternalSyntaxNode)base.InternalNode;
 
-		public NameNode FirstName => (NameNode)Children.First();
+		public NameNode FirstName => (NameNode)Children.First(c => c is NameNode);
 
-        public NameNode LastName => (NameNode)Children.Last();
+        public NameNode LastName => (NameNode)Children.Last(c => c is NameNode);
 
 		
 	}
